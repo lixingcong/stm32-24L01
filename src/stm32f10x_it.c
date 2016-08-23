@@ -36,7 +36,7 @@
 #include "usb_pwr.h"
 #include "apl_custom_function.h"
 
-uint32_t systick_count=0;
+unsigned int systick_count=0;
 
 /** @addtogroup STM32F10x_StdPeriph_Template
   * @{

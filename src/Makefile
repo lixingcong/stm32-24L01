@@ -32,6 +32,12 @@ VPATH+=drivers/a7190
 OBJS+=spi1_irq.o
 OBJS+=A7190.o
 
+VPATH+=stack
+OBJS+=hal.o
+OBJS+=coord_FSM.o
+OBJS+=router_FSM.o
+OBJS+=common_func.o
+
 VPATH+=drivers/route_table
 #OBJS+=route_table.o
 #OBJS+=apl_custom_function.o
