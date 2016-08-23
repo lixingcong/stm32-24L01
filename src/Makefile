@@ -22,8 +22,8 @@ OBJS+=delay.o
 #OBJS+=my_console.o
 OBJS+=timer2.o
 
-#VPATH+=drivers/pc_control
-#OBJS+=usart_scanf_irq.o
+VPATH+=drivers/pc_control
+OBJS+=usart_scanf_irq.o
 #OBJS+=execute_PC_cmd.o
 #OBJS+=parse_PC_cmd.o
 

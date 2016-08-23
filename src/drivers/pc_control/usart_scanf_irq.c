@@ -24,7 +24,7 @@ unsigned char usart_scanf_data[MAX_USART1_BUFFER_LEN];
 //                               0F535A4132353631423239433144310D0A   跳频32频道
 void usart_irq_scanf_callback() {
 	static char res;
-#if 0           // for debug
+#if 1           // for debug
 	int len = strlen(usart_scanf_data);
 	int i;
 	fprintf(stderr, "in usart1 callback, len=%d, str:\r\n", strlen(usart_scanf_data));
@@ -33,6 +33,7 @@ void usart_irq_scanf_callback() {
 	fprintf(stderr, "\r\n");
 #endif
 
+#if 0
 	// parse
 	res=parse_command(usart_scanf_data, my_control_from_pc_ptr);
 	switch(res){
@@ -50,4 +51,5 @@ void usart_irq_scanf_callback() {
 			fprintf(stderr, "ZZIFInvalid Command@\r\n");
 			break;
 	}
+#endif
 }

@@ -182,8 +182,8 @@ void USART1_IRQHandler(void)
 	unsigned char Res;
 	if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET) {
 		// WARNING: spaces were ignore by scanf()
-		//scanf("%s", usart_scanf_data);
-		//usart_irq_scanf_callback();
+		scanf("%s", usart_scanf_data);
+		usart_irq_scanf_callback();
 		USART_ClearITPendingBit(USART1, USART_IT_RXNE);
 	}
 
