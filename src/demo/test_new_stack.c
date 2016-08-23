@@ -10,6 +10,7 @@
 #include "delay.h"
 #include "usart.h"
 #include "timer2.h"
+#include "A7190.h"
 #include "misc.h"
 
 int main(){
@@ -20,5 +21,7 @@ int main(){
 	USART_scanf_config_EXT();
 
 	// init SP1+A7190
+	SPI1_Init();
+	initRF();
 	return 0;
 }

@@ -1,10 +1,11 @@
+#include "hal.h"
 #include "spi1_irq.h"
 #include "A7190.h"
 #include "A7190reg.h"
 #include "SPI1.h"
-#include "route_table.h"
-#include "execute_PC_cmd.h"
-#include "route_ping.h"
+//#include "route_table.h"
+//#include "execute_PC_cmd.h"
+//#include "route_ping.h"
 
 unsigned char ack_bytes[LRWPAN_MAX_FRAME_SIZE]; // max len
 
@@ -22,11 +23,12 @@ void spi1_irq_a7190(void) {
 #define  srcmode ack_bytes[3]
 	// complete frame has arrived
 	if (A7190_read_state() == IDLE) {
+#if 0
 #ifdef LRWPAN_COORDINATOR
 		if(dynamic_freq_mode!=0xff)//跳频模式忽略一切收到的数据包
 			goto do_rxflush;
 #endif
-		DEBUG_CHAR(DBG_ITRACE, DBG_CHAR_RXRCV);
+#endif
 		//if last packet has not been processed, we just
 		//read it but ignore it.
 		A7190_set_state(BUSY_RX);
@@ -38,6 +40,7 @@ void spi1_irq_a7190(void) {
 
 		do_rx:
 		if (flen == LRWPAN_ACKFRAME_LENGTH) {
+#if 0
 			if(isOffline==TRUE)
 				goto do_rxflush;
 #ifdef MAC_OUTPUT_DEBUG
@@ -55,8 +58,10 @@ void spi1_irq_a7190(void) {
 				// CRC ok, perform callback if this is an ACK
 				macRxCallback(ack_bytes, A7190_ReadRSSI());
 			}
+#endif
 
 		}else if(flen==LRWPAN_PINGFRAME_LENGTH){
+#if 0
 			if(isOffline==TRUE)
 				goto do_rxflush;
 #ifdef MAC_OUTPUT_DEBUG
@@ -65,7 +70,9 @@ void spi1_irq_a7190(void) {
 			ReadFIFO(&ack_bytes[0],LRWPAN_PINGFRAME_LENGTH);
 			A7190_set_state(IDLE);
 			macRxPingCallback(ack_bytes);
+#endif
 		}else if(flen==1){ // my custom packet format
+#if 0
 			if(isOffline==TRUE)
 				goto do_rxflush;
 #ifdef MAC_OUTPUT_DEBUG
@@ -77,7 +84,9 @@ void spi1_irq_a7190(void) {
 //				printf("%x ",ack_bytes[flen]);
 //			puts("");
 			macRxCustomPacketCallback(ack_bytes);
+#endif
 		}else {
+#if 0
 			//not an ack packet, lets do some more early rejection
 			// that the CC2430 seems to not do that we want to do.
 			//read the fcflsb, fcfmsb
@@ -142,6 +151,7 @@ void spi1_irq_a7190(void) {
 					MemFree(rx_frame);
 				}
 			}
+#endif
 		}
 
 		//flush any remaining bytes
@@ -154,9 +164,7 @@ void spi1_irq_a7190(void) {
 	// Transmission of a packet is finished. Enabling reception of ACK if required.
 	if (A7190_read_state() == BUSY_TX) {
 		//Finished TX, do call back
-		DEBUG_CHAR(DBG_ITRACE, DBG_CHAR_TXFIN);
-		phyTxEndCallBack();
-		macTxCallback();
+
 		A7190_set_state(IDLE);
 		A7190_WriteReg( FIFO1_REG, 0xff);
 		StrobeCmd( CMD_RX);
@@ -165,7 +173,6 @@ void spi1_irq_a7190(void) {
 	if (A7190_read_state() == WAIT_TX) {
 		//
 	}
-	usrIntCallback();
 
 #undef  fcflsb
 #undef  fcfmsb

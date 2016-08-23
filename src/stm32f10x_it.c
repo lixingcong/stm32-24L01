@@ -218,7 +218,7 @@ void EXTI9_5_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(EXTI_Line8)!=RESET)
 	{
-//		spi1_irq_a7190();
+		spi1_irq_a7190();
 		EXTI_ClearITPendingBit(EXTI_Line8);
 	}
 	

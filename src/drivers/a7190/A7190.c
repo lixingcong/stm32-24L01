@@ -11,6 +11,7 @@
 *********************************************************************/
 #include "A7190.h"
 #include "stm32f10x_spi.h"
+#include "hal.h"
 
  static  rtx_state_t rtx_state;
 Uint8			RfBuf[64];

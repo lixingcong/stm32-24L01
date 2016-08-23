@@ -1,6 +1,8 @@
 #ifndef SPI1_IRQ_H
 #define SPI1_IRQ_H
 
+#include "hal.h"
+
 void spi1_irq_a7190(void);
 void SPI1_handle(void);
 

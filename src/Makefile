@@ -16,7 +16,7 @@ VPATH+=demo
 VPATH+=drivers
 OBJS+=usart.o
 OBJS+=sys.o
-#OBJS+=SPI1.o
+OBJS+=SPI1.o
 #OBJS+=SPI2.o
 OBJS+=delay.o
 #OBJS+=my_console.o
@@ -28,8 +28,8 @@ OBJS+=usart_scanf_irq.o
 #OBJS+=parse_PC_cmd.o
 
 VPATH+=drivers/a7190
-#OBJS+=spi1_irq.o
-#OBJS+=A7190.o
+OBJS+=spi1_irq.o
+OBJS+=A7190.o
 
 VPATH+=drivers/route_table
 #OBJS+=route_table.o
