@@ -1,0 +1,6 @@
+power on
+r
+loadfile bin/main.hex
+r
+go
+qc
