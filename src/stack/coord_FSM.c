@@ -9,6 +9,7 @@
 #include "coord_FSM.h"
 #include "hal.h"
 #include "route_table.h"
+#include "stdio.h"
 
 #define INTERVAL_OF_SENDING_BEACON 10
 #define INTERVAL_OF_CHECKING_CHILDREN 5
@@ -43,13 +44,18 @@ void coordFSM(){
 			break;
 		case COORD_STATE_CHECK_CHILDREN:
 			if(halMACTimerNowDelta(last_timer_children_checked)>=MSECS_TO_MACTICKS(INTERVAL_OF_SENDING_BEACON*1000)){
-
+				check_my_children_online();
+				update_route_table_cache();
 				last_timer_children_checked=halGetMACTimer();
 			}
+			coord_FSM_state=COORD_STATE_SEND_BEACON;
 			break;
 		case COORD_STATE_DESTROY_NETWORK:
+			// TODO: 降级为路由器 2016年8月23日 下午11:31:38
+			return;
 			break;
 		default:
+			coord_FSM_state=COORD_STATE_INITAILIZE_ALL_NODES;
 			break;
 	}
 }

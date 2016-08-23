@@ -75,40 +75,21 @@ unsigned char get_next_hop(unsigned char this_hop, unsigned char dst) {
 }
 
 // 使用ping检测孩子是否在线，不在线的将被删除
-// 由于check_children_if_online和更新路由表是同时进行的，所以对两个数组比较不同之处就是丢失的孩子节点信息
 void check_my_children_online() {
-	// TODO: 复用共用体child_dstADDR，减少空间 2016年8月9日 下午4:21:33
-#if 0
-	static unsigned short child_saddr;
-	static LADDR_UNION child_dstADDR;
-	unsigned char i, j;
-
-	for(i=1;i<8;++i)child_dstADDR.laddr.bytes[i]=0;
-
+	unsigned char i;
 	for (i = 1; i < ALL_NODES_NUM; ++i) {
 		if (all_nodes_cache[i] == (MY_NODE_NUM)) {  // my child
-			if(0xff==macTxCustomPing(i, TRUE, 2, 300)){
+			if(0xff==macTxCustomPing(i, PING_DIRECTION_TO_CHILDREN, 2, 300)){
 				// TODO: 误删孩子情况偶尔出现 2016年8月18日 上午10:33:11
 				// if not online, del node in cache
 				all_nodes[i]=0xff;
-				child_dstADDR.laddr.bytes[0]=i;
 #ifdef ROUTE_TABLE_OUTPUT_DEBUG
-				printf("Delete neighbor node #%u ",i);
+				printf("Delete child #%u\r\n",i);
 #endif
-				// delete node in route table
-				if(ntDelNeighbor(&child_dstADDR.laddr)==TRUE){
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-					printf("ok\r\n");
-#endif
-				}else{
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-					printf("fail\r\n");
-#endif
-				}
 			}
 		}
 	}
-#endif
+
 }
 
 void add_to_my_parent(){
