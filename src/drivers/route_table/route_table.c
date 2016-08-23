@@ -10,14 +10,7 @@
 #include "route_table.h"
 #include "route_ping.h"
 #include "apl_custom_function.h"
-#include "lrwpan_common_types.h"
-#include "ieee_lrwpan_defs.h"
-#include "hal.h"
-#include "neighbor.h"
-#include "mac.h"
-#include "halStack.h"
 #include "A7190.h"
-#include "aps.h"
 #include "execute_PC_cmd.h"
 
 //#define ROUTE_TABLE_OUTPUT_DEBUG

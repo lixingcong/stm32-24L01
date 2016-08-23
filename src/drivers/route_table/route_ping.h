@@ -7,7 +7,6 @@
 
 #ifndef SRC_DRIVERS_ROUTE_TABLE_ROUTE_PING_H_
 #define SRC_DRIVERS_ROUTE_TABLE_ROUTE_PING_H_
-#include "compiler.h"
 
 unsigned char macTxPing(unsigned char dst, unsigned char dsn, BOOL isRequest);
 void macRxPingCallback(unsigned char *ptr);

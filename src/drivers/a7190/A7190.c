@@ -10,9 +10,7 @@
 **                                                                  **
 *********************************************************************/
 #include "A7190.h"
-#include "console.h"
 #include "stm32f10x_spi.h"
-#include "lrwpan_config.h"
 
  static  rtx_state_t rtx_state;
 Uint8			RfBuf[64];

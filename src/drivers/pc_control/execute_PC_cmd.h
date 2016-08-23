@@ -9,7 +9,6 @@
 #define _EXECUTE_PC_CMD_H_
 
 #include "define_songlu.h"
-#include "compiler.h"
 
 // 是否工作在跳频模式下,0xff代表不工作在跳频，0~2代表三个频段
 extern unsigned char dynamic_freq_mode;

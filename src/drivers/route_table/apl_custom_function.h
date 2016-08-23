@@ -9,7 +9,6 @@
 #ifndef _APL_CUSTOM_FUNCTION_H_
 #define _APL_CUSTOM_FUNCTION_H_
 
-#include "compiler.h"
 #include "route_table.h"
 
 typedef struct _APS_CUSTOM_FRAME{

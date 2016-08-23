@@ -8,19 +8,14 @@
 
 #include "route_ping.h"
 #include "route_table.h"
-#include "hal.h"
-#include "halStack.h"
-#include "lrwpan_common_types.h"
-#include "ieee_lrwpan_defs.h"
-#include "mac.h"
 #include "delay.h"
 
 
 //used for ping
 typedef struct _ROUTE_PING_DATA {
-	UINT32 last_tx_timer;
-	BYTE ackPending;
-	BYTE dsn;
+	unsigned int last_tx_timer;
+	unsigned char ackPending;
+	unsigned char dsn;
 }ROUTE_PING_DATA;
 
 ROUTE_PING_DATA route_ping_data;

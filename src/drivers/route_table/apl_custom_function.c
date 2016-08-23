@@ -8,9 +8,6 @@
 #include "apl_custom_function.h"
 #include "route_table.h"
 #include "route_ping.h"
-#include "compiler.h"
-#include "hal.h"
-#include "halStack.h"
 #include "delay.h"
 #include "timer2.h"
 

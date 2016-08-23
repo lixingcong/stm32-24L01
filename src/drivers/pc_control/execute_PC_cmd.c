@@ -7,12 +7,8 @@
 
 #include "execute_PC_cmd.h"
 #include "define_songlu.h"
-#include "halStack.h"
 #include "route_table.h"
-#include "compiler.h"
-#include "hal.h"
 #include "A7190.h"
-#include "ieee_lrwpan_defs.h"
 #include "spi1_irq.h"
 #include "ctl_lmx2581.h"
 #include "timer2.h"

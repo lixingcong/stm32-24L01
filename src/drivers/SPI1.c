@@ -1,5 +1,5 @@
 #include "SPI1.h"
-#include "msstate_lrwpan.h"
+
 #include "stm32f10x_exti.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_rcc.h"
@@ -72,8 +72,8 @@ void EXTI_config_for_A7190(){
 }
 
 
-BYTE SPI1_ReadWriteByte(BYTE TxData) {
-	BYTE retry = 0;
+unsigned char SPI1_ReadWriteByte(unsigned char TxData) {
+	unsigned char retry = 0;
 	while ((SPI1->SR & 1 << 1) == 0)  //等待发送区空脮
 	{
 		retry++;
@@ -91,8 +91,8 @@ BYTE SPI1_ReadWriteByte(BYTE TxData) {
 	return SPI1->DR;          //返回收到的数据
 }
 
-BYTE SPI1_ReadByte(BYTE TxData) {
-	BYTE retry = 0;
+unsigned char SPI1_ReadByte(unsigned char TxData) {
+	unsigned char retry = 0;
 	while ((SPI1->SR & 1 << 0) == 0)
 	{
 		retry++;

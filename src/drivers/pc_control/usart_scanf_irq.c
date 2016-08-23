@@ -13,7 +13,6 @@
 #include "string.h"
 #include "route_table.h"
 #include "delay.h"
-#include "hal.h"
 
 // 设置存储
 control_from_pc_t my_control_from_pc;

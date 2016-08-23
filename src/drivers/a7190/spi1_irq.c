@@ -1,25 +1,19 @@
 #include "spi1_irq.h"
-#include "halStack.h"
 #include "A7190.h"
 #include "A7190reg.h"
 #include "SPI1.h"
-#include "lrwpan_common_types.h"
-#include "ieee_lrwpan_defs.h"
-#include "msstate_lrwpan.h"
-#include "compiler.h"
 #include "route_table.h"
 #include "execute_PC_cmd.h"
 #include "route_ping.h"
 
-UINT32 spi_timer;
-BYTE ack_bytes[LRWPAN_MAX_FRAME_SIZE]; // max len
+unsigned char ack_bytes[LRWPAN_MAX_FRAME_SIZE]; // max len
 
 
 //This interrupt used for both TX and RX
 void spi1_irq_a7190(void) {
 	//used by spp_rf_IRQ
-	BYTE flen;
-	BYTE *ptr, *rx_frame;
+	unsigned char flen;
+	unsigned char *ptr, *rx_frame;
 	// BYTE crc;
 	//define alternate names for readability in this function
 #define  fcflsb  ack_bytes[0]
