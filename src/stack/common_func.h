@@ -32,4 +32,7 @@ extern unsigned char my_parent;
 #define FRAME_TYPE_LONG_MSG 0x00
 #define FRAME_TYPE_LONG_BROADCAST 0xff
 
+
+
+
 #endif /* SRC_STACK_COMMON_FUNC_H_ */

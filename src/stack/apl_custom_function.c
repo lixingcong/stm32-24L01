@@ -50,31 +50,3 @@ void update_route_table_info() {
 	isNeedCheckChildren = 1 - isNeedCheckChildren;  // True or False convert from each other
 }
 
-/*
- * 自定义的ping函数
- * retry_times: ping 重试次数
- * retry_interval: ping 重试间隔，单位毫秒
- */
-unsigned char macTxCustomPing(unsigned char dst, BOOL isRequest, unsigned char retry_times, unsigned short retry_interval){
-	unsigned char ping_cnt,result;
-	unsigned int last_ping_timer;
-	ping_cnt=retry_times;
-	result=macTxPing(dst, halGetRandomShortByte()&0xff, TRUE);
-	if(result==0xff){
-		last_ping_timer=halGetMACTimer();
-		while(1){
-			if(halMACTimerNowDelta(last_ping_timer) > MSECS_TO_MACTICKS(retry_interval)){
-				printf(" ping: retry for %u times\r\n",ping_cnt);
-				result=macTxPing(dst, halGetRandomShortByte()&0xff, TRUE);
-				if(result==0xff)
-					--ping_cnt;
-				else
-					return result;
-				if(ping_cnt==0)
-					break;
-				last_ping_timer=halGetMACTimer();
-			}
-		}
-	}
-	return result;
-}

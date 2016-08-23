@@ -14,6 +14,8 @@ extern unsigned int systick_count;
 
 // A7190频道
 #define LRWPAN_DEFAULT_START_CHANNEL 120
+
+#define LRWPAN_PINGFRAME_LENGTH 4
 #define LRWPAN_MAX_FRAME_SIZE 512
 
 #define LRWPAN_SYMBOLS_PER_SECOND   62500

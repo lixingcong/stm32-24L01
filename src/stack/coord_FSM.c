@@ -31,7 +31,7 @@ void coordFSM(){
 		case COORD_STATE_FORM_NETWORK:
 			printf("Coordinator, my addr is %u, Network formed\r\n",MY_NODE_NUM);
 			coord_FSM_state=COORD_STATE_SEND_BEACON;
-			last_timer_beacon_sent=halGetMACTimer();
+			last_timer_children_checked=last_timer_beacon_sent=halGetMACTimer();
 			break;
 		case COORD_STATE_SEND_BEACON:
 			if(halMACTimerNowDelta(last_timer_beacon_sent)>=MSECS_TO_MACTICKS(INTERVAL_OF_SENDING_BEACON*1000)){
@@ -42,7 +42,10 @@ void coordFSM(){
 			coord_FSM_state=COORD_STATE_CHECK_CHILDREN;
 			break;
 		case COORD_STATE_CHECK_CHILDREN:
+			if(halMACTimerNowDelta(last_timer_children_checked)>=MSECS_TO_MACTICKS(INTERVAL_OF_SENDING_BEACON*1000)){
 
+				last_timer_children_checked=halGetMACTimer();
+			}
 			break;
 		case COORD_STATE_DESTROY_NETWORK:
 			break;

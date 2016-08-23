@@ -10,6 +10,7 @@
 #define _APL_CUSTOM_FUNCTION_H_
 
 #include "route_table.h"
+#include "route_ping.h"
 
 typedef struct _APS_CUSTOM_FRAME{
 	unsigned char src_addr;
@@ -48,8 +49,7 @@ void update_AP_msg(unsigned char *ptr);
 // 定时器2中断调用更新路由
 void update_route_table_info();
 
-// ping
-unsigned char macTxCustomPing(unsigned char dst, BOOL isRequest, unsigned char retry_times, unsigned short retry_interval);
+
 #define aplSendCustomPing(dst,retry_times,retry_interval) \
 		macTxCustomPing(dst,1,retry_times,retry_interval)
 
