@@ -32,12 +32,15 @@ unsigned int last_route_updated_timer;
 static unsigned char payload_custom[LRWPAN_MAX_FRAME_SIZE];
 BOOL isOffline;
 
+unsigned char my_children_number;
+
 void init_all_nodes(){
 	unsigned char i;
 	for(i=0;i<ALL_NODES_NUM;++i){
 		all_nodes_cache[i]=all_nodes[i]=all_nodes[i+ALL_NODES_NUM]=0xff;
 	}
 	route_response_offset=0;
+	my_children_number=0;
 }
 
 // 寻找下一跳，基于all_nodes路由表
@@ -77,6 +80,7 @@ unsigned char get_next_hop(unsigned char this_hop, unsigned char dst) {
 // 使用ping检测孩子是否在线，不在线的将被删除
 void check_my_children_online() {
 	unsigned char i;
+	my_children_number=0;
 	for (i = 1; i < ALL_NODES_NUM; ++i) {
 		if (all_nodes_cache[i] == (MY_NODE_NUM)) {  // my child
 			if(0xff==macTxCustomPing(i, PING_DIRECTION_TO_CHILDREN, 2, 300)){
@@ -86,6 +90,8 @@ void check_my_children_online() {
 #ifdef ROUTE_TABLE_OUTPUT_DEBUG
 				printf("Delete child #%u\r\n",i);
 #endif
+			}else{
+				++my_children_number;
 			}
 		}
 	}
@@ -276,6 +282,7 @@ void send_custom_packet_relay(unsigned char src,unsigned char dst,unsigned char 
 	send_custom_packet(src,dst,flen,frm,frm_type);
 }
 // custom frame的接收处理函数
+#if 0
 void macRxCustomPacketCallback(unsigned char *ptr){
 	unsigned char i;
 	switch (*(ptr + 4)) {
@@ -369,7 +376,9 @@ void macRxCustomPacketCallback(unsigned char *ptr){
 #endif
 			break;
 	}
+
 }
+#endif
 
 void display_all_nodes(){
 	unsigned char i;
@@ -402,4 +411,57 @@ void update_route_response_content(BOOL isAdd, unsigned char child, unsigned cha
 	route_response[route_response_offset++]=all_nodes[child+ALL_NODES_NUM];
 }
 
+void macRxCustomPacketCallback(unsigned char *ptr){
+	unsigned short flen;
+	if((*(ptr)&0xf0)==0xf0){
+		// long msg(should judge outside)
+		flen=((*ptr)&0x01)<<8;
+		flen+=*(ptr+1);
+	}else{
+		// short msg
+		flen=*(ptr+1);
+		switch(*(ptr+2)){ // switch frame type
+			case FRAME_TYPE_SHORT_BEACON:
+				// TODO: beacon 2016年8月23日 下午11:53:12
+				break;
+			case FRAME_TYPE_SHORT_PING:
+				macRxPingCallback(ptr);
+				break;
+			case FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL:
+				if(*(ptr+5)==FRAME_FLAG_JOIN_REQUEST) // join req
+					send_join_network_response(*(ptr+4));
+				else if(*(ptr+5)==FRAME_FLAG_JOIN_RESPONSE){ // join response
+					if (isOffline == TRUE) {
+						isOffline = FALSE;
+						my_parent = *(ptr + 4);
+						add_to_my_parent();
+						send_join_network_response_ack(*(ptr+4));
+					}
+				}else{ // a join ACK
+					all_nodes[*(ptr+4)]=*(ptr+3);
+				}
+				break;
+			default:
+				break;
+		}
+	}
+}
 
+
+void send_join_network_response(unsigned char dst){
+	if(my_children_number<MAX_CHILDREN_NUM){
+		payload_custom[0]=FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL;
+		payload_custom[1]=dst;
+		payload_custom[2]=MY_NODE_NUM;
+		payload_custom[3]=FRAME_FLAG_JOIN_RESPONSE;
+		halSendPacket(4, payload_custom, TRUE);
+	}
+}
+
+void send_join_network_response_ack(unsigned char dst){
+	payload_custom[0]=FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL;
+	payload_custom[1]=dst;
+	payload_custom[2]=MY_NODE_NUM;
+	payload_custom[3]=FRAME_FLAG_JOIN_RESPONSE_ACK;
+	halSendPacket(4, payload_custom, TRUE);
+}

@@ -18,6 +18,8 @@ extern unsigned char my_parent;
 
 // 最多允许存放的协调器数目
 #define MAX_COORD_NUM 3
+// 最大孩子数目
+#define MAX_CHILDREN_NUM 3
 
 // 短帧类型（帧长小于256）
 #define FRAME_TYPE_SHORT_PING 0x00
@@ -32,7 +34,10 @@ extern unsigned char my_parent;
 #define FRAME_TYPE_LONG_MSG 0x00
 #define FRAME_TYPE_LONG_BROADCAST 0xff
 
-
+// 请求入网的标志
+#define FRAME_FLAG_JOIN_REQUEST 0x01
+#define FRAME_FLAG_JOIN_RESPONSE 0x02
+#define FRAME_FLAG_JOIN_RESPONSE_ACK 0x04
 
 
 #endif /* SRC_STACK_COMMON_FUNC_H_ */

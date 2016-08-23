@@ -8,17 +8,35 @@
 #include "common_func.h"
 #include "router_FSM.h"
 #include "hal.h"
+#include "route_table.h"
+#include "route_ping.h"
+#include "delay.h"
+#include "stdio.h"
 
 ROUTER_STATE_ENUM router_FSM_state;
 
-void route_FSM(){
+unsigned char router_fsm_payload[10];
+
+void router_FSM(){
 	switch(router_FSM_state){
 		case ROUTER_STATE_INITAILIZE_ALL_NODES:
-
+			init_all_nodes();
+			router_FSM_state=ROUTER_STATE_JOIN_NETWORK;
 			break;
 		case ROUTER_STATE_JOIN_NETWORK:
+			if(isOffline==TRUE){
+				printf("trying to join network\r\n");
+				router_send_join_request();
+				DelayMs(100);
+			}else{
+				printf("join succuessfully, parent is #%u\r\n",my_parent);
+				router_FSM_state=ROUTER_STATE_CHECK_CHILDREN;
+			}
 			break;
 		case ROUTER_STATE_CHECK_CHILDREN:
+			check_my_children_online();
+			// TODO: use a timer to judge if I am offline 2016年8月24日 上午12:21:35
+			// if(isOffline)....
 			break;
 		case ROUTER_STATE_UPGRADE_TO_COORD:
 			break;
@@ -27,3 +45,10 @@ void route_FSM(){
 	}
 }
 
+void router_send_join_request(){
+	router_fsm_payload[0]=FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL;
+	router_fsm_payload[1]=0xff;
+	router_fsm_payload[2]=MY_NODE_NUM;
+	router_fsm_payload[3]=FRAME_FLAG_JOIN_REQUEST;
+	halSendPacket(4, router_fsm_payload, TRUE);
+}

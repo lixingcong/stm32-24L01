@@ -18,4 +18,7 @@ typedef enum _ROUTER_STATE_ENUM {
 
 extern ROUTER_STATE_ENUM router_FSM_state;
 
+void router_FSM();
+void router_send_join_request();
+
 #endif /* SRC_STACK_ROUTER_FSM_H_ */

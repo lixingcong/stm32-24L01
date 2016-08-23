@@ -19,6 +19,10 @@ extern BOOL isOffline;
 
 // 所有节点，含有路由器
 #define ALL_NODES_NUM 20
+
+// 我的孩子数目
+extern unsigned char my_children_number;
+
 // 发送函数帧长flen最大为256-5=251
 #define MAX_CUSTOM_FRAME_LENGTH 251
 
@@ -59,6 +63,10 @@ void update_route_response_content(BOOL isAdd, unsigned char child, unsigned cha
 
 // callback for spi1_irq()
 void macRxCustomPacketCallback(unsigned char *ptr);
+
+
+void send_join_network_response(unsigned char dst);
+void send_join_network_response_ack(unsigned char dst);
 
 // 协调器清空的counter数目 数值太大的话会已删除节点清除不及时 太小的话会丢失部份节点信息
 #define COORD_EMPTY_COUNT 5
