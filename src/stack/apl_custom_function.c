@@ -10,6 +10,8 @@
 #include "route_ping.h"
 #include "delay.h"
 #include "timer2.h"
+#include "hal.h"
+#include "stdio.h"
 
 APS_CUSTOM_FRAME my_custom_frame;
 
@@ -57,13 +59,13 @@ unsigned char macTxCustomPing(unsigned char dst, BOOL isRequest, unsigned char r
 	unsigned char ping_cnt,result;
 	unsigned int last_ping_timer;
 	ping_cnt=retry_times;
-	result=macTxPing(dst, halGetRandomByte(), TRUE);
+	result=macTxPing(dst, halGetRandomShortByte()&0xff, TRUE);
 	if(result==0xff){
 		last_ping_timer=halGetMACTimer();
 		while(1){
 			if(halMACTimerNowDelta(last_ping_timer) > MSECS_TO_MACTICKS(retry_interval)){
 				printf(" ping: retry for %u times\r\n",ping_cnt);
-				result=macTxPing(dst, halGetRandomByte(), TRUE);
+				result=macTxPing(dst, halGetRandomShortByte()&0xff, TRUE);
 				if(result==0xff)
 					--ping_cnt;
 				else

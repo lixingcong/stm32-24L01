@@ -9,6 +9,7 @@
 #include "route_ping.h"
 #include "route_table.h"
 #include "delay.h"
+#include "hal.h"
 
 
 //used for ping
@@ -24,7 +25,6 @@ ROUTE_PING_DATA route_ping_data;
 unsigned char macTxPing(unsigned char dst, unsigned char dsn, BOOL isRequest) {
 	unsigned int timer;
 	unsigned char ping[LRWPAN_PINGFRAME_LENGTH];
-	while (!macTXIdle())macFSM();
 
 	// format ping
 	ping[0]=LRWPAN_PINGFRAME_LENGTH;
@@ -37,7 +37,7 @@ unsigned char macTxPing(unsigned char dst, unsigned char dsn, BOOL isRequest) {
 	ping[4]=dsn;
 
 	// send ping
-	halSendPacket(LRWPAN_PINGFRAME_LENGTH, &ping[0]);
+	halSendPacket(LRWPAN_PINGFRAME_LENGTH, &ping[0],TRUE);
 	DelayMs(1);
 
 #ifdef MAC_OUTPUT_DEBUG_PING

@@ -77,6 +77,7 @@ unsigned char get_next_hop(unsigned char this_hop, unsigned char dst) {
 // 由于check_children_if_online和更新路由表是同时进行的，所以对两个数组比较不同之处就是丢失的孩子节点信息
 void check_my_children_online() {
 	// TODO: 复用共用体child_dstADDR，减少空间 2016年8月9日 下午4:21:33
+#if 0
 	static unsigned short child_saddr;
 	static LADDR_UNION child_dstADDR;
 	unsigned char i, j;
@@ -106,10 +107,11 @@ void check_my_children_online() {
 			}
 		}
 	}
+#endif
 }
 
 void add_to_my_parent(){
-	all_nodes[MY_NODE_NUM]=(mac_pib.macCoordExtendedAddress.bytes[0])&0xff;
+	all_nodes[MY_NODE_NUM]=my_parent;
 }
 
 void deattach_from_my_parent(){
@@ -184,10 +186,6 @@ void send_custom_packet(unsigned char src, unsigned char dst,unsigned char flen,
 		return;
 	}
 
-	while(apsBusy()){
-		apsFSM();
-	}
-	apsState=APS_STATE_GENERIC_TX_WAIT;// lock APS
 	total_len=5+flen;
 	ptr=payload_custom;
 	*(ptr++)=total_len;
@@ -216,20 +214,20 @@ void send_custom_packet(unsigned char src, unsigned char dst,unsigned char flen,
 //#ifndef LRWPAN_COORDINATOR
 	// TODO: sendcustom函数中随机延时长度的设定 2016年8月18日 上午11:23:10
 	// 可以在rxcustom中加一个标志位禁止接收其它东西专心收发数据
-	delayms=halGetRandomTwoByte()&0xff;
+	delayms=halGetRandomShortByte();
 #ifdef ROUTE_TABLE_OUTPUT_DEBUG
 	printf("delay #%u ms\r\n",delayms);
 #endif
 	DelayMs(delayms);// to avoid broadcast storm
 #endif
 	A7190_set_state(IDLE);
-	halSendPacket(1, payload_custom);
+	halSendPacket(1, payload_custom , TRUE);
 //	printf("in send custom: ");
 //	for(i=0;i<5;++i)
 //		printf("%x ",payload_custom[i]);
 //	printf("\r\n");
 	DelayMs(1);
-	apsState=APS_STATE_IDLE;
+
 }
 
 // 给孩子和孙子们发递归广播
@@ -256,14 +254,13 @@ void send_custom_upload_route_request(){
 }
 // 向父亲上传自己的路由表，
 void send_custom_upload_route_response(){
-	unsigned char dst=mac_pib.macCoordExtendedAddress.bytes[0]; // parent's address
 #ifdef ROUTE_TABLE_OUTPUT_DEBUG
 	printf("in send upload response: dst=%u\r\n",dst);
 #endif
 	add_to_my_parent();
 
 	if(route_response_offset!=0){
-		send_custom_packet(MY_NODE_NUM, dst,route_response_offset,&route_response[0],CUSTOM_FRAME_TYPE_ROUTE_UPDATE_RESPONSE);
+		send_custom_packet(MY_NODE_NUM, my_parent,route_response_offset,&route_response[0],CUSTOM_FRAME_TYPE_ROUTE_UPDATE_RESPONSE);
 		route_response_offset=0;
 	}
 }
@@ -298,7 +295,6 @@ void send_custom_packet_relay(unsigned char src,unsigned char dst,unsigned char 
 }
 // custom frame的接收处理函数
 void macRxCustomPacketCallback(unsigned char *ptr){
-	unsigned char my_parent=mac_pib.macCoordExtendedAddress.bytes[0];
 	unsigned char i;
 	switch (*(ptr + 4)) {
 		case CUSTOM_FRAME_TYPE_BROADCAST:

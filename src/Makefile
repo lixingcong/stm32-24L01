@@ -37,9 +37,9 @@ OBJS+=hal.o
 OBJS+=coord_FSM.o
 OBJS+=router_FSM.o
 OBJS+=common_func.o
-#OBJS+=route_table.o
-#OBJS+=apl_custom_function.o
-#OBJS+=route_ping.o
+OBJS+=route_table.o
+OBJS+=apl_custom_function.o
+OBJS+=route_ping.o
 
 #VPATH+=drivers/lmx2581
 #OBJS+=lmx2581.o

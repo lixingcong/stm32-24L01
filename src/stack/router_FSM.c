@@ -11,6 +11,7 @@ ROUTER_STATE_ENUM router_FSM_state;
 void route_FSM(){
 	switch(router_FSM_state){
 		case ROUTER_STATE_INITAILIZE_ALL_NODES:
+
 			break;
 		case ROUTER_STATE_JOIN_NETWORK:
 			break;
@@ -22,3 +23,4 @@ void route_FSM(){
 			break;
 	}
 }
+
