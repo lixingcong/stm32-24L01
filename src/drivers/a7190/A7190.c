@@ -154,6 +154,7 @@ void Err_State(void)
 {
     //ERR display
     //Error Proc...
+	printf("a7190: error state...");
     while(1)
     {
         ;

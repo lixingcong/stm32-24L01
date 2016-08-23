@@ -12,6 +12,7 @@ CFLAGS_USE_NEWLIB=-ffunction-sections -fdata-sections -fno-builtin
 VPATH+=demo
 #	OBJS+=test_USB_ldd.o
 	OBJS+=test_new_stack.o
+#	OBJS+=test_a7190.o
 
 VPATH+=drivers
 OBJS+=usart.o

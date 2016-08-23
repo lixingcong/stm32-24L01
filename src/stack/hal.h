@@ -9,9 +9,9 @@
 #define SRC_STACK_HAL_H_
 
 
-typedef unsigned char       BOOL;
+typedef unsigned char BOOL;
 
-#define LRWPAN_DEFAULT_START_CHANNEL 24
+#define LRWPAN_DEFAULT_START_CHANNEL 120
 #define LRWPAN_PINGFRAME_LENGTH 5
 #define LRWPAN_ACKFRAME_LENGTH 3
 #define LRWPAN_MAX_FRAME_SIZE 256

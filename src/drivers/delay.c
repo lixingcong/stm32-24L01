@@ -42,3 +42,10 @@ void DelayMs(unsigned int dwTime)
         }
     }
 }
+
+void init_delay(void) {
+	SystemCoreClockUpdate();
+	SysTick_Config(SystemCoreClock / 62500);
+	NVIC_SetPriority(SysTick_IRQn, 0);
+}
+
