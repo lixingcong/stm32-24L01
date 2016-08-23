@@ -7,12 +7,13 @@ PROGRAM_NAME=bin/main
 LIBDIR=$(TOP)/libs
 STMLIB=$(LIBDIR)/STM32_USB-FS-Device_Lib_V4.0.0/Libraries
 
-TC=arm-none-eabi
+TC=/mydata/toolchain/gcc-arm-none-eabi-5_3-2016q1/bin/arm-none-eabi
 CC=$(TC)-gcc
 LD=$(TC)-ld -v
 OBJCOPY=$(TC)-objcopy
 AR=$(TC)-ar
 GDB=$(TC)-gdb
+SIZE_ARM=$(TC)-size
 
 # Device
 #STM32F103RBT (128KB FLASH, 20KB RAM) --> STM32F10X_MD
@@ -35,10 +36,10 @@ INCLUDE+=-I$(STMLIB)/CMSIS/Device/ST/STM32F10x/Include
 INCLUDE+=-I$(STMLIB)/CMSIS/Device/ST/STM32F10x/Source/Templates
 INCLUDE+=-I$(STMLIB)/STM32F10x_StdPeriph_Driver/inc
 INCLUDE+=-I$(STMLIB)/STM32_USB-FS-Device_Driver/inc
-INCLUDE+=-I$(TOP)/src/drivers -I$(TOP)/src/drivers/hal -I$(TOP)/src/drivers/a7190 -I$(TOP)/src/drivers/pc_control -I$(TOP)/src/drivers/route_table -I$(TOP)/src/demo -I$(TOP)/src/msstatePAN/src/stack -I$(TOP)/src/drivers/usb -I$(TOP)/src/drivers/lmx2581 
+INCLUDE+=-I$(TOP)/src/drivers -I$(TOP)/src/stack -I$(TOP)/src/drivers/a7190 -I$(TOP)/src/drivers/pc_control -I$(TOP)/src/drivers/route_table -I$(TOP)/src/demo -I$(TOP)/src/drivers/usb -I$(TOP)/src/drivers/lmx2581 
 
 # symbols or marcos defined
-SYMBOLS_DEFINE = -DLRWPAN_DEBUG -DLRWPAN_USE_DEMO_STATIC_BIND -DUSE_GCC_FOR_ARM
+SYMBOLS_DEFINE = -DUSE_GCC_FOR_ARM
  
 
 ifeq ($(module),coord)
@@ -52,13 +53,6 @@ ifeq ($(module),router)
 	SYMBOLS_DEFINE += -DLRWPAN_ROUTER
 	ifeq ($(change_addr),1)
 		SYMBOLS_DEFINE += -DIEEE_ADDRESS_ARRAY_ROUTER=$(addr)
-	endif
-endif
-ifeq ($(module),rfd)
-#	re-define, so comment it.
-#	SYMBOLS_DEFINE += -DLRWPAN_RFD
-	ifeq ($(change_addr),1)
-		SYMBOLS_DEFINE += -DIEEE_ADDRESS_ARRAY_RFD=$(addr)
 	endif
 endif
 

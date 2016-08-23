@@ -10,4 +10,15 @@
 #include "delay.h"
 #include "usart.h"
 #include "timer2.h"
+#include "misc.h"
 
+int main(){
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+	// init USART
+	USART1_init();
+	USART2_init();
+	USART_scanf_config_EXT();
+
+	// init SP1+A7190
+	return 0;
+}

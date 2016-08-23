@@ -12,6 +12,7 @@
 #include "apl_custom_function.h"
 #include "A7190.h"
 #include "execute_PC_cmd.h"
+#include "hal.h"
 
 //#define ROUTE_TABLE_OUTPUT_DEBUG
 

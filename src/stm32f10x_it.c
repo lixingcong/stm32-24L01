@@ -28,9 +28,9 @@
 #include "stm32f10x_usart.h"
 #include "stm32f10x_exti.h"
 #include "stm32f10x_tim.h"
-#include "spi1_irq.h"
+//#include "spi1_irq.h"
 #include "usart_scanf_irq.h"
-#include "SPI1.h"
+//#include "SPI1.h"
 #include "usb_lib.h"
 #include "usb_istr.h"
 #include "usb_pwr.h"
@@ -182,8 +182,8 @@ void USART1_IRQHandler(void)
 	unsigned char Res;
 	if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET) {
 		// WARNING: spaces were ignore by scanf()
-		scanf("%s", usart_scanf_data);
-		usart_irq_scanf_callback();
+		//scanf("%s", usart_scanf_data);
+		//usart_irq_scanf_callback();
 		USART_ClearITPendingBit(USART1, USART_IT_RXNE);
 	}
 
@@ -218,7 +218,7 @@ void EXTI9_5_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(EXTI_Line8)!=RESET)
 	{
-		spi1_irq_a7190();
+//		spi1_irq_a7190();
 		EXTI_ClearITPendingBit(EXTI_Line8);
 	}
 	
@@ -226,13 +226,13 @@ void EXTI9_5_IRQHandler(void)
 
 void USB_LP_CAN1_RX0_IRQHandler(void)
 {
-  USB_Istr();
+//  USB_Istr();
 }
 
 // 定时器2用于更新路由表
 void TIM2_IRQHandler(void){
 	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET){
 		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-		update_route_table_info();
+//		update_route_table_info();
 	}
 }

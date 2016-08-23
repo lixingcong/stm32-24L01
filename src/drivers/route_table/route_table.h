@@ -7,7 +7,7 @@
 
 #ifndef _ROUTE_TABLE_H_
 #define _ROUTE_TABLE_H_
-#include "compiler.h"
+#include "hal.h"
 
 // only for router update, used by update_route_table_info()
 #ifdef LRWPAN_ROUTER

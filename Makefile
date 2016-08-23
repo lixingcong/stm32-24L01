@@ -12,7 +12,7 @@ all: libs src
 		$(LDLIBS) $(LDFLAGS_USE_NEWLIB)
 #Extract info contained in ELF to readable text-files:
 #	arm-none-eabi-readelf -a $(PROGRAM_NAME).elf > $(PROGRAM_NAME).info_elf
-	arm-none-eabi-size -d -B $(PROGRAM_NAME).elf > $(PROGRAM_NAME).info_size
+	$(SIZE_ARM) -d -B $(PROGRAM_NAME).elf > $(PROGRAM_NAME).info_size
 #	arm-none-eabi-objdump -S $(PROGRAM_NAME).elf > $(PROGRAM_NAME).info_code
 #	arm-none-eabi-nm -t d -S --size-sort -s $(PROGRAM_NAME).elf > $(PROGRAM_NAME).info_symbol
 # binary execute hex and bin
