@@ -13,6 +13,7 @@
 #include "A7190.h"
 #include "execute_PC_cmd.h"
 #include "hal.h"
+#include "common_func.h"
 
 //#define ROUTE_TABLE_OUTPUT_DEBUG
 

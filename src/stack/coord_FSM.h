@@ -18,6 +18,8 @@ typedef enum _COORD_STATE_ENUM {
 
 extern COORD_STATE_ENUM coord_FSM_state;
 
+void coord_send_beacon();
+
 void coordFSM();
 
 #endif /* SRC_STACK_COORD_FSM_H_ */

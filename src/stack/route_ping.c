@@ -23,6 +23,7 @@ ROUTE_PING_DATA route_ping_data;
 
 // ping时延
 unsigned char macTxPing(unsigned char dst, unsigned char dsn, BOOL isRequest) {
+#if 0
 	unsigned int timer;
 	unsigned char ping[LRWPAN_PINGFRAME_LENGTH];
 
@@ -72,6 +73,7 @@ unsigned char macTxPing(unsigned char dst, unsigned char dsn, BOOL isRequest) {
 		return 0;
 
 	return 0xff; //timeout
+#endif
 }
 
 void macRxPingCallback(unsigned char *ptr) {

@@ -5,7 +5,10 @@
  *      Author: li
  */
 
+#include "common_func.h"
 #include "router_FSM.h"
+#include "hal.h"
+
 ROUTER_STATE_ENUM router_FSM_state;
 
 void route_FSM(){

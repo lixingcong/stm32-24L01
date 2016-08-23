@@ -7,9 +7,10 @@
 
 
 #include "hal.h"
+#include "A7190.h"
 
-MY_ROLE_ENUM my_role;
-unsigned char my_parent;//父亲节点
+
+unsigned char hal_payload[LRWPAN_MAX_FRAME_SIZE];
 
 unsigned char halGetMACTimer(void) {
 	return systick_count;
@@ -20,9 +21,16 @@ unsigned short halGetRandomShortByte(void) {
 }
 
 void halSendPacket(unsigned short flen, unsigned char *ptr, BOOL isShortDataLengthMode){
-	if(isShortDataLengthMode==TRUE){
-
-	}else{
-
+	if(flen>=LRWPAN_MAX_FRAME_SIZE-2){
+		printf("halSendPacket: packet too long, drop\r\n");
+		return;
 	}
+	if(isShortDataLengthMode==TRUE && flen<=256){
+		WriteFIFO1(0x00);
+	}else{
+		WriteFIFO1(0xf0|((flen>>8)&0x01));
+	}
+	WriteFIFO1(flen&0xff);
+	// TODO: WriteFIFO() para flen should be UINT16
+	WriteFIFO(ptr,flen);
 }

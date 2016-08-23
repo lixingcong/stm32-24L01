@@ -8,16 +8,13 @@
 #ifndef SRC_STACK_HAL_H_
 #define SRC_STACK_HAL_H_
 
-
 typedef unsigned char BOOL;
 
 extern unsigned int systick_count;
 
+// A7190频道
 #define LRWPAN_DEFAULT_START_CHANNEL 120
-
-#define LRWPAN_PINGFRAME_LENGTH 5
-#define LRWPAN_ACKFRAME_LENGTH 3
-#define LRWPAN_MAX_FRAME_SIZE 256
+#define LRWPAN_MAX_FRAME_SIZE 512
 
 #define LRWPAN_SYMBOLS_PER_SECOND   62500
 #define MSECS_TO_MACTICKS(x)   (x*(LRWPAN_SYMBOLS_PER_SECOND/1000))
@@ -59,13 +56,6 @@ typedef enum
 bool;
 #endif
 
-typedef enum _MY_ROLE_ENUM {
-	ROLE_COORDINATOR,
-	ROLE_ROUTER
-}MY_ROLE_ENUM;
-
-extern MY_ROLE_ENUM my_role;
-extern unsigned char my_parent;
 
 #ifndef NULL
 #define NULL ((void *)0)
