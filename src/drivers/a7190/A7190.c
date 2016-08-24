@@ -460,7 +460,7 @@ void initRF(void)
 //**********************************************************************
 //  WriteFIFO
 //**********************************************************************
-void WriteFIFO(Uint8 *txbuf,Uint8 length)
+void WriteFIFO(Uint8 *txbuf,Uint16 length)
 {
     Uint16 i;
   // set FIFO length

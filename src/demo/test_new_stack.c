@@ -12,6 +12,9 @@
 #include "timer2.h"
 #include "A7190.h"
 #include "misc.h"
+#include "common_func.h"
+#include "coord_FSM.h"
+#include "router_FSM.h"
 
 int main(){
 	unsigned char payload[10];
@@ -32,30 +35,19 @@ int main(){
 
 	printf("init done\r\n");
 #ifdef LRWPAN_COORDINATOR
-	printf("coord\r\n");
+	my_role=ROLE_COORDINATOR;
+	coord_FSM_state=COORD_STATE_INITAILIZE_ALL_NODES;
 #else
-	printf("router\r\n");
+	my_role=ROLE_ROUTER;
+	router_FSM_state=ROUTER_STATE_INITAILIZE_ALL_NODES;
 #endif
 
-	payload[0]=3;
-	payload[1]='h';
-	payload[2]='i';
 
 	while(1){
-#ifdef LRWPAN_COORDINATOR
-		if (A7190_read_state() == IDLE) {
-			A7190_set_state(WAIT_TX);
-			StrobeCmd(CMD_STBY);
-			Set_FIFO_len(3 &0xff,0x00);
-			StrobeCmd(CMD_TFR);
-			WriteFIFO(payload, 3);
-			A7190_set_state(BUSY_TX);
-			StrobeCmd(CMD_TX);
-		}else
-			printf("busy when TX\r\n");
-		DelayMs(1000);
-#endif
-
+		if(my_role==ROLE_COORDINATOR)
+			while(1)coordFSM();
+		else
+			while(1)router_FSM();
 	}
 	return 0;
 }

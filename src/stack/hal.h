@@ -21,7 +21,7 @@ extern unsigned int systick_count;
 #define LRWPAN_SYMBOLS_PER_SECOND   62500
 #define MSECS_TO_MACTICKS(x)   (x*(LRWPAN_SYMBOLS_PER_SECOND/1000))
 #define MACTICKS_TO_MSECS(x)   (x/(LRWPAN_SYMBOLS_PER_SECOND/1000))
-#define halMACTimerNowDelta(x) ((halGetMACTimer()-(x))& 0xffffffff)
+#define halMACTimerNowDelta(x) ((halGetMACTimer()-(x))& 0xfffff)
 
 
 //修改为合适的网络地址，也可以使用make传递宏定义
@@ -63,7 +63,7 @@ bool;
 #define NULL ((void *)0)
 #endif
 
-unsigned char halGetMACTimer(void);
+unsigned int halGetMACTimer(void);
 void halSendPacket(unsigned short flen, unsigned char *ptr, BOOL isShortDataLengthMode);
 unsigned short halGetRandomShortByte(void);
 

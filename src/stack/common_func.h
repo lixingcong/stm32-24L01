@@ -15,6 +15,8 @@ typedef enum _MY_ROLE_ENUM {
 
 extern MY_ROLE_ENUM my_role;
 extern unsigned char my_parent;
+extern unsigned int last_timer_beacon_sent;
+extern unsigned int last_timer_children_checked;
 
 // 最多允许存放的协调器数目
 #define MAX_COORD_NUM 3
@@ -38,6 +40,10 @@ extern unsigned char my_parent;
 #define FRAME_FLAG_JOIN_REQUEST 0x01
 #define FRAME_FLAG_JOIN_RESPONSE 0x02
 #define FRAME_FLAG_JOIN_RESPONSE_ACK 0x04
+
+// 定期检查间隔
+#define INTERVAL_OF_SENDING_BEACON 6
+#define INTERVAL_OF_CHECKING_CHILDREN 5
 
 
 #endif /* SRC_STACK_COMMON_FUNC_H_ */

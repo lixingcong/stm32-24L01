@@ -428,17 +428,25 @@ void macRxCustomPacketCallback(unsigned char *ptr){
 				macRxPingCallback(ptr);
 				break;
 			case FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL:
-				if(*(ptr+5)==FRAME_FLAG_JOIN_REQUEST) // join req
+				printf("here\r\n");
+				if(*(ptr+5)==FRAME_FLAG_JOIN_REQUEST){ // join req
+					printf("send a join reponse\r\n");
 					send_join_network_response(*(ptr+4));
+				}
+
 				else if(*(ptr+5)==FRAME_FLAG_JOIN_RESPONSE){ // join response
 					if (isOffline == TRUE) {
 						isOffline = FALSE;
 						my_parent = *(ptr + 4);
 						add_to_my_parent();
 						send_join_network_response_ack(*(ptr+4));
+						printf("send a join request ack\r\n");
 					}
 				}else{ // a join ACK
+					printf("recv a join ack\r\n");
 					all_nodes[*(ptr+4)]=*(ptr+3);
+					if(*(ptr+3)==MY_NODE_NUM)
+						printf("Node #%u joined\r\n",*(ptr+4));
 				}
 				break;
 			default:

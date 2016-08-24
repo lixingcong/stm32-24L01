@@ -3,7 +3,7 @@
 #include "A7190.h"
 #include "A7190reg.h"
 #include "SPI1.h"
-//#include "route_table.h"
+#include "route_table.h"
 //#include "execute_PC_cmd.h"
 //#include "route_ping.h"
 
@@ -13,7 +13,7 @@ unsigned char ack_bytes[LRWPAN_MAX_FRAME_SIZE]; // max len
 //This interrupt used for both TX and RX
 void spi1_irq_a7190(void) {
 	unsigned char flen,i;
-
+	printf("in spi1 irq\r\n");
 	if (A7190_read_state() == IDLE) {
 #if 0
 #ifdef LRWPAN_COORDINATOR
@@ -28,15 +28,18 @@ void spi1_irq_a7190(void) {
 		A7190_set_state(BUSY_RX);
 		flen = ReadFIFO1(1);  //read the length
 
-
+		ack_bytes[0]=flen;
 		do_rx:
-		if (flen !=0) {
-			ReadFIFO(ack_bytes, flen-1);
-			printf("recv A7190: ");
-			printf("%x ",flen);
-			for(i=0;i<flen-1;++i)
+		if ((flen&0xf0)==0xf0) { // long
+
+		}else{ // short
+			ack_bytes[1]=ReadFIFO1(1);
+
+			ReadFIFO(&ack_bytes[2],ack_bytes[1]);
+			for(i=2;i<ack_bytes[1];++i)
 				printf("%x ",ack_bytes[i]);
 			printf("\r\n");
+			macRxCustomPacketCallback(ack_bytes);
 		}
 
 		//flush any remaining bytes

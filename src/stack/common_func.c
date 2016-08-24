@@ -11,3 +11,6 @@
 MY_ROLE_ENUM my_role;
 unsigned char my_parent;//父亲节点
 
+unsigned int last_timer_beacon_sent;
+unsigned int last_timer_children_checked;
+

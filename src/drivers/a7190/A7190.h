@@ -32,7 +32,7 @@ void A7190_FCB(void);
 void A7190_Config(void);
 void A7190_Cal(void);
 
-void WriteFIFO(Uint8 *txbuf,Uint8 length);
+void WriteFIFO(Uint8 *txbuf,Uint16 length);
 void WriteFIFO1(Uint8 buf);
 
 void ReadFIFO(Uint8 *RfBuf,Uint8 length);

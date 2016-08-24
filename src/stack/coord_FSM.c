@@ -11,13 +11,7 @@
 #include "route_table.h"
 #include "stdio.h"
 
-#define INTERVAL_OF_SENDING_BEACON 10
-#define INTERVAL_OF_CHECKING_CHILDREN 5
-
 COORD_STATE_ENUM coord_FSM_state;
-
-unsigned int last_timer_beacon_sent;
-unsigned int last_timer_children_checked;
 
 unsigned char coord_fsm_payload[10];
 unsigned char coord_nodes_list[MAX_COORD_NUM];
@@ -39,6 +33,7 @@ void coordFSM(){
 				// TODO: clear all coord nodes
 				coord_send_beacon();
 				last_timer_beacon_sent=halGetMACTimer();
+				printf("here beacon\r\n");
 			}
 			coord_FSM_state=COORD_STATE_CHECK_CHILDREN;
 			break;
@@ -47,6 +42,7 @@ void coordFSM(){
 				check_my_children_online();
 				update_route_table_cache();
 				last_timer_children_checked=halGetMACTimer();
+				printf("here check children\r\n");
 			}
 			coord_FSM_state=COORD_STATE_SEND_BEACON;
 			break;

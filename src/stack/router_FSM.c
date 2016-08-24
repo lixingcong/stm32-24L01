@@ -22,6 +22,8 @@ void router_FSM(){
 		case ROUTER_STATE_INITAILIZE_ALL_NODES:
 			init_all_nodes();
 			router_FSM_state=ROUTER_STATE_JOIN_NETWORK;
+			last_timer_children_checked=halGetMACTimer();
+			isOffline=TRUE;
 			break;
 		case ROUTER_STATE_JOIN_NETWORK:
 			if(isOffline==TRUE){
@@ -34,7 +36,11 @@ void router_FSM(){
 			}
 			break;
 		case ROUTER_STATE_CHECK_CHILDREN:
-			check_my_children_online();
+			if(halMACTimerNowDelta(last_timer_children_checked)>=MSECS_TO_MACTICKS(INTERVAL_OF_SENDING_BEACON*1000)){
+				check_my_children_online();
+				update_route_table_cache();
+				last_timer_children_checked=halGetMACTimer();
+			}
 			// TODO: use a timer to judge if I am offline 2016年8月24日 上午12:21:35
 			// if(isOffline)....
 			break;

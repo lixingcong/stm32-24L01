@@ -16,7 +16,7 @@
 
 #define Sint8  signed   char
 #define Uint8  unsigned char
-#define Uint16 unsigned int
-#define Uint32 unsigned long
+#define Uint16 unsigned short
+#define Uint32 unsigned int
 
 #endif
