@@ -44,7 +44,6 @@ void check_my_children_online();
 
 void merge_grandsons(unsigned char *ptr);
 
-BOOL check_if_children_empty();
 
 // send function
 void send_custom_broadcast(unsigned char flen,unsigned char *frm);

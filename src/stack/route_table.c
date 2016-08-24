@@ -99,14 +99,6 @@ void check_my_children_online() {
 }
 
 
-// 增加孩子
-void add_to_my_child(unsigned char addr){
-	all_nodes[addr]=(MY_NODE_NUM);
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-	printf("add #%u as my child\r\n",addr);
-#endif
-}
-
 // 合并孙子，默认覆盖。
 void merge_grandsons(unsigned char *ptr){
 	unsigned char i,*my_ptr;
@@ -131,14 +123,6 @@ void merge_grandsons(unsigned char *ptr){
 		my_ptr+=2;
 	}
 
-}
-
-
-BOOL check_if_children_empty(){
-	unsigned char i;
-	for(i=1;i<ALL_NODES_NUM;++i)
-		if(all_nodes[i]==(MY_NODE_NUM))return FALSE;
-	return TRUE;
 }
 
 /*
