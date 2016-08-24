@@ -19,7 +19,6 @@
 
 extern void aplRxCustomCallBack(void);
 unsigned char all_nodes[ALL_NODES_NUM*2];// 存放实时更新路由表，用于转发数据包等操作
-unsigned char all_nodes_cache[ALL_NODES_NUM]; // 存放上次的路由表，对比产生一个增量的路由表
 
 unsigned char route_response[3*ALL_NODES_NUM+3];// 缓冲区专门存放待发送的增量路由表，前面有3个帧头
 unsigned char route_response_offset;// 增量路由表偏移量
@@ -37,7 +36,7 @@ unsigned char my_children_number;
 void init_all_nodes(){
 	unsigned char i;
 	for(i=0;i<ALL_NODES_NUM;++i){
-		all_nodes_cache[i]=all_nodes[i]=all_nodes[i+ALL_NODES_NUM]=0xff;
+		all_nodes[i]=all_nodes[i+ALL_NODES_NUM]=0xff;
 	}
 	route_response_offset=3;
 	my_children_number=0;
@@ -82,10 +81,11 @@ unsigned char get_next_hop(unsigned char this_hop, unsigned char dst) {
 void check_my_children_online() {
 	unsigned char i;
 	for (i = 1; i < ALL_NODES_NUM; ++i) {
-		if (all_nodes_cache[i] == (MY_NODE_NUM)) {  // my child
+		if (all_nodes[i] == (MY_NODE_NUM)) {  // my child
 			if(0xff==macTxCustomPing(i, PING_DIRECTION_TO_CHILDREN, 2, 300)){
 				// TODO: 误删孩子情况偶尔出现 2016年8月18日 上午10:33:11
 				// if not online, del node in cache
+				update_route_response_content(FALSE, i, MY_NODE_NUM);
 				all_nodes[i]=0xff;
 				--my_children_number;
 #ifdef ROUTE_TABLE_OUTPUT_DEBUG
@@ -216,10 +216,17 @@ void send_custom_upload_route_request(){
 }
 // 向父亲上传自己的路由表，
 void send_route_increasing_change_to_parent(){
+	unsigned char i;
 	route_response[0]=FRAME_TYPE_SHORT_ROUTE_UPDATE;
 	route_response[1]=my_parent;
 	route_response[2]=MY_NODE_NUM;
+	printf("in send increasing: ");
+	for(i=0;i<route_response_offset;++i)
+		printf("%x ",route_response[i]);
+	printf("\r\n");
 	halSendPacket(route_response_offset, &route_response[0], TRUE);
+
+	DelayMs(2);
 	route_response_offset=3;
 }
 
@@ -260,6 +267,7 @@ void display_all_nodes(){
 }
 
 void update_route_table_cache(){
+#if 0
 	unsigned char i;
 	for(i=1;i<ALL_NODES_NUM;++i){
 		if(all_nodes[i]!=all_nodes_cache[i] ){
@@ -270,7 +278,7 @@ void update_route_table_cache(){
 		}
 		all_nodes_cache[i]=all_nodes[i];
 	}
-
+#endif
 }
 
 void update_route_response_content(BOOL isAdd, unsigned char child, unsigned char parent){
@@ -304,8 +312,15 @@ void macRxCustomPacketCallback(unsigned char *ptr){
 				if(*(ptr+5)==FRAME_FLAG_JOIN_REQUEST){ // join req
 					if(all_nodes[MY_NODE_NUM]==*(ptr+4))// sender is my parent, not allow to join(loopback)
 						break;
-					if(my_children_number<MAX_CHILDREN_NUM)
+					if(all_nodes[*(ptr+4)]==MY_NODE_NUM){
 						send_join_network_response(*(ptr+4));
+						break;
+					}
+					if(my_children_number<MAX_CHILDREN_NUM){
+						DelayMs(1);
+						send_join_network_response(*(ptr+4));
+					}
+
 				}
 
 				else if(*(ptr+5)==FRAME_FLAG_JOIN_RESPONSE){ // join response
@@ -320,6 +335,7 @@ void macRxCustomPacketCallback(unsigned char *ptr){
 					all_nodes[*(ptr+4)]=*(ptr+3);
 					if(*(ptr+3)==MY_NODE_NUM){ // new child
 						printf("Node #%u joined\r\n",*(ptr+4));
+						update_route_response_content(TRUE, *(ptr+4), MY_NODE_NUM);
 						++my_children_number;
 					}
 

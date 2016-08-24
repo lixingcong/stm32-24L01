@@ -21,11 +21,11 @@ unsigned short halGetRandomShortByte(void) {
 }
 
 void halSendPacket(unsigned short flen, unsigned char *ptr, BOOL isShortDataLengthMode){
-	unsigned int flen_real;
+	unsigned short flen_real;
 	unsigned char last_a7190_state;
 	flen_real=flen+2;
 
-	if (flen_real > LRWPAN_MAX_FRAME_SIZE) {
+	if (flen_real+1 > LRWPAN_MAX_FRAME_SIZE) {
 		printf("halSendPacket: packet too long, drop\r\n");
 		return;
 	}
@@ -34,7 +34,7 @@ void halSendPacket(unsigned short flen, unsigned char *ptr, BOOL isShortDataLeng
 	A7190_set_state(WAIT_TX);
 
 	StrobeCmd(CMD_STBY);
-	Set_FIFO_len((flen_real&0xff),((flen_real>>8)&0x01));
+	Set_FIFO_len(((flen_real+1)&0xff),(((flen_real+1)>>8)&0x01)); // 经过测试，要flen_real+1才能成功
 	StrobeCmd(CMD_TFR);
 
 	if (isShortDataLengthMode == TRUE && flen_real <= 256) {

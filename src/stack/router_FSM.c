@@ -28,7 +28,7 @@ void router_FSM(){
 			init_all_nodes();
 			router_FSM_state=ROUTER_STATE_JOIN_NETWORK;
 			last_timer_children_checked=halGetMACTimer();
-			printf("Router, my addr is %ud\r\n",MY_NODE_NUM);
+			printf("Router, my addr is %u\r\n",MY_NODE_NUM);
 			isOffline=TRUE;
 			break;
 		case ROUTER_STATE_JOIN_NETWORK:
