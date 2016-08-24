@@ -35,6 +35,7 @@ void spi1_irq_a7190(void) {
 			ack_bytes[1]=ReadFIFO1(1);
 
 			ReadFIFO(&ack_bytes[2],ack_bytes[1]);
+			printf("%x %x ",ack_bytes[0],ack_bytes[1]);
 			for(i=2;i<ack_bytes[1];++i)
 				printf("%x ",ack_bytes[i]);
 			printf("\r\n");
@@ -54,6 +55,7 @@ void spi1_irq_a7190(void) {
 	if (A7190_read_state() == BUSY_TX) {
 		//Finished TX, do call back
 		A7190_set_state(IDLE);
+		Set_FIFO_len(0xff, 0x01); // 这句话很重要，复位fifo指针
 		StrobeCmd( CMD_RX);
 		StrobeCmd(CMD_RFR);
 	}

@@ -110,23 +110,24 @@ void add_to_my_child(unsigned char addr){
 void merge_grandsons(unsigned char *ptr){
 	unsigned char i,*my_ptr;
 	my_ptr=ptr+5;
-	for(i=0;i<(*(ptr)-5);i+=3){
+	for(i=0;i<(*(ptr+1)-5);i+=3){
 		switch(*(my_ptr++)){
+			if(*(my_ptr)>=ALL_NODES_NUM)
+				break;
 			case FRAME_FLAG_UPDATE_ROUTE_ADD:
-				all_nodes[*(my_ptr++)]=*(my_ptr++);
-				printf("merging");
+				all_nodes[*(my_ptr)]=*(my_ptr+1);
+				printf("updated");
 				break;
 			case FRAME_FLAG_UPDATE_ROUTE_REMOVE:
 				if(all_nodes[*(my_ptr)]==*(my_ptr+1))
 					all_nodes[*(my_ptr)]=0xff;
-				my_ptr+=2;
-				printf("deleting");
+				printf("deleted");
 				break;
 			default:
-				my_ptr+=2;
 				break;
 		}
-		printf(": node #%u 's parent is #%u\r\n",*(my_ptr-2),*(my_ptr-1));
+		printf(": node #%u 's parent is #%u\r\n",*(my_ptr),*(my_ptr+1));
+		my_ptr+=2;
 	}
 
 }
@@ -218,7 +219,7 @@ void send_route_increasing_change_to_parent(){
 	route_response[0]=FRAME_TYPE_SHORT_ROUTE_UPDATE;
 	route_response[1]=my_parent;
 	route_response[2]=MY_NODE_NUM;
-	halSendPacket(route_response_offset, route_response, TRUE);
+	halSendPacket(route_response_offset, &route_response[0], TRUE);
 	route_response_offset=3;
 }
 

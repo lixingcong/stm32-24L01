@@ -34,7 +34,7 @@ void halSendPacket(unsigned short flen, unsigned char *ptr, BOOL isShortDataLeng
 	A7190_set_state(WAIT_TX);
 
 	StrobeCmd(CMD_STBY);
-	Set_FIFO_len(flen_real&0xff,((flen_real>>8)&0x01));
+	Set_FIFO_len((flen_real&0xff),((flen_real>>8)&0x01));
 	StrobeCmd(CMD_TFR);
 
 	if (isShortDataLengthMode == TRUE && flen_real <= 256) {
