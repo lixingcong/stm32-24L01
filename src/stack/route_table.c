@@ -126,67 +126,56 @@ void merge_grandsons(unsigned char *ptr){
 }
 
 /*
- * - - - -- - - - -- - - - -- - - - -- - - -- -
- * |         custom frame by lixingcong        |
- * - - -- - - - - - - -- - - -- - - - - - - -- -
- * | flen | nexthop | dest | src | prop | data |
- * |   1  |    1    |   1  |  1  |   1  |  *   |
- *-- - - - - - - -- - - -- - - - - - - -- - - -
+ * - - - -- - - - -- - - - -- - - - -- - - -- -  --
+ * |         custom frame by lixingcong            |
+ * - - -- - - - - - - -- - - -- - - - - - - -- - - -
+ * | flen | frm_type |nexthop | dest | src | data  |
+ * |   2  |     1    |   1    |   1  |  1  |  *    |
+ *-- - - - - - - -- - - -- - - - - - - -- - - - - -
  */
 
 // 注意dst为0xff为广播，谨慎使用
-void send_custom_packet(unsigned char src, unsigned char dst,unsigned char flen,unsigned char *frm, unsigned char frm_type){
-	unsigned char total_len,i;
-	unsigned char *ptr;
-	unsigned short delayms;
-	if(flen>MAX_CUSTOM_FRAME_LENGTH){
+void send_custom_packet(unsigned char src, unsigned char dst,unsigned short flen,unsigned char *frm, unsigned char frm_type){
+	unsigned short total_len,i;
+	unsigned char nexthop,thishop;
+
+	if(flen>LRWPAN_MAX_FRAME_SIZE-6){
 #ifdef ROUTE_TABLE_OUTPUT_DEBUG
 		printf("send_custom_packet(): packet too big, send fail\r\n");
 #endif
 		return;
 	}
 
-	total_len=5+flen;
-	ptr=payload_custom;
-	*(ptr++)=total_len;
-	if(dst==0xff){
-		*(ptr++)=0xff;
-		*(ptr++)=0xff;
-	} else {
-		*(ptr++) = get_next_hop((MY_NODE_NUM), dst);
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-		printf("in send custom packet: nexthop=%u\r\n",*(ptr-1));
-#endif
-		if (*(ptr - 1) == 0xff) {
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-			printf("relay dst not arrived, frm_type=%u\r\n",frm_type);
-#endif
-			return;
-		}
-		*(ptr++) = dst;
-	}
-	*(ptr++)=src;
-	*(ptr++)=frm_type;
-	for(i=0;i<flen;++i)
-		*(ptr++)=*(frm+i);
+	total_len=4+flen;
 
-#if 0
-//#ifndef LRWPAN_COORDINATOR
-	// TODO: sendcustom函数中随机延时长度的设定 2016年8月18日 上午11:23:10
-	// 可以在rxcustom中加一个标志位禁止接收其它东西专心收发数据
-	delayms=halGetRandomShortByte();
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-	printf("delay #%u ms\r\n",delayms);
-#endif
-	DelayMs(delayms);// to avoid broadcast storm
-#endif
-	A7190_set_state(IDLE);
-	halSendPacket(1, payload_custom , TRUE);
+	nexthop=dst;
+	do{
+		if(0xff!=macTxPing(nexthop, TRUE, PING_DIRECTION_TO_OTHERS))
+			break;
+
+		nexthop=get_next_hop(nexthop, MY_NODE_NUM); // you should set thishop to MY_NODE_NUM
+		if(nexthop==0xff)
+			break;
+	}while(1);
+
+	if(nexthop==0xff)
+		nexthop=my_parent;
+
+	printf("send_custom_packet: nexthop=#%u, dst=#%u\r\n",nexthop,dst);
+
+	payload_custom[0]=frm_type;
+	payload_custom[1]=nexthop;
+	payload_custom[2]=dst;
+	payload_custom[3]=src;
+
+	for(i=0;i<flen;++i)
+		payload_custom[i+4]=*(frm+i);
+
+	halSendPacket(total_len, payload_custom , FALSE);
 //	printf("in send custom: ");
 //	for(i=0;i<5;++i)
 //		printf("%x ",payload_custom[i]);
 //	printf("\r\n");
-	DelayMs(1);
 
 }
 
@@ -261,15 +250,14 @@ void update_route_response_content(BOOL isAdd, unsigned char child, unsigned cha
 	route_response[route_response_offset++]=parent;
 }
 
-void macRxCustomPacketCallback(unsigned char *ptr){
-	unsigned short flen;
-	if((*(ptr)&0xf0)==0xf0){
+void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned short flen){
+	unsigned short i;
+	if(isShortMSG==FALSE){
 		// long msg(should judge outside)
-		flen=((*ptr)&0x01)<<8;
-		flen+=*(ptr+1);
+		printf("recv long msg:\r\n");
+		for(i=0;i<flen;i++)
+			printf("%u: %x\r\n",i,*(ptr+i));
 	}else{
-		// short msg
-		flen=*(ptr+1);
 		switch(*(ptr+2)){ // switch frame type
 			case FRAME_TYPE_SHORT_BEACON:
 				// TODO: beacon 2016年8月23日 下午11:53:12

@@ -527,7 +527,7 @@ void WriteFIFO2(Uint16 length)
         ByteSend(PN9_Tab[i]);
     CS_DISABLE();
 }
-void ReadFIFO(Uint8 *RfBuf,Uint8 length)
+void ReadFIFO(Uint8 *RfBuf,Uint16 length)
 {
     Uint16 i;
 

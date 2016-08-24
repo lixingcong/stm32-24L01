@@ -35,7 +35,7 @@ void A7190_Cal(void);
 void WriteFIFO(Uint8 *txbuf,Uint16 length);
 void WriteFIFO1(Uint8 buf);
 
-void ReadFIFO(Uint8 *RfBuf,Uint8 length);
+void ReadFIFO(Uint8 *RfBuf,Uint16 length);
 Uint8 ReadFIFO1(Uint8 length);
 
 void Set_FIFO_len(Uint8 length_low,Uint8 length_high);

@@ -16,9 +16,11 @@
 #include "coord_FSM.h"
 #include "router_FSM.h"
 #include "hal.h"
+#include "route_table.h"
 
 int main(){
-	unsigned char payload[10];
+	unsigned char payload[512];
+	unsigned int my_timer,i;
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	// init delay timer
 	init_delay();
@@ -44,9 +46,18 @@ int main(){
 #endif
 
 	//payload[0]='h';payload[1]='i';
+	for(i=0;i<512;i++)
+		payload[i]=(i+2)%256;
 	while(1){
 		if(my_role==ROLE_COORDINATOR){
-			while(1)coordFSM();
+			my_timer=halGetMACTimer();
+			while(1){
+				coordFSM();
+				if(halMACTimerNowDelta(my_timer)>=MSECS_TO_MACTICKS(6000)){
+					send_custom_packet(MY_NODE_NUM, 1, 300, payload, 0xff);
+					while(1);
+				}
+			}
 		}
 
 		else{
