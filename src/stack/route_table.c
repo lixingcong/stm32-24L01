@@ -21,7 +21,7 @@ extern void aplRxCustomCallBack(void);
 unsigned char all_nodes[ALL_NODES_NUM*2];// 存放实时更新路由表，用于转发数据包等操作
 unsigned char all_nodes_cache[ALL_NODES_NUM]; // 存放上次的路由表，对比产生一个增量的路由表
 
-unsigned char route_response[3*ALL_NODES_NUM];// 缓冲区专门存放待发送的增量路由表
+unsigned char route_response[3*ALL_NODES_NUM+3];// 缓冲区专门存放待发送的增量路由表，前面有3个帧头
 unsigned char route_response_offset;// 增量路由表偏移量
 
 // only for router update, used by update_route_table_info()
@@ -39,8 +39,9 @@ void init_all_nodes(){
 	for(i=0;i<ALL_NODES_NUM;++i){
 		all_nodes_cache[i]=all_nodes[i]=all_nodes[i+ALL_NODES_NUM]=0xff;
 	}
-	route_response_offset=0;
+	route_response_offset=3;
 	my_children_number=0;
+	my_parent=0xff;
 }
 
 // 寻找下一跳，基于all_nodes路由表
@@ -80,18 +81,16 @@ unsigned char get_next_hop(unsigned char this_hop, unsigned char dst) {
 // 使用ping检测孩子是否在线，不在线的将被删除
 void check_my_children_online() {
 	unsigned char i;
-	my_children_number=0;
 	for (i = 1; i < ALL_NODES_NUM; ++i) {
 		if (all_nodes_cache[i] == (MY_NODE_NUM)) {  // my child
 			if(0xff==macTxCustomPing(i, PING_DIRECTION_TO_CHILDREN, 2, 300)){
 				// TODO: 误删孩子情况偶尔出现 2016年8月18日 上午10:33:11
 				// if not online, del node in cache
 				all_nodes[i]=0xff;
+				--my_children_number;
 #ifdef ROUTE_TABLE_OUTPUT_DEBUG
 				printf("Delete child #%u\r\n",i);
 #endif
-			}else{
-				++my_children_number;
 			}
 		}
 	}
@@ -111,25 +110,25 @@ void add_to_my_child(unsigned char addr){
 void merge_grandsons(unsigned char *ptr){
 	unsigned char i,*my_ptr;
 	my_ptr=ptr+5;
-	for(i=0;i<(*ptr-5);i+=3){
-		if(((*(my_ptr+i))&0x80)==0x80){ // 增量添加
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-			printf("merged: ");
-#endif
-			all_nodes[(*(my_ptr+i))&0x3f]=*(my_ptr+i+1); // parent
-			all_nodes[((*(my_ptr+i))&0x3f)+ALL_NODES_NUM]=*(my_ptr+i+2); // RSSI
-		}else{ // 增量删除
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-			printf("deleted: ");
-#endif
-			if(all_nodes[(*(my_ptr+i))&0x3f]==*(my_ptr+i+1)){ // really delete this node
-				all_nodes[(*(my_ptr+i))&0x3f]=0xff;
-			}
+	for(i=0;i<(*(ptr)-5);i+=3){
+		switch(*(my_ptr++)){
+			case FRAME_FLAG_UPDATE_ROUTE_ADD:
+				all_nodes[*(my_ptr++)]=*(my_ptr++);
+				printf("merging");
+				break;
+			case FRAME_FLAG_UPDATE_ROUTE_REMOVE:
+				if(all_nodes[*(my_ptr)]==*(my_ptr+1))
+					all_nodes[*(my_ptr)]=0xff;
+				my_ptr+=2;
+				printf("deleting");
+				break;
+			default:
+				my_ptr+=2;
+				break;
 		}
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-		printf("node #%u 's parent is #%u, RSSI=%u\r\n",*(my_ptr+i)&0x3f,*(my_ptr+i+1),*(my_ptr+i+2));
-#endif
+		printf(": node #%u 's parent is #%u\r\n",*(my_ptr-2),*(my_ptr-1));
 	}
+
 }
 
 
@@ -213,22 +212,14 @@ void send_custom_broadcast(unsigned char flen,unsigned char *frm){
 
 // 向孩子广播一个路由更新请求
 void send_custom_upload_route_request(){
-	send_custom_packet(MY_NODE_NUM, 0xff,0,NULL,CUSTOM_FRAME_TYPE_ROUTE_UPDATE_REQUEST);
-#ifdef LRWPAN_COORDINATOR
-	//clear_all_nodes();
-#else
-	if(check_if_children_empty()==TRUE){
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-		printf("my children is empty, uploading route table\r\n");
-#endif
-		send_custom_upload_route_response();
-	}else{
-		//clear_all_nodes();
-	}
-#endif
 }
 // 向父亲上传自己的路由表，
-void send_custom_upload_route_response(){
+void send_route_increasing_change_to_parent(){
+	route_response[0]=FRAME_TYPE_SHORT_ROUTE_UPDATE;
+	route_response[1]=my_parent;
+	route_response[2]=MY_NODE_NUM;
+	halSendPacket(route_response_offset, route_response, TRUE);
+	route_response_offset=3;
 }
 
 // 把dst作为Payload,发送到协调器，然后由协调器上传给PC绘制路径图，该路径表示发送者到dst的路径
@@ -270,25 +261,26 @@ void display_all_nodes(){
 void update_route_table_cache(){
 	unsigned char i;
 	for(i=1;i<ALL_NODES_NUM;++i){
-		if(all_nodes[i]!=0xff)
-			update_route_response_content(TRUE,i,all_nodes[i]); // update ping
-		else if(all_nodes_cache[i]!=0xff)
-			update_route_response_content(FALSE,i,all_nodes_cache[i]); // remove a node
-		// new cache value
+		if(all_nodes[i]!=all_nodes_cache[i] ){
+			if(all_nodes_cache[i]==0xff)
+				update_route_response_content(TRUE, i, all_nodes[i]); // add a child
+			if(all_nodes[i]==0xff)
+				update_route_response_content(FALSE, i, all_nodes_cache[i]); // delete a child
+		}
 		all_nodes_cache[i]=all_nodes[i];
 	}
 
 }
 
 void update_route_response_content(BOOL isAdd, unsigned char child, unsigned char parent){
-	if(route_response_offset>=ALL_NODES_NUM*3) // excceed max len
+	if(route_response_offset>=ALL_NODES_NUM*3+3) // excceed max len
 		return;
 	if(isAdd==TRUE)
-		route_response[route_response_offset++]=child|0x80; // 增量添加
+		route_response[route_response_offset++]=FRAME_FLAG_UPDATE_ROUTE_ADD; // 增量添加
 	else
-		route_response[route_response_offset++]=child|0x00; // 增量删除
+		route_response[route_response_offset++]=FRAME_FLAG_UPDATE_ROUTE_REMOVE; // 增量删除
+	route_response[route_response_offset++]=child;
 	route_response[route_response_offset++]=parent;
-	route_response[route_response_offset++]=all_nodes[child+ALL_NODES_NUM];
 }
 
 void macRxCustomPacketCallback(unsigned char *ptr){
@@ -309,7 +301,10 @@ void macRxCustomPacketCallback(unsigned char *ptr){
 				break;
 			case FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL:
 				if(*(ptr+5)==FRAME_FLAG_JOIN_REQUEST){ // join req
-					send_join_network_response(*(ptr+4));
+					if(all_nodes[MY_NODE_NUM]==*(ptr+4))// sender is my parent, not allow to join(loopback)
+						break;
+					if(my_children_number<MAX_CHILDREN_NUM)
+						send_join_network_response(*(ptr+4));
 				}
 
 				else if(*(ptr+5)==FRAME_FLAG_JOIN_RESPONSE){ // join response
@@ -322,9 +317,16 @@ void macRxCustomPacketCallback(unsigned char *ptr){
 				}else{ // a join ACK
 					printf("recv a join ack\r\n");
 					all_nodes[*(ptr+4)]=*(ptr+3);
-					if(*(ptr+3)==MY_NODE_NUM)
+					if(*(ptr+3)==MY_NODE_NUM){ // new child
 						printf("Node #%u joined\r\n",*(ptr+4));
+						++my_children_number;
+					}
+
 				}
+				break;
+			case FRAME_TYPE_SHORT_ROUTE_UPDATE:
+				if(*(ptr+3)==MY_NODE_NUM)
+					merge_grandsons(ptr);
 				break;
 			default:
 				break;
@@ -350,3 +352,5 @@ void send_join_network_response_ack(unsigned char dst){
 	payload_custom[3]=FRAME_FLAG_JOIN_RESPONSE_ACK;
 	halSendPacket(4, payload_custom, TRUE);
 }
+
+

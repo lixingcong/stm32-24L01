@@ -21,15 +21,14 @@ extern unsigned int last_timer_children_checked;
 // 最多允许存放的协调器数目
 #define MAX_COORD_NUM 3
 // 最大孩子数目
-#define MAX_CHILDREN_NUM 3
+#define MAX_CHILDREN_NUM 1
 
 // 短帧类型（帧长小于256）
 #define FRAME_TYPE_SHORT_PING 0x00
-#define FRAME_TYPE_SHORT_ACK  0x01
+#define FRAME_TYPE_SHORT_SEND_PATH_TO_PC  0x01
 #define FRAME_TYPE_SHORT_BEACON 0xf0
 #define FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL 0xf2
 #define FRAME_TYPE_SHORT_ROUTE_UPDATE 0xf4
-#define FRAME_TYPE_SHORT_ROUTE_SEND_TO_PC 0xf5
 #define FRAME_TYPE_SHORT_CHANGE_ROLE 0xf8
 
 // 长帧类型（帧长较长，小于500）
@@ -45,6 +44,10 @@ extern unsigned int last_timer_children_checked;
 #define INTERVAL_OF_SENDING_BEACON 10
 #define INTERVAL_OF_CHECKING_CHILDREN 5
 #define INTERVAL_OF_MY_PARENT_CHECK_ME (INTERVAL_OF_CHECKING_CHILDREN*2)
+
+// 路由表逐级上传（增量更新）类型
+#define FRAME_FLAG_UPDATE_ROUTE_ADD 0xf0
+#define FRAME_FLAG_UPDATE_ROUTE_REMOVE 0x0f
 
 
 #endif /* SRC_STACK_COMMON_FUNC_H_ */

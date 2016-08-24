@@ -57,9 +57,11 @@ void router_FSM(){
 			router_FSM_state=ROUTER_STATE_CHECK_CHILDREN;
 			break;
 		case ROUTER_STATE_CHECK_CHILDREN:
-			if(halMACTimerNowDelta(last_timer_children_checked)>=MSECS_TO_MACTICKS(INTERVAL_OF_SENDING_BEACON*1000)){
+			if(halMACTimerNowDelta(last_timer_children_checked)>=MSECS_TO_MACTICKS(INTERVAL_OF_CHECKING_CHILDREN*1000)){
 				check_my_children_online();
 				update_route_table_cache();
+				if(route_response_offset>3)
+					send_route_increasing_change_to_parent();
 				display_all_nodes();
 				last_timer_children_checked=halGetMACTimer();
 			}
@@ -79,3 +81,5 @@ void router_send_join_request(){
 	router_fsm_payload[3]=FRAME_FLAG_JOIN_REQUEST;
 	halSendPacket(4, router_fsm_payload, TRUE);
 }
+
+// TODO: send_PAATH_to_PC 2016年8月24日 下午1:51:45

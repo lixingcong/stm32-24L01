@@ -107,6 +107,8 @@ unsigned char macTxCustomPing(unsigned char dst, unsigned char direction, unsign
 // TODO: send direction 改变路由表 2016年8月23日 下午11:20:13
 void macRxPingCallback(unsigned char *ptr) {
 	if (*(ptr+3) == (MY_NODE_NUM)) {
+		if(isOffline==TRUE) // 离线状态不响应ping
+			return;
 		if ((*(ptr + 5) & 0x10 ) == 0x10) {  // receive a ping request, make a response to him
 			// todo: 这里出现一种情况：父亲的路由表没有孩子，却给孩子回复ping包，需要修正
 			switch((*(ptr+5))&0x0f){

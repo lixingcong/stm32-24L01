@@ -26,6 +26,9 @@ extern unsigned char my_children_number;
 // 发送函数帧长flen最大为256-5=251
 #define MAX_CUSTOM_FRAME_LENGTH 251
 
+// 偏移值
+extern unsigned char route_response_offset;
+
 
 // 数组下标[1...ALL_NODES_NUM-1]是指向父亲
 // all_nodes[ALL_NODE_NUM]和all_nodes[0]无定义
@@ -47,7 +50,7 @@ BOOL check_if_children_empty();
 // send function
 void send_custom_broadcast(unsigned char flen,unsigned char *frm);
 void send_custom_upload_route_request();
-void send_custom_upload_route_response();
+
 void send_custom_packet_relay(unsigned char src,unsigned char dst,unsigned char flen,unsigned char *frm,unsigned char frm_type);
 void send_custom_routine_to_coord(unsigned char dst);
 
@@ -72,6 +75,8 @@ void send_join_network_response_ack(unsigned char dst);
 #define CUSTOM_FRAME_TYPE_ROUTE_UPDATE_RESPONSE 0x02
 #define CUSTOM_FRAME_TYPE_DATA 0x03
 #define CUSTOM_FRAME_TYPE_UPLOADROUTEPATH_TO_PC 0x04
+
+void send_route_increasing_change_to_parent();
 
 
 #endif /* _DEFINE_ROUTE_TABLE_H_ */
