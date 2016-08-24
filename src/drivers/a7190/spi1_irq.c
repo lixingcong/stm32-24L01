@@ -35,9 +35,9 @@ void spi1_irq_a7190(void) {
 			ack_bytes[1]=ReadFIFO1(1);
 
 			ReadFIFO(&ack_bytes[2],ack_bytes[1]);
-//			for(i=2;i<ack_bytes[1];++i)
-//				printf("%x ",ack_bytes[i]);
-//			printf("\r\n");
+			for(i=2;i<ack_bytes[1];++i)
+				printf("%x ",ack_bytes[i]);
+			printf("\r\n");
 			macRxCustomPacketCallback(ack_bytes);
 		}
 
