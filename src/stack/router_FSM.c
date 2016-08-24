@@ -16,6 +16,7 @@
 ROUTER_STATE_ENUM router_FSM_state;
 
 unsigned char router_fsm_payload[10];
+unsigned int last_timer_parent_checked_me;
 
 void router_FSM(){
 	switch(router_FSM_state){
@@ -32,17 +33,33 @@ void router_FSM(){
 				DelayMs(300);
 			}else{
 				printf("join succuessfully, parent is #%u\r\n",my_parent);
-				router_FSM_state=ROUTER_STATE_CHECK_CHILDREN;
+				router_FSM_state=ROUTER_STATE_CHECK_PARENT;
+				last_timer_parent_checked_me=halGetMACTimer();
 			}
+			break;
+		case ROUTER_STATE_CHECK_PARENT:
+			// TODO: use a timer to judge if I am offline 2016年8月24日 上午12:21:35
+			// if(isOffline)....
+			if(halMACTimerNowDelta(last_timer_parent_checked_me)>=MSECS_TO_MACTICKS(INTERVAL_OF_MY_PARENT_CHECK_ME*1000)){
+				printf("long time no see my parent's ping\r\n");
+				if(0xff==macTxCustomPing(my_parent, PING_DIRECTION_TO_PARENT, 2, 200)){
+					isOffline=TRUE;
+					router_FSM_state=ROUTER_STATE_JOIN_NETWORK;
+					printf("Start to rejoin...\r\n");
+					break;
+				}
+				last_timer_parent_checked_me=halGetMACTimer();
+			}
+			router_FSM_state=ROUTER_STATE_CHECK_CHILDREN;
 			break;
 		case ROUTER_STATE_CHECK_CHILDREN:
 			if(halMACTimerNowDelta(last_timer_children_checked)>=MSECS_TO_MACTICKS(INTERVAL_OF_SENDING_BEACON*1000)){
 				check_my_children_online();
 				update_route_table_cache();
+				display_all_nodes();
 				last_timer_children_checked=halGetMACTimer();
 			}
-			// TODO: use a timer to judge if I am offline 2016年8月24日 上午12:21:35
-			// if(isOffline)....
+			router_FSM_state=ROUTER_STATE_CHECK_PARENT;
 			break;
 		case ROUTER_STATE_UPGRADE_TO_COORD:
 			break;

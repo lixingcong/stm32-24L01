@@ -17,6 +17,7 @@ typedef enum _ROUTER_STATE_ENUM {
 }ROUTER_STATE_ENUM;
 
 extern ROUTER_STATE_ENUM router_FSM_state;
+extern unsigned int last_timer_parent_checked_me;
 
 void router_FSM();
 void router_send_join_request();

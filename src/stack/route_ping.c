@@ -12,7 +12,7 @@
 #include "delay.h"
 #include "hal.h"
 #include "stdio.h"
-
+#include "router_FSM.h"
 
 //used for ping
 typedef struct _ROUTE_PING_DATA {
@@ -52,8 +52,8 @@ unsigned char macTxPing(unsigned char dst, BOOL isRequest, unsigned char directi
 
 			if(route_ping_data.ackPending == FALSE)
 				break;
-			// ping timeout=20ms
-			if (timer > MSECS_TO_MACTICKS(20)){
+			// ping timeout=30ms
+			if (timer > MSECS_TO_MACTICKS(30)){
 #ifdef MAC_OUTPUT_DEBUG_PING
 				printf("macTxPing(): ping time out\r\n");
 #endif
@@ -88,7 +88,7 @@ unsigned char macTxCustomPing(unsigned char dst, unsigned char direction, unsign
 		last_ping_timer=halGetMACTimer();
 		while(1){
 			if(halMACTimerNowDelta(last_ping_timer) > MSECS_TO_MACTICKS(retry_interval)){
-				printf(" ping: retry for %u times\r\n",ping_cnt);
+				printf(" ping to #%u: retry for %u times\r\n",dst,ping_cnt);
 				result=macTxPing(dst, TRUE, direction);
 				if(result==0xff)
 					--ping_cnt;
@@ -107,12 +107,12 @@ unsigned char macTxCustomPing(unsigned char dst, unsigned char direction, unsign
 // TODO: send direction 改变路由表 2016年8月23日 下午11:20:13
 void macRxPingCallback(unsigned char *ptr) {
 	if (*(ptr+3) == (MY_NODE_NUM)) {
-		if (*(ptr + 5) & 0x10 == 0x10) {  // receive a ping request, make a response to him
+		if ((*(ptr + 5) & 0x10 ) == 0x10) {  // receive a ping request, make a response to him
 			// todo: 这里出现一种情况：父亲的路由表没有孩子，却给孩子回复ping包，需要修正
-			//if(all_nodes[*(ptr+2)]==*(ptr+3)||all_nodes[*(ptr+3)]==*(ptr+2))
-			switch(*(ptr+5)&0x0f){
+			switch((*(ptr+5))&0x0f){
 				case PING_DIRECTION_TO_CHILDREN:
 					macTxPing(*(ptr+4), FALSE, PING_DIRECTION_TO_PARENT);
+					last_timer_parent_checked_me=halGetMACTimer();// 更新定时器：父亲刚刚给我检查了！
 					break;
 				case PING_DIRECTION_TO_PARENT:
 					all_nodes[*(ptr+4)]=MY_NODE_NUM;  // 孩子发给我的东西，通通接收，并改变路由表
@@ -130,6 +130,10 @@ void macRxPingCallback(unsigned char *ptr) {
 #endif
 				route_ping_data.ackPending = FALSE;
 			}
+		}
+	}else{ // ping dst is not me
+		if((*(ptr+5)&0x0f)==PING_DIRECTION_TO_CHILDREN){
+			all_nodes[*(ptr+3)]=*(ptr+4); // 对于偷听到的Ping包，可以实现邻居更新
 		}
 	}
 }

@@ -30,7 +30,7 @@ void spi1_irq_a7190(void) {
 		ack_bytes[0]=flen;
 		do_rx:
 		if ((flen&0xf0)==0xf0) { // long
-
+			// TODO: 处理超长包（干扰包），限制flen为512 2016年8月24日 上午10:03:49
 		}else{ // short
 			ack_bytes[1]=ReadFIFO1(1);
 
