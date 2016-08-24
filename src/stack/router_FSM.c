@@ -32,11 +32,13 @@ void router_FSM(){
 			isOffline=TRUE;
 			break;
 		case ROUTER_STATE_JOIN_NETWORK:
-			if(isOffline==TRUE){
-				printf("trying to join network\r\n");
-				router_send_join_request();
-				DelayMs(2000-(halGetRandomShortByte()&0xff));
-			}else{
+			if(isOffline==TRUE){ // offline
+				if(halMACTimerNowDelta(last_timer_children_checked)>=MSECS_TO_MACTICKS((2000+(MY_NODE_NUM>>2)))){
+					printf("trying to join network\r\n");
+					router_send_join_request();
+					last_timer_children_checked=halGetMACTimer();
+				}
+			}else{ // online
 				printf("join succuessfully, parent is #%u\r\n",my_parent);
 				router_FSM_state=ROUTER_STATE_CHECK_PARENT;
 				last_timer_parent_checked_me=halGetMACTimer();
@@ -44,7 +46,7 @@ void router_FSM(){
 			break;
 		case ROUTER_STATE_CHECK_PARENT:
 			if(halMACTimerNowDelta(last_timer_parent_checked_me)>=MSECS_TO_MACTICKS(INTERVAL_OF_MY_PARENT_CHECK_ME*1000)){
-				printf("long time no see my parent's ping\r\n");
+				printf("no parent's ping for a while, check it\r\n");
 				if(0xff==macTxCustomPing(my_parent, PING_DIRECTION_TO_PARENT, 2, 200)){
 					isOffline=TRUE;
 					router_FSM_state=ROUTER_STATE_JOIN_NETWORK;

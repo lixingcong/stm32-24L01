@@ -259,14 +259,14 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 				if(*(ptr+5)==FRAME_FLAG_JOIN_REQUEST){ // join req
 					if(my_parent==*(ptr+4))// sender is my parent, not allow to join(loopback)
 						break;
-					if(*(ptr+4)==MY_NODE_NUM) // conflict address, not allow
+					if(*(ptr+4)==MY_NODE_NUM) // conflict address, not allow(this situation should not appear in reality)
 						break;
-					if(all_nodes[*(ptr+4)]==MY_NODE_NUM){
+					if(all_nodes[*(ptr+4)]==MY_NODE_NUM){ // if dst was my son before, let him join again
 						send_join_network_response(*(ptr+4),FALSE);
 						break;
 					}
 					if(my_children_number<MAX_CHILDREN_NUM){
-						DelayMs(1);
+						DelayMs(1); // slow down for a while
 						send_join_network_response(*(ptr+4),FALSE);
 					}
 
