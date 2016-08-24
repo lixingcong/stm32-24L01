@@ -40,7 +40,6 @@ void init_all_nodes(){
 	}
 	route_response_offset=3;
 	my_children_number=0;
-	my_parent=0xff;
 }
 
 // 寻找下一跳，基于all_nodes路由表
@@ -310,7 +309,7 @@ void macRxCustomPacketCallback(unsigned char *ptr){
 				break;
 			case FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL:
 				if(*(ptr+5)==FRAME_FLAG_JOIN_REQUEST){ // join req
-					if(all_nodes[MY_NODE_NUM]==*(ptr+4))// sender is my parent, not allow to join(loopback)
+					if(my_parent==*(ptr+4))// sender is my parent, not allow to join(loopback)
 						break;
 					if(all_nodes[*(ptr+4)]==MY_NODE_NUM){
 						send_join_network_response(*(ptr+4));
@@ -327,7 +326,6 @@ void macRxCustomPacketCallback(unsigned char *ptr){
 					if (isOffline == TRUE) {
 						isOffline = FALSE;
 						my_parent = *(ptr + 4);
-						all_nodes[MY_NODE_NUM]=my_parent;
 						send_join_network_response_ack(*(ptr+4));
 					}
 				}else{ // a join ACK

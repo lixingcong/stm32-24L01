@@ -107,17 +107,17 @@ unsigned char macTxCustomPing(unsigned char dst, unsigned char direction, unsign
 // TODO: send direction 改变路由表 2016年8月23日 下午11:20:13
 void macRxPingCallback(unsigned char *ptr) {
 	if (*(ptr+3) == (MY_NODE_NUM)) {
-		if(isOffline==TRUE) // 离线状态不响应ping
-			return;
 		if ((*(ptr + 5) & 0x10 ) == 0x10) {  // receive a ping request, make a response to him
 			// todo: 这里出现一种情况：父亲的路由表没有孩子，却给孩子回复ping包，需要修正
 			switch((*(ptr+5))&0x0f){
 				case PING_DIRECTION_TO_CHILDREN:
 					macTxPing(*(ptr+4), FALSE, PING_DIRECTION_TO_PARENT);
+					my_parent=*(ptr+4); // 父亲的给我发的，改变路由
 					last_timer_parent_checked_me=halGetMACTimer();// 更新定时器：父亲刚刚给我检查了！
+					isOffline=FALSE;
 					break;
 				case PING_DIRECTION_TO_PARENT:
-					all_nodes[*(ptr+4)]=MY_NODE_NUM;  // 孩子发给我的东西，通通接收，并改变路由表
+					all_nodes[*(ptr+4)]=MY_NODE_NUM;  // 孩子发给我的东西，并改变路由表
 					macTxPing(*(ptr+4), FALSE, PING_DIRECTION_TO_CHILDREN);
 					break;
 				default:

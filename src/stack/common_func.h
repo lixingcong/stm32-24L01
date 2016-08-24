@@ -14,7 +14,8 @@ typedef enum _MY_ROLE_ENUM {
 }MY_ROLE_ENUM;
 
 extern MY_ROLE_ENUM my_role;
-extern unsigned char my_parent;
+#define my_parent (all_nodes[MY_NODE_NUM])
+
 extern unsigned int last_timer_beacon_sent;
 extern unsigned int last_timer_children_checked;
 
