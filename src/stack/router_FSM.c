@@ -34,7 +34,7 @@ void router_FSM(){
 			if(isOffline==TRUE){
 				printf("trying to join network\r\n");
 				router_send_join_request();
-				DelayMs(300);
+				DelayMs(2000-(halGetRandomShortByte()&0xff));
 			}else{
 				printf("join succuessfully, parent is #%u\r\n",my_parent);
 				router_FSM_state=ROUTER_STATE_CHECK_PARENT;
