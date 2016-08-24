@@ -21,6 +21,10 @@ unsigned int last_timer_parent_checked_me;
 void router_FSM(){
 	switch(router_FSM_state){
 		case ROUTER_STATE_INITAILIZE_ALL_NODES:
+			if(MY_NODE_NUM>=ALL_NODES_NUM){ // 超过节点。
+				printf("ERROR: max allow nodes num is %u, but my addr is %u\r\n",ALL_NODES_NUM,MY_NODE_NUM);
+				while(1);
+			}
 			init_all_nodes();
 			router_FSM_state=ROUTER_STATE_JOIN_NETWORK;
 			last_timer_children_checked=halGetMACTimer();
