@@ -31,9 +31,8 @@ extern unsigned char route_response_offset;
 
 
 // 数组下标[1...ALL_NODES_NUM-1]是指向父亲
-// all_nodes[ALL_NODE_NUM]和all_nodes[0]无定义
-// all_nodes[ALL_NODE_NUM+1.......ALL_NODE_NUM*2-1]是信号强度
-extern unsigned char all_nodes[ALL_NODES_NUM*2];
+// all_nodes[0]无定义
+extern unsigned char all_nodes[ALL_NODES_NUM];
 
 void init_all_nodes();
 

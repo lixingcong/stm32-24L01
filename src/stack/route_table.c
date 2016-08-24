@@ -18,7 +18,7 @@
 //#define ROUTE_TABLE_OUTPUT_DEBUG
 
 extern void aplRxCustomCallBack(void);
-unsigned char all_nodes[ALL_NODES_NUM*2];// 存放实时更新路由表，用于转发数据包等操作
+unsigned char all_nodes[ALL_NODES_NUM];// 存放实时更新路由表，用于转发数据包等操作
 
 unsigned char route_response[3*ALL_NODES_NUM+3];// 缓冲区专门存放待发送的增量路由表，前面有3个帧头
 unsigned char route_response_offset;// 增量路由表偏移量
@@ -36,7 +36,7 @@ unsigned char my_children_number;
 void init_all_nodes(){
 	unsigned char i;
 	for(i=0;i<ALL_NODES_NUM;++i){
-		all_nodes[i]=all_nodes[i+ALL_NODES_NUM]=0xff;
+		all_nodes[i]=0xff;
 	}
 	route_response_offset=3;
 	my_children_number=0;
@@ -264,7 +264,7 @@ void display_all_nodes(){
 	unsigned char i;
 	for(i=1;i<ALL_NODES_NUM;++i)
 		if(all_nodes[i]!=0xff)
-			printf("Node #%u 's parent is #%u, ping=%ums\r\n",i,all_nodes[i],all_nodes[i+ALL_NODES_NUM]);
+			printf("- Node #%u 's parent is #%u\r\n",i,all_nodes[i]);
 }
 
 void update_route_table_cache(){

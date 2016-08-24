@@ -43,8 +43,6 @@ void router_FSM(){
 			}
 			break;
 		case ROUTER_STATE_CHECK_PARENT:
-			// TODO: use a timer to judge if I am offline 2016年8月24日 上午12:21:35
-			// if(isOffline)....
 			if(halMACTimerNowDelta(last_timer_parent_checked_me)>=MSECS_TO_MACTICKS(INTERVAL_OF_MY_PARENT_CHECK_ME*1000)){
 				printf("long time no see my parent's ping\r\n");
 				if(0xff==macTxCustomPing(my_parent, PING_DIRECTION_TO_PARENT, 2, 200)){
@@ -83,4 +81,4 @@ void router_send_join_request(){
 	halSendPacket(4, router_fsm_payload, TRUE);
 }
 
-// TODO: send_PAATH_to_PC 2016年8月24日 下午1:51:45
+// TODO: send_PAATH_to_PC， 依赖多跳实现 2016年8月24日 下午1:51:45

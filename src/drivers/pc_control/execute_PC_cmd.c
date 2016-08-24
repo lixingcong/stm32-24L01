@@ -85,7 +85,7 @@ void upload_route_table(){
 	fprintf(stderr,"ZZST");
 	fprintf(stderr,"$,R0,ADDR0, ,&0,#");
 	for(i=1;i<=ALL_NODES_NUM;++i){
-		if(all_nodes[i]<ALL_NODES_NUM)
+		if(all_nodes[i]<ALL_NODES_NUM)// todo: no ping info (ALL
 			fprintf(stderr,"$,R%u,ADDR%u,%u,&%u,#",i,i,all_nodes[i+ALL_NODES_NUM],all_nodes[i]);
 	}
 	fprintf(stderr,"@\r\n");
