@@ -13,7 +13,6 @@ unsigned char ack_bytes[LRWPAN_MAX_FRAME_SIZE]; // max len
 //This interrupt used for both TX and RX
 void spi1_irq_a7190(void) {
 	unsigned char flen,i;
-	printf("in spi1 irq\r\n");
 	if (A7190_read_state() == IDLE) {
 #if 0
 #ifdef LRWPAN_COORDINATOR
@@ -36,9 +35,9 @@ void spi1_irq_a7190(void) {
 			ack_bytes[1]=ReadFIFO1(1);
 
 			ReadFIFO(&ack_bytes[2],ack_bytes[1]);
-			for(i=2;i<ack_bytes[1];++i)
-				printf("%x ",ack_bytes[i]);
-			printf("\r\n");
+//			for(i=2;i<ack_bytes[1];++i)
+//				printf("%x ",ack_bytes[i]);
+//			printf("\r\n");
 			macRxCustomPacketCallback(ack_bytes);
 		}
 

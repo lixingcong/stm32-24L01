@@ -15,6 +15,7 @@
 #include "common_func.h"
 #include "coord_FSM.h"
 #include "router_FSM.h"
+#include "hal.h"
 
 int main(){
 	unsigned char payload[10];
@@ -42,12 +43,16 @@ int main(){
 	router_FSM_state=ROUTER_STATE_INITAILIZE_ALL_NODES;
 #endif
 
-
+	//payload[0]='h';payload[1]='i';
 	while(1){
-		if(my_role==ROLE_COORDINATOR)
+		if(my_role==ROLE_COORDINATOR){
 			while(1)coordFSM();
-		else
+		}
+
+		else{
 			while(1)router_FSM();
+		}
+
 	}
 	return 0;
 }

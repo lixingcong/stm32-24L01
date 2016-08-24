@@ -27,13 +27,13 @@ void coordFSM(){
 			printf("Coordinator, my addr is %u, Network formed\r\n",MY_NODE_NUM);
 			coord_FSM_state=COORD_STATE_SEND_BEACON;
 			last_timer_children_checked=last_timer_beacon_sent=halGetMACTimer();
+			isOffline=FALSE;
 			break;
 		case COORD_STATE_SEND_BEACON:
 			if(halMACTimerNowDelta(last_timer_beacon_sent)>=MSECS_TO_MACTICKS(INTERVAL_OF_SENDING_BEACON*1000)){
 				// TODO: clear all coord nodes
 				coord_send_beacon();
 				last_timer_beacon_sent=halGetMACTimer();
-				printf("here beacon\r\n");
 			}
 			coord_FSM_state=COORD_STATE_CHECK_CHILDREN;
 			break;
@@ -42,7 +42,6 @@ void coordFSM(){
 				check_my_children_online();
 				update_route_table_cache();
 				last_timer_children_checked=halGetMACTimer();
-				printf("here check children\r\n");
 			}
 			coord_FSM_state=COORD_STATE_SEND_BEACON;
 			break;

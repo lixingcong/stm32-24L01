@@ -428,9 +428,7 @@ void macRxCustomPacketCallback(unsigned char *ptr){
 				macRxPingCallback(ptr);
 				break;
 			case FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL:
-				printf("here\r\n");
 				if(*(ptr+5)==FRAME_FLAG_JOIN_REQUEST){ // join req
-					printf("send a join reponse\r\n");
 					send_join_network_response(*(ptr+4));
 				}
 
@@ -440,7 +438,6 @@ void macRxCustomPacketCallback(unsigned char *ptr){
 						my_parent = *(ptr + 4);
 						add_to_my_parent();
 						send_join_network_response_ack(*(ptr+4));
-						printf("send a join request ack\r\n");
 					}
 				}else{ // a join ACK
 					printf("recv a join ack\r\n");
