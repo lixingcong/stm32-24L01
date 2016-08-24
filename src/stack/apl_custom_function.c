@@ -44,7 +44,7 @@ void update_route_table_info() {
 #endif
 	} else {
 		check_my_children_online();
-		update_route_table_cache();
+//		update_route_table_cache();
 		display_all_nodes();
 	}
 	isNeedCheckChildren = 1 - isNeedCheckChildren;  // True or False convert from each other

@@ -221,13 +221,11 @@ void send_route_increasing_change_to_parent(){
 	route_response[0]=FRAME_TYPE_SHORT_ROUTE_UPDATE;
 	route_response[1]=my_parent;
 	route_response[2]=MY_NODE_NUM;
-	printf("in send increasing: ");
-	for(i=0;i<route_response_offset;++i)
-		printf("%x ",route_response[i]);
-	printf("\r\n");
+//	printf("in send increasing: ");
+//	for(i=0;i<route_response_offset;++i)
+//		printf("%x ",route_response[i]);
+//	printf("\r\n");
 	halSendPacket(route_response_offset, &route_response[0], TRUE);
-
-	DelayMs(2);
 	route_response_offset=3;
 }
 
@@ -267,20 +265,6 @@ void display_all_nodes(){
 			printf("- Node #%u 's parent is #%u\r\n",i,all_nodes[i]);
 }
 
-void update_route_table_cache(){
-#if 0
-	unsigned char i;
-	for(i=1;i<ALL_NODES_NUM;++i){
-		if(all_nodes[i]!=all_nodes_cache[i] ){
-			if(all_nodes_cache[i]==0xff)
-				update_route_response_content(TRUE, i, all_nodes[i]); // add a child
-			if(all_nodes[i]==0xff)
-				update_route_response_content(FALSE, i, all_nodes_cache[i]); // delete a child
-		}
-		all_nodes_cache[i]=all_nodes[i];
-	}
-#endif
-}
 
 void update_route_response_content(BOOL isAdd, unsigned char child, unsigned char parent){
 	if(route_response_offset>=ALL_NODES_NUM*3+3) // excceed max len
@@ -312,6 +296,8 @@ void macRxCustomPacketCallback(unsigned char *ptr){
 			case FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL:
 				if(*(ptr+5)==FRAME_FLAG_JOIN_REQUEST){ // join req
 					if(my_parent==*(ptr+4))// sender is my parent, not allow to join(loopback)
+						break;
+					if(*(ptr+4)==MY_NODE_NUM) // conflict address, not allow
 						break;
 					if(all_nodes[*(ptr+4)]==MY_NODE_NUM){
 						send_join_network_response(*(ptr+4),FALSE);

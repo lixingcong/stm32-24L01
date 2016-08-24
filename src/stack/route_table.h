@@ -53,7 +53,6 @@ void send_custom_upload_route_request();
 void send_custom_packet_relay(unsigned char src,unsigned char dst,unsigned char flen,unsigned char *frm,unsigned char frm_type);
 void send_custom_routine_to_coord(unsigned char dst);
 
-void update_route_table_cache();
 void display_all_nodes();
 void update_route_response_content(BOOL isAdd, unsigned char child, unsigned char parent);
 

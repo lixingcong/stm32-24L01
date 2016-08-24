@@ -58,7 +58,6 @@ void router_FSM(){
 		case ROUTER_STATE_CHECK_CHILDREN:
 			if(halMACTimerNowDelta(last_timer_children_checked)>=MSECS_TO_MACTICKS(INTERVAL_OF_CHECKING_CHILDREN*1000)){
 				check_my_children_online();
-				update_route_table_cache();
 				if(route_response_offset>3)
 					send_route_increasing_change_to_parent();
 				display_all_nodes();
