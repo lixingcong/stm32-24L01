@@ -137,7 +137,7 @@ void merge_grandsons(unsigned char *ptr){
 // 注意dst为0xff为广播，谨慎使用
 void send_custom_packet(unsigned char src, unsigned char dst,unsigned short flen,unsigned char *frm, unsigned char frm_type){
 	unsigned short total_len,i;
-	unsigned char nexthop,thishop;
+	unsigned char nexthop;
 
 	if(flen>LRWPAN_MAX_FRAME_SIZE-6){
 #ifdef ROUTE_TABLE_OUTPUT_DEBUG
@@ -149,18 +149,8 @@ void send_custom_packet(unsigned char src, unsigned char dst,unsigned short flen
 	total_len=4+flen;
 
 	nexthop=dst;
-	do{
-		if(0xff!=macTxPing(nexthop, TRUE, PING_DIRECTION_TO_OTHERS))
-			break;
-
-		nexthop=get_next_hop(nexthop, MY_NODE_NUM); // you should set thishop to MY_NODE_NUM
-		if(nexthop==0xff)
-			break;
-	}while(1);
-
-	if(nexthop==0xff)
-		nexthop=my_parent;
-
+	if(0xff==macTxPing(nexthop, TRUE, PING_DIRECTION_TO_OTHERS)) // first try to send it as next hop
+		nexthop=get_next_hop(nexthop, MY_NODE_NUM);
 	printf("send_custom_packet: nexthop=#%u, dst=#%u\r\n",nexthop,dst);
 
 	payload_custom[0]=frm_type;

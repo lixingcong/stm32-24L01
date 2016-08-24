@@ -50,18 +50,15 @@ int main(){
 		payload[i]=(i+2)%256;
 	while(1){
 		if(my_role==ROLE_COORDINATOR){
-			my_timer=halGetMACTimer();
 			while(1){
 				coordFSM();
-				if(halMACTimerNowDelta(my_timer)>=MSECS_TO_MACTICKS(6000)){
-					send_custom_packet(MY_NODE_NUM, 1, 300, payload, 0xff);
-					while(1);
-				}
 			}
 		}
 
 		else{
-			while(1)router_FSM();
+			while(1){
+				router_FSM();
+			}
 		}
 
 	}

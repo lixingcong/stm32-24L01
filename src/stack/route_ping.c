@@ -52,8 +52,8 @@ unsigned char macTxPing(unsigned char dst, BOOL isRequest, unsigned char directi
 
 			if(route_ping_data.ackPending == FALSE)
 				break;
-			// ping timeout=30ms
-			if (timer > MSECS_TO_MACTICKS(30)){
+			// ping timeout=5ms
+			if (timer > MSECS_TO_MACTICKS(5)){
 #ifdef MAC_OUTPUT_DEBUG_PING
 				printf("macTxPing(): ping time out\r\n");
 #endif
