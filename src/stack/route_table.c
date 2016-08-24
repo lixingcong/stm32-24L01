@@ -78,7 +78,9 @@ unsigned char get_next_hop(unsigned char this_hop, unsigned char dst) {
 
 // 使用ping检测孩子是否在线，不在线的将被删除
 void check_my_children_online() {
+	unsigned char children_counter;
 	unsigned char i;
+	children_counter=0;
 	for (i = 1; i < ALL_NODES_NUM; ++i) {
 		if (all_nodes[i] == (MY_NODE_NUM)) {  // my child
 			if(0xff==macTxCustomPing(i, PING_DIRECTION_TO_CHILDREN, 2, 300)){
@@ -86,14 +88,14 @@ void check_my_children_online() {
 				// if not online, del node in cache
 				update_route_response_content(FALSE, i, MY_NODE_NUM);
 				all_nodes[i]=0xff;
-				--my_children_number;
 #ifdef ROUTE_TABLE_OUTPUT_DEBUG
 				printf("Delete child #%u\r\n",i);
 #endif
-			}
+			}else
+				++children_counter;
 		}
 	}
-
+	my_children_number=children_counter;
 }
 
 
@@ -312,12 +314,12 @@ void macRxCustomPacketCallback(unsigned char *ptr){
 					if(my_parent==*(ptr+4))// sender is my parent, not allow to join(loopback)
 						break;
 					if(all_nodes[*(ptr+4)]==MY_NODE_NUM){
-						send_join_network_response(*(ptr+4));
+						send_join_network_response(*(ptr+4),FALSE);
 						break;
 					}
 					if(my_children_number<MAX_CHILDREN_NUM){
 						DelayMs(1);
-						send_join_network_response(*(ptr+4));
+						send_join_network_response(*(ptr+4),FALSE);
 					}
 
 				}
@@ -326,7 +328,7 @@ void macRxCustomPacketCallback(unsigned char *ptr){
 					if (isOffline == TRUE) {
 						isOffline = FALSE;
 						my_parent = *(ptr + 4);
-						send_join_network_response_ack(*(ptr+4));
+						send_join_network_response(*(ptr+4),TRUE);
 					}
 				}else{ // a join ACK
 					printf("recv a join ack\r\n");
@@ -334,7 +336,6 @@ void macRxCustomPacketCallback(unsigned char *ptr){
 					if(*(ptr+3)==MY_NODE_NUM){ // new child
 						printf("Node #%u joined\r\n",*(ptr+4));
 						update_route_response_content(TRUE, *(ptr+4), MY_NODE_NUM);
-						++my_children_number;
 					}
 
 				}
@@ -350,22 +351,14 @@ void macRxCustomPacketCallback(unsigned char *ptr){
 }
 
 
-void send_join_network_response(unsigned char dst){
-	if(my_children_number<MAX_CHILDREN_NUM){
-		payload_custom[0]=FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL;
-		payload_custom[1]=dst;
-		payload_custom[2]=MY_NODE_NUM;
-		payload_custom[3]=FRAME_FLAG_JOIN_RESPONSE;
-		halSendPacket(4, payload_custom, TRUE);
-	}
-}
-
-void send_join_network_response_ack(unsigned char dst){
+void send_join_network_response(unsigned char dst, BOOL isACK){
 	payload_custom[0]=FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL;
 	payload_custom[1]=dst;
 	payload_custom[2]=MY_NODE_NUM;
-	payload_custom[3]=FRAME_FLAG_JOIN_RESPONSE_ACK;
+	if(isACK==FALSE)
+		payload_custom[3]=FRAME_FLAG_JOIN_RESPONSE;
+	else
+		payload_custom[3]=FRAME_FLAG_JOIN_RESPONSE_ACK;
 	halSendPacket(4, payload_custom, TRUE);
 }
-
 

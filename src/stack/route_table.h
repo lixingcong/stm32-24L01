@@ -63,8 +63,7 @@ void update_route_response_content(BOOL isAdd, unsigned char child, unsigned cha
 void macRxCustomPacketCallback(unsigned char *ptr);
 
 
-void send_join_network_response(unsigned char dst);
-void send_join_network_response_ack(unsigned char dst);
+void send_join_network_response(unsigned char dst, BOOL isACK);
 
 // 协调器清空的counter数目 数值太大的话会已删除节点清除不及时 太小的话会丢失部份节点信息
 #define COORD_EMPTY_COUNT 5
