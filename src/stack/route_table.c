@@ -326,7 +326,7 @@ void macRxCustomPacketCallback(unsigned char *ptr){
 				}
 				break;
 			case FRAME_TYPE_SHORT_ROUTE_UPDATE:
-				if(*(ptr+3)==MY_NODE_NUM)
+				if(*(ptr+3)==MY_NODE_NUM || *(ptr+4)==my_parent)
 					merge_grandsons(ptr);
 				break;
 			default:
