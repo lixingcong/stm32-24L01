@@ -98,13 +98,6 @@ void check_my_children_online() {
 
 }
 
-void add_to_my_parent(){
-	all_nodes[MY_NODE_NUM]=my_parent;
-}
-
-void deattach_from_my_parent(){
-	all_nodes[MY_NODE_NUM]=0xff;
-}
 
 // 增加孩子
 void add_to_my_child(unsigned char addr){
@@ -139,12 +132,6 @@ void merge_grandsons(unsigned char *ptr){
 	}
 }
 
-// 清除孙子和信号强度
-void clear_all_nodes(){
-	unsigned char i;
-	for(i=1;i<ALL_NODES_NUM*2;++i)
-		all_nodes[i]=0xff;
-}
 
 BOOL check_if_children_empty(){
 	unsigned char i;
@@ -236,21 +223,12 @@ void send_custom_upload_route_request(){
 #endif
 		send_custom_upload_route_response();
 	}else{
-		clear_all_nodes();
+		//clear_all_nodes();
 	}
 #endif
 }
 // 向父亲上传自己的路由表，
 void send_custom_upload_route_response(){
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-	printf("in send upload response: dst=%u\r\n",dst);
-#endif
-	add_to_my_parent();
-
-	if(route_response_offset!=0){
-		send_custom_packet(MY_NODE_NUM, my_parent,route_response_offset,&route_response[0],CUSTOM_FRAME_TYPE_ROUTE_UPDATE_RESPONSE);
-		route_response_offset=0;
-	}
 }
 
 // 把dst作为Payload,发送到协调器，然后由协调器上传给PC绘制路径图，该路径表示发送者到dst的路径
@@ -281,104 +259,6 @@ void send_custom_packet_relay(unsigned char src,unsigned char dst,unsigned char 
 #endif
 	send_custom_packet(src,dst,flen,frm,frm_type);
 }
-// custom frame的接收处理函数
-#if 0
-void macRxCustomPacketCallback(unsigned char *ptr){
-	unsigned char i;
-	switch (*(ptr + 4)) {
-		case CUSTOM_FRAME_TYPE_BROADCAST:
-			if (*(ptr + 1) == MY_NODE_NUM) {  // next hop node is me
-				if (*(ptr + 2) != MY_NODE_NUM) { // dst is not me, relay it
-					// don't show msg
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-					printf("relaying broadcast, src=#%u, dst=#%u\r\n",*(ptr+3),*(ptr+2));
-#endif
-					send_custom_packet_relay(*(ptr + 3), *(ptr + 2), (*ptr) - 5, ptr + 5,CUSTOM_FRAME_TYPE_BROADCAST);
-				} else {
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-					printf("recv my dst broadcast: ");
-#endif
-					update_AP_msg(ptr);
-					aplRxCustomCallBack();
-					send_custom_broadcast(*(ptr) - 5, ptr + 5);  // send broadcast to my grandsons
-				}
-			} else if (*(ptr + 1) == 0xff) {  // all children's broadcast
-				if (*(ptr + 3) == my_parent) {  // if src is my parent
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-					printf("recv a normal broadcast: ");
-#endif
-					update_AP_msg(ptr);
-					aplRxCustomCallBack();
-					send_custom_broadcast(*(ptr) - 5, ptr + 5);  // recursive send broadcast
-				}
-			} else {
-				// illegal broadcast
-			}
-			break;
-		case CUSTOM_FRAME_TYPE_ROUTE_UPDATE_REQUEST:
-#ifdef LRWPAN_ROUTER
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-			printf("recv a custom route update request\r\n");
-#endif
-			if(*(ptr+3)==my_parent) {  // the src is my parent
-				//clear_all_nodes(); // flush all nodes
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-				printf("route update request is from my parent\r\n");
-#endif
-				send_custom_upload_route_request();// recursive send broadcast
-				last_route_updated_timer=halGetMACTimer(); // write down current time
-			} else {
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-				printf("route update request is not from my parent\r\n");
-#endif
-			}
-#endif
-			break;
-		case CUSTOM_FRAME_TYPE_ROUTE_UPDATE_RESPONSE:
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-			printf("recv a custom route response: src=#%u dst=#%u\r\n", *(ptr + 3), *(ptr + 2));
-#endif
-			if (*(ptr + 2) == MY_NODE_NUM) {  // dst is me
-				merge_grandsons(ptr);
-#ifndef LRWPAN_COORDINATOR
-				send_custom_upload_route_response();
-#endif
-			}
-			break;
-		case CUSTOM_FRAME_TYPE_DATA:
-			if (*(ptr + 1) == MY_NODE_NUM) {  // next hop is me
-				if(*(ptr+2)!=MY_NODE_NUM){ // dst is not me, relay it
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-					printf("relaying msg packet, src=#%u, dst=#%u\r\n",*(ptr+3),*(ptr+2));
-#endif
-					send_custom_packet_relay(*(ptr + 3), *(ptr + 2), (*ptr) - 5, ptr + 5,CUSTOM_FRAME_TYPE_DATA);
-				}else{ // dst is me
-					update_AP_msg(ptr);
-					aplRxCustomCallBack();
-				}
-			}
-			break;
-		case CUSTOM_FRAME_TYPE_UPLOADROUTEPATH_TO_PC:
-			if (*(ptr + 1) == MY_NODE_NUM) {  // next hop is me
-				if(*(ptr+2)!=MY_NODE_NUM){ // dst is not me, relay it
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-					printf("relaying route PC packet, src=#%u, dst=#%u\r\n",*(ptr+3),*(ptr+2));
-#endif
-					send_custom_packet_relay(*(ptr + 3), *(ptr + 2), 1, ptr + 5,CUSTOM_FRAME_TYPE_UPLOADROUTEPATH_TO_PC);
-				}else{ // dst is me, uploading path to PC
-					upload_route_for_PC(*(ptr+3), *(ptr+5));
-				}
-			}
-			break;
-		default:
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
-			printf("unsupport custom frame type\r\n");
-#endif
-			break;
-	}
-
-}
-#endif
 
 void display_all_nodes(){
 	unsigned char i;
@@ -436,7 +316,7 @@ void macRxCustomPacketCallback(unsigned char *ptr){
 					if (isOffline == TRUE) {
 						isOffline = FALSE;
 						my_parent = *(ptr + 4);
-						add_to_my_parent();
+						all_nodes[MY_NODE_NUM]=my_parent;
 						send_join_network_response_ack(*(ptr+4));
 					}
 				}else{ // a join ACK

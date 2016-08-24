@@ -39,14 +39,9 @@ unsigned char get_next_hop(unsigned char this_hop,unsigned char dst);
 
 void check_my_children_online();
 
-// TODO: 删掉非协调器的功能 宏定义屏蔽 2016年8月19日 上午10:54:06
-void add_to_my_parent();
-void deattach_from_my_parent();
-void add_to_my_child(unsigned char addr);
 
 void merge_grandsons(unsigned char *ptr);
 
-void clear_all_nodes();
 BOOL check_if_children_empty();
 
 // send function
