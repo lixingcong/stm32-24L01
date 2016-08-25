@@ -4,8 +4,7 @@
 #include "A7190reg.h"
 #include "SPI1.h"
 #include "route_table.h"
-//#include "execute_PC_cmd.h"
-//#include "route_ping.h"
+
 
 unsigned char ack_bytes[LRWPAN_MAX_FRAME_SIZE]; // max len
 
@@ -15,16 +14,11 @@ void spi1_irq_a7190(void) {
 	unsigned char flen,i;
 	unsigned short total_flen;
 	if (A7190_read_state() == IDLE) {
-#if 0
 #ifdef LRWPAN_COORDINATOR
 		if(dynamic_freq_mode!=0xff)//跳频模式忽略一切收到的数据包
 			goto do_rxflush;
 #endif
-#ifdef LRWPAN_ROUTER
-		if(isOffline==TRUE)
-			goto do_rxflush;
-#endif
-#endif
+
 		A7190_set_state(BUSY_RX);
 		flen = ReadFIFO1(1);  //read the length
 
@@ -38,10 +32,12 @@ void spi1_irq_a7190(void) {
 			macRxCustomPacketCallback(ack_bytes,FALSE,total_flen);
 		}else if((flen&0xff)==0x00){ // short
 			ReadFIFO(&ack_bytes[2],ack_bytes[1]);
+#if 0
 			printf("%x %x ",ack_bytes[0],ack_bytes[1]);
 			for(i=2;i<ack_bytes[1];++i)
 				printf("%x ",ack_bytes[i]);
 			printf("\r\n");
+#endif
 			macRxCustomPacketCallback(ack_bytes,TRUE,ack_bytes[1]);
 		}else{
 			goto do_rxflush; // drop invalid packet
