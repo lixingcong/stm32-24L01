@@ -64,7 +64,8 @@ int main(){
 				do{
 					router_FSM();
 				}while(isOffline==TRUE);
-
+				aplSendCustomMSG(0,5,payload);
+				DelayMs(2000);
 			}
 		}
 

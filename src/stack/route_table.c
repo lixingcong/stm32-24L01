@@ -208,7 +208,7 @@ void send_custom_packet_relay(unsigned char src,unsigned char dst,unsigned char 
 		printf("Routing ");
 	else
 		printf("Sending ");
-	printf("packet...frm_type=%u, msg=",frm_type);
+	printf("packet...frm_type=0x%x, msg=",frm_type);
 	for(i=0;i<flen;++i)
 		printf("%c",*(frm+i));
 	printf("\r\n");
