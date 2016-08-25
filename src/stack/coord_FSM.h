@@ -13,7 +13,7 @@ typedef enum _COORD_STATE_ENUM {
 	COORD_STATE_FORM_NETWORK, // 形成网络
 	COORD_STATE_SEND_BEACON, // 周期性发送协调器在线帧（有利于两个协调器融合）
 	COORD_STATE_CHECK_CHILDREN,  // 检查孩子
-	COORD_STATE_DESTROY_NETWORK // 破坏网络，退化成路由器
+	COORD_STATE_DOWNGRADE_TO_ROUTER // 退化成路由器，网络拓朴不变
 }COORD_STATE_ENUM;
 
 extern COORD_STATE_ENUM coord_FSM_state;

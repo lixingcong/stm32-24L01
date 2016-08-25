@@ -45,7 +45,7 @@ void coordFSM(){
 			}
 			coord_FSM_state=COORD_STATE_SEND_BEACON;
 			break;
-		case COORD_STATE_DESTROY_NETWORK:
+		case COORD_STATE_DOWNGRADE_TO_ROUTER:
 			// TODO: 降级为路由器 2016年8月23日 下午11:31:38
 			return;
 			break;
