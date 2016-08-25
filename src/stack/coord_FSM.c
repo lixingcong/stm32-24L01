@@ -5,7 +5,6 @@
  *      Author: li
  */
 
-#include "common_func.h"
 #include "coord_FSM.h"
 #include "hal.h"
 #include "route_table.h"

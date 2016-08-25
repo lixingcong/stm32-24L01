@@ -6,7 +6,6 @@
  *      Ping时延
  */
 
-#include "common_func.h"
 #include "route_ping.h"
 #include "route_table.h"
 #include "delay.h"

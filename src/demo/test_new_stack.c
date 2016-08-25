@@ -12,7 +12,6 @@
 #include "timer2.h"
 #include "A7190.h"
 #include "misc.h"
-#include "common_func.h"
 #include "coord_FSM.h"
 #include "router_FSM.h"
 #include "hal.h"

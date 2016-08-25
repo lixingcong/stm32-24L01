@@ -13,7 +13,6 @@
 #include "A7190.h"
 #include "execute_PC_cmd.h"
 #include "hal.h"
-#include "common_func.h"
 
 //#define ROUTE_TABLE_OUTPUT_DEBUG
 
@@ -30,6 +29,12 @@ unsigned int last_route_updated_timer;
 
 static unsigned char payload_custom[LRWPAN_MAX_FRAME_SIZE];
 BOOL isOffline;
+
+// 我的角色：协调器 or 路由器？
+MY_ROLE_ENUM my_role;
+
+unsigned int last_timer_beacon_sent;
+unsigned int last_timer_children_checked;
 
 unsigned char my_children_number;
 
