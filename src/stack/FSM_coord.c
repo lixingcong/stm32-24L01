@@ -7,6 +7,7 @@
  */
 
 #include "FSM_coord.h"
+#include "FSM_router.h"
 #include "hal.h"
 #include "route_table.h"
 #include "stdio.h"
@@ -16,7 +17,6 @@ COORD_STATE_ENUM coord_FSM_state;
 unsigned char coord_nodes_list[MAX_COORD_NUM];
 
 void coord_FSM(){
-	unsigned char i;
 	switch(coord_FSM_state){
 		case COORD_STATE_INITAILIZE_ALL_NODES:
 			init_all_nodes();
@@ -45,8 +45,10 @@ void coord_FSM(){
 			coord_FSM_state=COORD_STATE_SEND_BEACON;
 			break;
 		case COORD_STATE_DOWNGRADE_TO_ROUTER:
-			// TODO: 降级为路由器 2016年8月23日 下午11:31:38
-			return;
+			// TODO: 降级为路由器，在什么条件下触发 2016年8月23日 下午11:31:38
+			mainFSM=router_FSM;
+			isOffline=TRUE;
+			router_FSM_state=ROUTER_STATE_JOIN_NETWORK;
 			break;
 		default:
 			coord_FSM_state=COORD_STATE_INITAILIZE_ALL_NODES;

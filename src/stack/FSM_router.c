@@ -8,6 +8,7 @@
 
 
 #include "FSM_router.h"
+#include "FSM_coord.h"
 #include "hal.h"
 #include "route_table.h"
 #include "route_ping.h"
@@ -68,7 +69,9 @@ void router_FSM(){
 			router_FSM_state=ROUTER_STATE_CHECK_PARENT;
 			break;
 		case ROUTER_STATE_UPGRADE_TO_COORD:
-			// TODO: 升级为协调器 2016年8月25日 上午10:15:39
+			// TODO: 升级为协调器，在什么条件下触发 2016年8月25日 上午10:15:39
+			mainFSM=coord_FSM;
+			coord_FSM_state=COORD_STATE_FORM_NETWORK;
 			break;
 		default:
 			break;
