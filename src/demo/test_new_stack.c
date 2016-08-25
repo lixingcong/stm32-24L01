@@ -64,8 +64,7 @@ int main(){
 				do{
 					router_FSM();
 				}while(isOffline==TRUE);
-				send_custom_packet(MY_NODE_NUM, 0, 5, payload, FRAME_TYPE_LONG_MSG);
-				DelayMs(2000);
+
 			}
 		}
 

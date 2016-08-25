@@ -203,7 +203,6 @@ void send_custom_routine_to_coord(unsigned char dst){
 
 // 标准包的转发 多跳
 void send_custom_packet_relay(unsigned char src,unsigned char dst,unsigned char flen,unsigned char *frm,unsigned char frm_type){
-#if 0
 	unsigned char i;
 	if(src!=MY_NODE_NUM)
 		printf("Routing ");
@@ -215,7 +214,6 @@ void send_custom_packet_relay(unsigned char src,unsigned char dst,unsigned char 
 	printf("\r\n");
 
 	send_custom_packet(src, dst, flen, frm, frm_type);
-#endif
 }
 
 void display_all_nodes(){
@@ -240,13 +238,21 @@ void update_route_response_content(BOOL isAdd, unsigned char child, unsigned cha
 void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned short flen){
 	unsigned short i;
 	if(isShortMSG==FALSE){
-		switch(*(ptr+2)){ // switch frame type
+		switch(*(ptr+2)){ // switch frame type [LONG]
 			case FRAME_TYPE_LONG_MSG:
-				update_AP_msg(ptr, flen);
-				aplRxCustomCallBack();
-				break;
 			case FRAME_TYPE_LONG_MSG_WITH_ACK:
-				// recv and reply a ACK
+				if(*(ptr+3)==MY_NODE_NUM){ // next hop is me
+					if(*(ptr+4)==MY_NODE_NUM){ // dst is me, recv it
+						if(*(ptr+2)==FRAME_TYPE_LONG_MSG_WITH_ACK){
+							// reply an ACK
+							// TODO: ACK 2016年8月25日 上午9:40:21
+						}
+						update_AP_msg(ptr, flen);
+						aplRxCustomCallBack();
+					}else{ // dst is not me, relay it
+						send_custom_packet_relay(*(ptr+5), *(ptr+4), flen-6, ptr+6, *(ptr+2));
+					}
+				}
 				break;
 			case FRAME_TYPE_LONG_ACK:
 				// compare dsn
@@ -258,7 +264,7 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 				break;
 		}
 	}else{
-		switch(*(ptr+2)){ // switch frame type
+		switch(*(ptr+2)){ // switch frame type [SHORT]
 			case FRAME_TYPE_SHORT_BEACON:
 				// TODO: beacon 2016年8月23日 下午11:53:12
 				break;
