@@ -9,7 +9,6 @@
 #include "route_table.h"
 #include "route_ping.h"
 #include "delay.h"
-#include "timer2.h"
 #include "hal.h"
 #include "stdio.h"
 

@@ -228,11 +228,3 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
 {
 //  USB_Istr();
 }
-
-// 定时器2用于更新路由表
-void TIM2_IRQHandler(void){
-	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET){
-		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-//		update_route_table_info();
-	}
-}

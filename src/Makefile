@@ -21,7 +21,6 @@ OBJS+=SPI1.o
 #OBJS+=SPI2.o
 OBJS+=delay.o
 #OBJS+=my_console.o
-OBJS+=timer2.o
 
 VPATH+=drivers/pc_control
 OBJS+=usart_scanf_irq.o
@@ -36,7 +35,6 @@ VPATH+=stack
 OBJS+=hal.o
 OBJS+=coord_FSM.o
 OBJS+=router_FSM.o
-#OBJS+=common_func.o
 OBJS+=route_table.o
 OBJS+=apl_custom_function.o
 OBJS+=route_ping.o
