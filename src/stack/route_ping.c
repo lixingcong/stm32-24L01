@@ -27,7 +27,7 @@ ROUTE_PING_DATA route_ping_data;
 
 unsigned char macTxPing(unsigned char dst, BOOL isRequest, unsigned char direction){
 	unsigned int timer;
-	unsigned char ping[LRWPAN_PINGFRAME_LENGTH];
+	unsigned char ping[FRAME_LENGTH_PING];
 	ping[0]=FRAME_TYPE_SHORT_PING;
 	ping[1]=dst;
 	ping[2]=MY_NODE_NUM;
@@ -37,7 +37,7 @@ unsigned char macTxPing(unsigned char dst, BOOL isRequest, unsigned char directi
 		ping[3]=0x00; // ping response
 	ping[3]|=direction;
 
-	halSendPacket(LRWPAN_PINGFRAME_LENGTH, ping, TRUE);
+	halSendPacket(FRAME_LENGTH_PING, ping, TRUE);
 
 #ifdef MAC_OUTPUT_DEBUG_PING
 	printf("macTxPing(): sent ping packet\r\n");

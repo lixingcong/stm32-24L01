@@ -33,7 +33,7 @@ extern unsigned char all_nodes[ALL_NODES_NUM];
 
 void init_all_nodes();
 
-// 获取下一跳的长地址（低8位）
+// 获取下一跳的长地址
 unsigned char get_next_hop(unsigned char this_hop,unsigned char dst);
 
 void check_my_children_online();

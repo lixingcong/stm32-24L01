@@ -15,7 +15,6 @@
 
 ROUTER_STATE_ENUM router_FSM_state;
 
-unsigned char router_fsm_payload[10];
 unsigned int last_timer_parent_checked_me;
 
 void router_FSM(){
@@ -76,11 +75,12 @@ void router_FSM(){
 }
 
 void router_send_join_request(){
-	router_fsm_payload[0]=FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL;
-	router_fsm_payload[1]=0xff;
-	router_fsm_payload[2]=MY_NODE_NUM;
-	router_fsm_payload[3]=FRAME_FLAG_JOIN_REQUEST;
-	halSendPacket(4, router_fsm_payload, TRUE);
+	static unsigned char router_join_payload[FRAME_LENGTH_JOIN_INFO];
+	router_join_payload[0]=FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL;
+	router_join_payload[1]=0xff;
+	router_join_payload[2]=MY_NODE_NUM;
+	router_join_payload[3]=FRAME_FLAG_JOIN_REQUEST;
+	halSendPacket(FRAME_LENGTH_JOIN_INFO, router_join_payload, TRUE);
 }
 
 // TODO: send_PAATH_to_PC， 依赖多跳实现 2016年8月24日 下午1:51:45

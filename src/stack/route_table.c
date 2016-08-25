@@ -20,7 +20,7 @@
 extern void aplRxCustomCallBack(void);
 unsigned char all_nodes[ALL_NODES_NUM];// 存放实时更新路由表，用于转发数据包等操作
 
-unsigned char route_response[3*ALL_NODES_NUM+3];// 缓冲区专门存放待发送的增量路由表，前面有3个帧头
+unsigned char route_response[FRAME_LENGTH_ROUTE_CHANGE_RESPONSE];// 缓冲区专门存放待发送的增量路由表，前面有3个帧头
 unsigned char route_response_offset;// 增量路由表偏移量
 
 // only for router update, used by update_route_table_info()
@@ -189,7 +189,7 @@ void send_route_increasing_change_to_parent(){
 
 // 把dst作为Payload,发送到协调器，然后由协调器上传给PC绘制路径图，该路径表示发送者到dst的路径
 void send_custom_routine_to_coord(unsigned char dst){
-	static unsigned char routine_payload[4];
+	static unsigned char routine_payload[FRAME_LENGTH_SEND_TO_PC];
 	if(my_role==ROLE_COORDINATOR){ // src=0, directly upload to PC
 		//upload_route_for_PC(0, dst);
 		return;
@@ -201,7 +201,7 @@ void send_custom_routine_to_coord(unsigned char dst){
 	routine_payload[1]=0; // send to coord
 	routine_payload[2]=MY_NODE_NUM;
 	routine_payload[3]=dst;
-	halSendPacket(4, routine_payload, TRUE);
+	halSendPacket(FRAME_LENGTH_SEND_TO_PC, routine_payload, TRUE);
 }
 
 // 标准包的转发 多跳
@@ -228,7 +228,7 @@ void display_all_nodes(){
 
 
 void update_route_response_content(BOOL isAdd, unsigned char child, unsigned char parent){
-	if(route_response_offset>=ALL_NODES_NUM*3+3) // excceed max len
+	if(route_response_offset>=FRAME_LENGTH_ROUTE_CHANGE_RESPONSE) // excceed max len
 		return;
 	if(isAdd==TRUE)
 		route_response[route_response_offset++]=FRAME_FLAG_UPDATE_ROUTE_ADD; // 增量添加
@@ -285,7 +285,7 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 	}else{
 		switch(*(ptr+2)){ // switch frame type [SHORT]
 			case FRAME_TYPE_SHORT_BEACON:
-				// TODO: beacon 2016年8月23日 下午11:53:12
+				// TODO: beacon callback 2016年8月23日 下午11:53:12
 				break;
 			case FRAME_TYPE_SHORT_PING:
 				macRxPingCallback(ptr);
@@ -338,13 +338,14 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 
 
 void send_join_network_response(unsigned char dst, BOOL isACK){
-	payload_custom[0]=FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL;
-	payload_custom[1]=dst;
-	payload_custom[2]=MY_NODE_NUM;
+	static unsigned char join_response_payload[FRAME_LENGTH_JOIN_INFO];
+	join_response_payload[0]=FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL;
+	join_response_payload[1]=dst;
+	join_response_payload[2]=MY_NODE_NUM;
 	if(isACK==FALSE)
-		payload_custom[3]=FRAME_FLAG_JOIN_RESPONSE;
+		join_response_payload[3]=FRAME_FLAG_JOIN_RESPONSE;
 	else
-		payload_custom[3]=FRAME_FLAG_JOIN_RESPONSE_ACK;
-	halSendPacket(4, payload_custom, TRUE);
+		join_response_payload[3]=FRAME_FLAG_JOIN_RESPONSE_ACK;
+	halSendPacket(FRAME_LENGTH_JOIN_INFO, join_response_payload, TRUE);
 }
 

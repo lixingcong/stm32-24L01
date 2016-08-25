@@ -13,7 +13,6 @@
 
 COORD_STATE_ENUM coord_FSM_state;
 
-unsigned char coord_fsm_payload[10];
 unsigned char coord_nodes_list[MAX_COORD_NUM];
 
 void coordFSM(){
@@ -56,8 +55,9 @@ void coordFSM(){
 }
 
 void coord_send_beacon(){
-	coord_fsm_payload[0]=FRAME_TYPE_SHORT_BEACON;
-	coord_fsm_payload[1]=0xff;
-	coord_fsm_payload[2]=MY_NODE_NUM;
-	halSendPacket(3, coord_fsm_payload, TRUE);
+	static unsigned char coord_beacon_payload[FRAME_LENGTH_BEACON];
+	coord_beacon_payload[0]=FRAME_TYPE_SHORT_BEACON;
+	coord_beacon_payload[1]=0xff;
+	coord_beacon_payload[2]=MY_NODE_NUM;
+	halSendPacket(FRAME_LENGTH_BEACON, coord_beacon_payload, TRUE);
 }

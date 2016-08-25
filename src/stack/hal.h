@@ -12,12 +12,13 @@ typedef unsigned char BOOL;
 
 extern unsigned int systick_count;
 
-// A7190频道
+// A7190频道，设置不同的频道可以避免干扰
 #define LRWPAN_DEFAULT_START_CHANNEL 120
 
-#define LRWPAN_PINGFRAME_LENGTH 4
+// 单个packet最大长度，根据A7910手册设置
 #define LRWPAN_MAX_FRAME_SIZE 512
 
+// 来自msstatePAN协议栈的几个函数，主要功能是延时
 #define LRWPAN_SYMBOLS_PER_SECOND   62500
 #define MSECS_TO_MACTICKS(x)   (x*(LRWPAN_SYMBOLS_PER_SECOND/1000))
 #define MACTICKS_TO_MSECS(x)   (x/(LRWPAN_SYMBOLS_PER_SECOND/1000))

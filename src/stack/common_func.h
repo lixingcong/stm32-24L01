@@ -24,6 +24,13 @@ extern unsigned int last_timer_children_checked;
 // 最大孩子数目
 #define MAX_CHILDREN_NUM 1
 
+// 短帧的长度，不含2个头字节flen，因为头字节是由halSendPacket()函数修改的
+#define FRAME_LENGTH_BEACON 3
+#define FRAME_LENGTH_PING 4
+#define FRAME_LENGTH_JOIN_INFO 4
+#define FRAME_LENGTH_SEND_TO_PC 4
+#define FRAME_LENGTH_ROUTE_CHANGE_RESPONSE (ALL_NODES_NUM*3+3)
+
 // 短帧类型（帧长小于256）
 #define FRAME_TYPE_SHORT_PING 0x00
 #define FRAME_TYPE_SHORT_SEND_PATH_TO_PC  0x01
