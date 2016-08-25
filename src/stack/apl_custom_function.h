@@ -40,7 +40,7 @@ extern APS_CUSTOM_FRAME my_custom_frame;
 
 // 先发送到dst节点，dst节点收到后广播后，由dst给它的孩子和孙子进行广播
 #define aplSendCustomDstBROADCAST(dst,flen,frm) \
-		send_custom_packet(MY_NODE_NUM, dst,flen,frm,CUSTOM_FRAME_TYPE_BROADCAST)
+		send_custom_packet_relay(MY_NODE_NUM,dst,flen,frm,FRAME_TYPE_LONG_BROADCAST)
 
 
 // 更新AP层的接收信息，以便于对接aplRxCustomCallBack()
@@ -48,6 +48,6 @@ void update_AP_msg(unsigned char *ptr,unsigned short flen);
 
 
 #define aplSendCustomPing(dst,retry_times,retry_interval) \
-		macTxCustomPing(dst,1,retry_times,retry_interval)
+		macTxCustomPing(dst, PING_DIRECTION_TO_OTHERS, retry_times,retry_interval)
 
 #endif /* APL_CUSTOM_FUNCTION_H_ */

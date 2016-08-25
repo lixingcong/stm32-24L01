@@ -54,8 +54,13 @@ int main(){
 
 	while(1){
 		if(my_role==ROLE_COORDINATOR){
+			my_timer=halGetMACTimer();
 			while(1){
 				coordFSM();
+				if(halMACTimerNowDelta(my_timer)>=MSECS_TO_MACTICKS(3000)){
+					aplSendCustomBROADCAST(5,payload);
+					my_timer=halGetMACTimer();
+				}
 			}
 		}
 
@@ -64,8 +69,8 @@ int main(){
 				do{
 					router_FSM();
 				}while(isOffline==TRUE);
-				aplSendCustomMSG(0,5,payload);
-				DelayMs(2000);
+//				aplSendCustomMSG(0,5,payload);
+//				DelayMs(2000);
 			}
 		}
 

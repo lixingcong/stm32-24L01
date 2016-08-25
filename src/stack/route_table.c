@@ -148,10 +148,13 @@ void send_custom_packet(unsigned char src, unsigned char dst,unsigned short flen
 
 	total_len=4+flen;
 
-	nexthop=dst;
-	if(0xff==macTxPing(nexthop, TRUE, PING_DIRECTION_TO_OTHERS)) // first try to send it as next hop
-		nexthop=get_next_hop(nexthop, MY_NODE_NUM);
-	printf("send_custom_packet: nexthop=#%u, dst=#%u\r\n",nexthop,dst);
+	if(dst!=0xff){ // broadcast packet
+		nexthop=dst;
+		if(0xff==macTxPing(nexthop, TRUE, PING_DIRECTION_TO_OTHERS)) // first try to send it as next hop
+			nexthop=get_next_hop(nexthop, MY_NODE_NUM); // if ping time out, choose next hop in normal way
+		printf("send_custom_packet: nexthop=#%u, dst=#%u\r\n",nexthop,dst);
+	}else
+		nexthop=0xff;
 
 	payload_custom[0]=frm_type;
 	payload_custom[1]=nexthop;
@@ -172,7 +175,7 @@ void send_custom_packet(unsigned char src, unsigned char dst,unsigned short flen
 // 给孩子和孙子们发递归广播
 void send_custom_broadcast(unsigned char flen,unsigned char *frm){
 	// TODO: use DSN to avoid last broadcast 2016年8月10日 上午8:23:12
-	send_custom_packet(MY_NODE_NUM, 0xff,flen,frm,CUSTOM_FRAME_TYPE_BROADCAST);
+	send_custom_packet(MY_NODE_NUM, 0xff, flen, frm, FRAME_TYPE_LONG_BROADCAST);
 }
 
 // 向父亲上传自己的路由表，
@@ -255,10 +258,26 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 				}
 				break;
 			case FRAME_TYPE_LONG_ACK:
-				// compare dsn
+				// recv a ACK respons, now compare dsn
 				break;
 			case FRAME_TYPE_LONG_BROADCAST:
-				// recv and relay it
+				if(*(ptr+3)==MY_NODE_NUM){ // next hop is me
+					if(*(ptr+4)==MY_NODE_NUM){ // dst is me, recv it as a broadcast
+						update_AP_msg(ptr,flen);
+						aplRxCustomCallBack();
+						send_custom_broadcast(flen-6, ptr+6);  // send broadcast to my grandsons
+					}else{ // dst is not me, relay it
+						send_custom_packet_relay(*(ptr+5), *(ptr+4), flen-6, ptr+6, *(ptr+2));
+					}
+				}else if (*(ptr + 5) == my_parent) {  // src is my parent
+					if(*(ptr+3)==0xff){ // next hop is 0xff: all children's broadcast
+						update_AP_msg(ptr,flen);
+						aplRxCustomCallBack();
+						send_custom_broadcast(flen-6, ptr+6);  // send broadcast to my grandsons
+					}
+				}else{
+					// invalid broadcast(not from my parent)
+				}
 				break;
 			default:
 				break;

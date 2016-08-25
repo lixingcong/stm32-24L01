@@ -33,7 +33,6 @@ void spi1_irq_a7190(void) {
 
 		do_rx:
 		if ((flen&0xfe)==0xf0) { // long
-			printf("recv long\r\n");
 			total_flen=((flen&0x01)<<8)|ack_bytes[1];
 			ReadFIFO(&ack_bytes[2],total_flen-2);
 			macRxCustomPacketCallback(ack_bytes,FALSE,total_flen);
