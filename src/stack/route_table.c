@@ -279,7 +279,6 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 						send_join_network_response(*(ptr+4),TRUE);
 					}
 				}else{ // a join ACK
-					printf("recv a join ack\r\n");
 					all_nodes[*(ptr+4)]=*(ptr+3);
 					if(*(ptr+3)==MY_NODE_NUM){ // new child
 						printf("Node #%u joined\r\n",*(ptr+4));

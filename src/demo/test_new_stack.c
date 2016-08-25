@@ -35,8 +35,8 @@ int main(){
 	EXTI_config_for_A7190();
 
 	initRF();
+	printf("A7190 init done, PLL channel=%u\r\n",LRWPAN_DEFAULT_START_CHANNEL);
 
-	printf("init done\r\n");
 #ifdef LRWPAN_COORDINATOR
 	my_role=ROLE_COORDINATOR;
 	coord_FSM_state=COORD_STATE_INITAILIZE_ALL_NODES;
@@ -57,7 +57,9 @@ int main(){
 
 		else{
 			while(1){
-				router_FSM();
+				do{
+					router_FSM();
+				}while(isOffline==TRUE);
 			}
 		}
 
