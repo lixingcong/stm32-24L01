@@ -30,10 +30,21 @@
 // --------pc_control-----------
 #include "execute_PC_cmd.h"
 
+#define USB_FROM_PHONE_MAX_LEN 162
+unsigned char usb_recv_buffer[USB_FROM_PHONE_MAX_LEN];
+
+typedef enum _USB_APP_STATE_ENUM {
+	USB_APP_STATE_SELF_CHECK,
+	USB_APP_STATE_WAIT_FOR_USER_INPUT,
+	USB_APP_STATE_SEND_DATA
+}USB_APP_STATE_ENUM;
+
 int main(){
-	// TODO: remove 临时变量 2016年8月25日 上午11:22:24
-	unsigned char payload[512];
-	unsigned int my_timer,i;
+	unsigned char *usb_recv_ptr,j;
+	unsigned char ep2_rev_ok; // received ok flag
+
+	USB_APP_STATE_ENUM my_usb_stage;
+	my_usb_stage=USB_APP_STATE_WAIT_FOR_USER_INPUT;
 
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	// init delay timer
@@ -77,16 +88,54 @@ int main(){
 	mainFSM=router_FSM;
 #endif
 
-	payload[0]='h';
-	payload[1]='e';
-	payload[2]='l';
-	payload[3]='l';
-	payload[4]='o';
-
 	while(1){
 		do{
 			mainFSM();// 组网、入网状态机
 		}while(isOffline==TRUE);
+
+		// usb loop
+		switch (my_usb_stage) {
+			case USB_APP_STATE_SELF_CHECK:
+				ep2_rev_ok = USB_GetData(ENDP2, usb_recv_buffer, USB_FROM_PHONE_MAX_LEN);
+				if (ep2_rev_ok) {
+					if (usb_recv_buffer[6] == 1 && usb_recv_buffer[7] == 1) {      //组网检验
+						usb_recv_buffer[7] = all_nodes[MY_NODE_NUM];
+						USB_SendData(ENDP2, usb_recv_buffer, USB_FROM_PHONE_MAX_LEN);
+					} else {
+						usb_recv_buffer[7] = 0x20;
+						USB_SendData(ENDP2, usb_recv_buffer, USB_FROM_PHONE_MAX_LEN);
+					}
+					for (j = 0; j < USB_FROM_PHONE_MAX_LEN; j++) {
+						usb_recv_buffer[j] = 0;
+					}
+					ep2_rev_ok = 0;
+					my_usb_stage = USB_APP_STATE_WAIT_FOR_USER_INPUT;
+				}
+				break;
+				// wait for recv
+			case USB_APP_STATE_WAIT_FOR_USER_INPUT:
+				ep2_rev_ok = USB_GetData(ENDP2, usb_recv_buffer, USB_FROM_PHONE_MAX_LEN);
+				if (ep2_rev_ok) {
+					printf("recv USB data !!!!!\r\n");
+					// move pointer to msg offset
+					usb_recv_ptr = &usb_recv_buffer[24];
+					while (*usb_recv_ptr != 0)
+						printf("%c", *(usb_recv_ptr++));
+					printf("\r\n");
+
+					ep2_rev_ok = 0;
+					my_usb_stage = USB_APP_STATE_SEND_DATA;
+				}
+				break;
+				// after recv, go to send
+			case USB_APP_STATE_SEND_DATA:
+
+				aplSendCustomMSG(usb_recv_buffer[23],USB_FROM_PHONE_MAX_LEN,usb_recv_buffer);
+
+				//send_custom_routine_to_coord(usb_recv_buffer[23]);
+				my_usb_stage = USB_APP_STATE_WAIT_FOR_USER_INPUT;
+				break;
+		}
 
 #ifdef LRWPAN_COORDINATOR
 		if(dynamic_freq_mode!=0xff)
@@ -115,7 +164,15 @@ void aplRxCustomCallBack(){
 	ptr=aplGetCustomRxMsgData();
 	len=aplGetCustomRxMsgLen();
 
+	// move pointer to msg offset
+	ptr+=24;
+	while(*ptr!=0)
+		printf("%c",*(ptr++));
+	printf("\r\n");
+
+#if 0
 	for(i=0;i<len;++i)
 		putchar(*(ptr+i));
 	printf("\r\n");
+#endif
 }
