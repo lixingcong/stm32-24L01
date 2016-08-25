@@ -18,6 +18,7 @@
 ROUTER_STATE_ENUM router_FSM_state;
 
 unsigned int last_timer_parent_checked_me;
+void update_route_cache_and_find_difference();
 
 void router_FSM(){
 	switch(router_FSM_state){
@@ -61,6 +62,7 @@ void router_FSM(){
 		case ROUTER_STATE_CHECK_CHILDREN:
 			if(halMACTimerNowDelta(last_timer_children_checked)>=MSECS_TO_MACTICKS(INTERVAL_OF_CHECKING_CHILDREN*1000)){
 				check_my_children_online();
+				update_route_cache_and_find_difference();
 				if(route_response_offset>3)
 					send_route_increasing_change_to_parent();
 				display_all_nodes();
@@ -87,4 +89,19 @@ void router_send_join_request(){
 	halSendPacket(FRAME_LENGTH_JOIN_INFO, router_join_payload, TRUE);
 }
 
-// TODO: send_PAATH_to_PC， 依赖多跳实现 2016年8月24日 下午1:51:45
+// 查找路由表差异，以便于传输增量路由表
+void update_route_cache_and_find_difference(){
+	unsigned char i;
+	for(i=1;i<ALL_NODES_NUM;++i){
+		if(all_nodes[i]!=all_nodes_cache[i]){
+			if(all_nodes_cache[i]==0xff)
+				update_route_response_content(TRUE, i, all_nodes[i]); // add
+			else
+				update_route_response_content(FALSE, i, all_nodes_cache[i]); // delete
+
+		}
+		all_nodes_cache[i]=all_nodes[i];
+	}
+}
+
+
