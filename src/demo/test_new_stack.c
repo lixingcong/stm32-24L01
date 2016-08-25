@@ -17,6 +17,7 @@
 #include "router_FSM.h"
 #include "hal.h"
 #include "route_table.h"
+#include "apl_custom_function.h"
 
 int main(){
 	unsigned char payload[512];
@@ -45,9 +46,12 @@ int main(){
 	router_FSM_state=ROUTER_STATE_INITAILIZE_ALL_NODES;
 #endif
 
-	//payload[0]='h';payload[1]='i';
-	for(i=0;i<512;i++)
-		payload[i]=(i+2)%256;
+	payload[0]='h';
+	payload[1]='e';
+	payload[2]='l';
+	payload[3]='l';
+	payload[4]='o';
+
 	while(1){
 		if(my_role==ROLE_COORDINATOR){
 			while(1){
@@ -60,6 +64,8 @@ int main(){
 				do{
 					router_FSM();
 				}while(isOffline==TRUE);
+				send_custom_packet(MY_NODE_NUM, 0, 5, payload, FRAME_TYPE_LONG_MSG);
+				DelayMs(2000);
 			}
 		}
 
@@ -67,6 +73,26 @@ int main(){
 	return 0;
 }
 
-void aplRxCustomCallBack(void){
+void aplRxCustomCallBack(){
+	unsigned short len,i;
+	unsigned char *ptr;
+	printf("recv a custom packet, type=");
 
+	switch(aplGetCustomRxMsgType()){
+		case FRAME_TYPE_LONG_BROADCAST:
+			printf("broadcast: \r\n");
+			break;
+		case FRAME_TYPE_LONG_MSG:
+			printf("msg: \r\n");
+			break;
+		default:
+			printf("unsupport msg in RxCallback\r\n");
+			return;
+	}
+	ptr=aplGetCustomRxMsgData();
+	len=aplGetCustomRxMsgLen();
+
+	for(i=0;i<len;++i)
+		putchar(*(ptr+i));
+	printf("\r\n");
 }

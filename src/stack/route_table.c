@@ -203,7 +203,7 @@ void send_custom_routine_to_coord(unsigned char dst){
 
 // 标准包的转发 多跳
 void send_custom_packet_relay(unsigned char src,unsigned char dst,unsigned char flen,unsigned char *frm,unsigned char frm_type){
-#ifdef ROUTE_TABLE_OUTPUT_DEBUG
+#if 0
 	unsigned char i;
 	if(src!=MY_NODE_NUM)
 		printf("Routing ");
@@ -213,8 +213,9 @@ void send_custom_packet_relay(unsigned char src,unsigned char dst,unsigned char 
 	for(i=0;i<flen;++i)
 		printf("%c",*(frm+i));
 	printf("\r\n");
+
+	send_custom_packet(src, dst, flen, frm, frm_type);
 #endif
-	send_custom_packet(src,dst,flen,frm,frm_type);
 }
 
 void display_all_nodes(){
@@ -239,10 +240,23 @@ void update_route_response_content(BOOL isAdd, unsigned char child, unsigned cha
 void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned short flen){
 	unsigned short i;
 	if(isShortMSG==FALSE){
-		// long msg(should judge outside)
-		printf("recv long msg:\r\n");
-		for(i=0;i<flen;i++)
-			printf("%u: %x\r\n",i,*(ptr+i));
+		switch(*(ptr+2)){ // switch frame type
+			case FRAME_TYPE_LONG_MSG:
+				update_AP_msg(ptr, flen);
+				aplRxCustomCallBack();
+				break;
+			case FRAME_TYPE_LONG_MSG_WITH_ACK:
+				// recv and reply a ACK
+				break;
+			case FRAME_TYPE_LONG_ACK:
+				// compare dsn
+				break;
+			case FRAME_TYPE_LONG_BROADCAST:
+				// recv and relay it
+				break;
+			default:
+				break;
+		}
 	}else{
 		switch(*(ptr+2)){ // switch frame type
 			case FRAME_TYPE_SHORT_BEACON:

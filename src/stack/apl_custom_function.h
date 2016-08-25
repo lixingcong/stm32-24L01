@@ -15,7 +15,7 @@
 typedef struct _APS_CUSTOM_FRAME{
 	unsigned char src_addr;
 	unsigned char *data;
-	unsigned char flen;
+	unsigned short flen;
 	BOOL frame_type;
 }APS_CUSTOM_FRAME;
 
@@ -44,7 +44,7 @@ extern APS_CUSTOM_FRAME my_custom_frame;
 
 
 // 更新AP层的接收信息，以便于对接aplRxCustomCallBack()
-void update_AP_msg(unsigned char *ptr);
+void update_AP_msg(unsigned char *ptr,unsigned short flen);
 
 
 #define aplSendCustomPing(dst,retry_times,retry_interval) \
