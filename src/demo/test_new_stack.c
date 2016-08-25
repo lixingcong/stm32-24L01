@@ -60,7 +60,6 @@ int main(){
 				do{
 					router_FSM();
 				}while(isOffline==TRUE);
-				send_custom_routine_to_coord(3);
 			}
 		}
 

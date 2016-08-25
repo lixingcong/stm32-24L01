@@ -44,7 +44,6 @@ void merge_grandsons(unsigned char *ptr);
 
 // send function
 void send_custom_broadcast(unsigned char flen,unsigned char *frm);
-void send_custom_upload_route_request();
 void send_custom_packet(unsigned char src, unsigned char dst,unsigned short flen,unsigned char *frm, unsigned char frm_type);
 void send_custom_packet_relay(unsigned char src,unsigned char dst,unsigned char flen,unsigned char *frm,unsigned char frm_type);
 void send_custom_routine_to_coord(unsigned char dst);

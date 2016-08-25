@@ -46,9 +46,6 @@ extern APS_CUSTOM_FRAME my_custom_frame;
 // 更新AP层的接收信息，以便于对接aplRxCustomCallBack()
 void update_AP_msg(unsigned char *ptr);
 
-// 定时器2中断调用更新路由
-void update_route_table_info();
-
 
 #define aplSendCustomPing(dst,retry_times,retry_interval) \
 		macTxCustomPing(dst,1,retry_times,retry_interval)

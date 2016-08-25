@@ -175,19 +175,11 @@ void send_custom_broadcast(unsigned char flen,unsigned char *frm){
 	send_custom_packet(MY_NODE_NUM, 0xff,flen,frm,CUSTOM_FRAME_TYPE_BROADCAST);
 }
 
-// 向孩子广播一个路由更新请求
-void send_custom_upload_route_request(){
-}
 // 向父亲上传自己的路由表，
 void send_route_increasing_change_to_parent(){
-	unsigned char i;
 	route_response[0]=FRAME_TYPE_SHORT_ROUTE_UPDATE;
 	route_response[1]=my_parent;
 	route_response[2]=MY_NODE_NUM;
-//	printf("in send increasing: ");
-//	for(i=0;i<route_response_offset;++i)
-//		printf("%x ",route_response[i]);
-//	printf("\r\n");
 	halSendPacket(route_response_offset, &route_response[0], TRUE);
 	route_response_offset=3;
 }
