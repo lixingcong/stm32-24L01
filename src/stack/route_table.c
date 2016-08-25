@@ -224,6 +224,7 @@ void display_all_nodes(){
 	for(i=1;i<ALL_NODES_NUM;++i)
 		if(all_nodes[i]!=0xff)
 			printf("- Node #%u 's parent is #%u\r\n",i,all_nodes[i]);
+	printf("-\r\n");
 }
 
 
