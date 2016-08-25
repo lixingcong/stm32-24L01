@@ -33,10 +33,10 @@ OBJS+=A7190.o
 
 VPATH+=stack
 OBJS+=hal.o
-OBJS+=coord_FSM.o
-OBJS+=router_FSM.o
+OBJS+=FSM_coord.o
+OBJS+=FSM_router.o
 OBJS+=route_table.o
-OBJS+=apl_custom_function.o
+OBJS+=route_AP_level.o
 OBJS+=route_ping.o
 
 #VPATH+=drivers/lmx2581

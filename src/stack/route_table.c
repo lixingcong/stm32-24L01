@@ -9,7 +9,7 @@
 
 #include "route_table.h"
 #include "route_ping.h"
-#include "apl_custom_function.h"
+#include "route_AP_level.h"
 #include "A7190.h"
 #include "execute_PC_cmd.h"
 #include "hal.h"
@@ -22,12 +22,8 @@ unsigned char all_nodes[ALL_NODES_NUM];// 存放实时更新路由表，用于�
 unsigned char route_response[FRAME_LENGTH_ROUTE_CHANGE_RESPONSE];// 缓冲区专门存放待发送的增量路由表，前面有3个帧头
 unsigned char route_response_offset;// 增量路由表偏移量
 
-// only for router update, used by update_route_table_info()
-#ifdef LRWPAN_ROUTER
-unsigned int last_route_updated_timer;
-#endif
-
 static unsigned char payload_custom[LRWPAN_MAX_FRAME_SIZE];
+
 BOOL isOffline;
 
 // 我的角色：协调器 or 路由器？

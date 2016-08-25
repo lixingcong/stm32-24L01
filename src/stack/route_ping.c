@@ -11,7 +11,8 @@
 #include "delay.h"
 #include "hal.h"
 #include "stdio.h"
-#include "router_FSM.h"
+
+extern unsigned int last_timer_parent_checked_me; // defined in FSM_router.c
 
 //used for ping
 typedef struct _ROUTE_PING_DATA {

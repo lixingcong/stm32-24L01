@@ -34,7 +34,7 @@
 #include "usb_lib.h"
 #include "usb_istr.h"
 #include "usb_pwr.h"
-#include "apl_custom_function.h"
+
 
 unsigned int systick_count=0;
 
