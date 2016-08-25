@@ -206,15 +206,22 @@ void send_custom_routine_to_coord(unsigned char dst){
 
 // 标准包的转发 多跳
 void send_custom_packet_relay(unsigned char src,unsigned char dst,unsigned char flen,unsigned char *frm,unsigned char frm_type){
-	unsigned char i;
+	unsigned char i,*ptr;
 	if(src!=MY_NODE_NUM)
 		printf("Routing ");
 	else
 		printf("Sending ");
 	printf("packet...frm_type=0x%x, msg=",frm_type);
+#if 0
 	for(i=0;i<flen;++i)
 		printf("%c",*(frm+i));
 	printf("\r\n");
+#else
+	ptr=frm+24;
+	while(*ptr!=0)
+		printf("%c",*(ptr++));
+	printf("\r\n");
+#endif
 
 	send_custom_packet(src, dst, flen, frm, frm_type);
 }
