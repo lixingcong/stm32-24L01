@@ -32,7 +32,7 @@ unsigned char macTxPing(unsigned char dst, BOOL isRequest, unsigned char directi
 	ping[1]=dst;
 	ping[2]=MY_NODE_NUM;
 	if(isRequest==TRUE)
-		ping[3]=0x10; // ping request
+		ping[3]=0xf0; // ping request
 	else
 		ping[3]=0x00; // ping response
 	ping[3]|=direction;
@@ -52,7 +52,7 @@ unsigned char macTxPing(unsigned char dst, BOOL isRequest, unsigned char directi
 
 			if(route_ping_data.ackPending == FALSE)
 				break;
-			// ping timeout=5ms
+			// TODO: ping timeout=5ms
 			if (timer > MSECS_TO_MACTICKS(5)){
 #ifdef MAC_OUTPUT_DEBUG_PING
 				printf("macTxPing(): ping time out\r\n");
@@ -76,6 +76,7 @@ unsigned char macTxPing(unsigned char dst, BOOL isRequest, unsigned char directi
 
 /*
  * 自定义的ping函数
+ * direction: 有三种方向：父亲->孩子、孩子->父亲、不分方向
  * retry_times: ping 重试次数
  * retry_interval: ping 重试间隔，单位毫秒
  */
@@ -104,11 +105,9 @@ unsigned char macTxCustomPing(unsigned char dst, unsigned char direction, unsign
 }
 
 
-// TODO: send direction 改变路由表 2016年8月23日 下午11:20:13
 void macRxPingCallback(unsigned char *ptr) {
 	if (*(ptr+3) == (MY_NODE_NUM)) {
-		if ((*(ptr + 5) & 0x10 ) == 0x10) {  // receive a ping request, make a response to him
-			// todo: 这里出现一种情况：父亲的路由表没有孩子，却给孩子回复ping包，需要修正
+		if ((*(ptr + 5) & 0xf0 ) == 0xf0) {  // receive a ping request, make a response to him
 			switch((*(ptr+5))&0x0f){
 				case PING_DIRECTION_TO_CHILDREN:
 					macTxPing(*(ptr+4), FALSE, PING_DIRECTION_TO_PARENT);
@@ -125,13 +124,15 @@ void macRxPingCallback(unsigned char *ptr) {
 					break;
 			}
 
-		} else {  // receive a ping response, mark mac_ping_data.ackpending as FALSE
+		} else if((*(ptr + 5) & 0xf0 ) == 0x00) {  // receive a ping response, mark mac_ping_data.ackpending as FALSE
 			if (*(ptr + 4) == route_ping_data.dst) {
 #ifdef MAC_OUTPUT_DEBUG_PING
 				printf("macRxPingCallback(): ok dsn in macPingcallback()\r\n");
 #endif
 				route_ping_data.ackPending = FALSE;
 			}
+		}else{
+			// invalid ping packet
 		}
 	}else{ // ping dst is not me
 		if((*(ptr+5)&0x0f)==PING_DIRECTION_TO_CHILDREN){

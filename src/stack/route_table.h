@@ -38,7 +38,6 @@ unsigned char get_next_hop(unsigned char this_hop,unsigned char dst);
 
 void check_my_children_online();
 
-
 void merge_grandsons(unsigned char *ptr);
 
 
@@ -47,6 +46,8 @@ void send_custom_broadcast(unsigned char flen,unsigned char *frm);
 void send_custom_packet(unsigned char src, unsigned char dst,unsigned short flen,unsigned char *frm, unsigned char frm_type);
 void send_custom_packet_relay(unsigned char src,unsigned char dst,unsigned char flen,unsigned char *frm,unsigned char frm_type);
 void send_custom_routine_to_coord(unsigned char dst);
+// 增量更新路由表
+void send_route_increasing_change_to_parent();
 
 void display_all_nodes();
 void update_route_response_content(BOOL isAdd, unsigned char child, unsigned char parent);
@@ -59,14 +60,7 @@ void macRxCustomPacketCallback(unsigned char *ptr,BOOL isShortMSG, unsigned shor
 void send_join_network_response(unsigned char dst, BOOL isACK);
 
 
-// 自定义的mac层转发常量
-#define CUSTOM_FRAME_TYPE_BROADCAST 0xff
-#define CUSTOM_FRAME_TYPE_ROUTE_UPDATE_REQUEST  0x01
-#define CUSTOM_FRAME_TYPE_ROUTE_UPDATE_RESPONSE 0x02
-#define CUSTOM_FRAME_TYPE_DATA 0x03
-#define CUSTOM_FRAME_TYPE_UPLOADROUTEPATH_TO_PC 0x04
 
-void send_route_increasing_change_to_parent();
 
 
 #endif /* _DEFINE_ROUTE_TABLE_H_ */
