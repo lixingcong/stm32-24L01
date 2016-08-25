@@ -24,13 +24,14 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h"
 #include "stm32f10x_usart.h"
+#include "stm32f10x_tim.h"
 #include "stm32f10x_exti.h"
 #include "spi1_irq.h"
 #include "usart_scanf_irq.h"
 #include "SPI1.h"
 #include "usb_istr.h"
 #include "stdio.h"
-
+#include "timer2.h"
 
 unsigned int systick_count=0;
 
@@ -135,6 +136,7 @@ void DebugMon_Handler(void)
   */
 void PendSV_Handler(void)
 {
+
 }
 
 /**
@@ -144,9 +146,7 @@ void PendSV_Handler(void)
   */
 void SysTick_Handler(void)
 {
-	
-	systick_count++;
-	
+	++systick_count;
 }
 
 /******************************************************************************/
@@ -223,4 +223,12 @@ void EXTI9_5_IRQHandler(void)
 void USB_LP_CAN1_RX0_IRQHandler(void)
 {
 	USB_Istr();
+}
+
+// 定时器2用于更新system_msecond
+void TIM2_IRQHandler(void){
+	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET){
+		++system_msecond;
+		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+	}
 }

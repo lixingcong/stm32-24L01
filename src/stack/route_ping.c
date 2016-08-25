@@ -53,7 +53,7 @@ unsigned char macTxPing(unsigned char dst, BOOL isRequest, unsigned char directi
 			if(route_ping_data.ackPending == FALSE)
 				break;
 			// TODO: ping timeout=5ms
-			if (timer > MSECS_TO_MACTICKS(5)){
+			if (timer > 5){
 #ifdef MAC_OUTPUT_DEBUG_PING
 				printf("macTxPing(): ping time out\r\n");
 #endif
@@ -64,7 +64,7 @@ unsigned char macTxPing(unsigned char dst, BOOL isRequest, unsigned char directi
 #ifdef MAC_OUTPUT_DEBUG_PING
 			printf("macTxPing(): ping ack successfully\r\n");
 #endif
-			return (unsigned char) (MACTICKS_TO_MSECS(timer));  // Successfully ack
+			return (unsigned char) (timer);  // Successfully ack
 		}
 
 	}else
@@ -88,7 +88,7 @@ unsigned char macTxCustomPing(unsigned char dst, unsigned char direction, unsign
 	if(result==0xff){
 		last_ping_timer=halGetMACTimer();
 		while(1){
-			if(halMACTimerNowDelta(last_ping_timer) > MSECS_TO_MACTICKS(retry_interval)){
+			if(halMACTimerNowDelta(last_ping_timer) > (retry_interval)){
 				printf(" ping to #%u: retry for %u times\r\n",dst,ping_cnt);
 				result=macTxPing(dst, TRUE, direction);
 				if(result==0xff)

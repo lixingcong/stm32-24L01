@@ -9,9 +9,13 @@
 
 #include "hal.h"
 #include "A7190.h"
+#include "timer2.h"
 
+extern unsigned int systick_count;
+
+// 返回当前的毫秒数
 unsigned int halGetMACTimer(void) {
-	return systick_count;
+	return system_msecond;
 }
 
 unsigned short halGetRandomShortByte(void) {

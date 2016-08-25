@@ -21,6 +21,7 @@ OBJS+=SPI1.o
 OBJS+=SPI2.o
 OBJS+=delay.o
 OBJS+=usb_1.o
+OBJS+=timer2.o
 
 VPATH+=drivers/pc_control
 OBJS+=usart_scanf_irq.o

@@ -109,7 +109,7 @@ void USART1_init(void) {
 void USART_scanf_config_EXT(void) {
 	NVIC_InitTypeDef NVIC_InitStructure;
 	//初始化中断向量
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
 #ifndef USE_USART1_AS_OUTPUT_DEBUG
 	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
 #else

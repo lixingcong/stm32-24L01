@@ -52,7 +52,7 @@ void work_under_dynamic_mode(){
 
 		halSendPacket(((unsigned short)LRWPAN_MAX_FRAME_SIZE), ack_bytes,FALSE); // 往死里发包
 		// TODO: 跳频模式下发送间隔，频谱仪上显示不稳定 2016年8月18日 下午1:01:51
-		if (halMACTimerNowDelta(last_timer) > MSECS_TO_MACTICKS(10)){ // 每10ms改变VCO频率
+		if (halMACTimerNowDelta(last_timer) > 10){ // 每10ms改变VCO频率
 			freq=(freq<(LMX2581_MAX_FREQ-freq_step_in)?(freq+freq_step_in):LMX2581_MIN_FREQ);
 			ctl_frequency_set(freq);
 			last_timer=halGetMACTimer();

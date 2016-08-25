@@ -18,12 +18,8 @@ extern unsigned int systick_count;
 // 单个packet最大长度，根据A7910手册设置
 #define LRWPAN_MAX_FRAME_SIZE 512
 
-// 来自msstatePAN协议栈的几个函数，主要功能是延时
-#define LRWPAN_SYMBOLS_PER_SECOND   62500
-#define MSECS_TO_MACTICKS(x)   (x*(LRWPAN_SYMBOLS_PER_SECOND/1000))
-#define MACTICKS_TO_MSECS(x)   (x/(LRWPAN_SYMBOLS_PER_SECOND/1000))
-#define halMACTimerNowDelta(x) ((halGetMACTimer()-(x))& 0xfffff)
-
+// 求出距离上次的毫秒数x之差，限制为0xffff即为65535ms
+#define halMACTimerNowDelta(x) ((halGetMACTimer()-(x))& 0xffff)
 
 //修改为合适的网络地址，也可以使用make传递宏定义
 #ifndef IEEE_ADDRESS_ARRAY_COORD

@@ -35,7 +35,7 @@ void router_FSM(){
 			break;
 		case ROUTER_STATE_JOIN_NETWORK:
 			if(isOffline==TRUE){ // offline
-				if(halMACTimerNowDelta(last_timer_children_checked)>=MSECS_TO_MACTICKS((2000+(MY_NODE_NUM>>2)))){
+				if(halMACTimerNowDelta(last_timer_children_checked)>=((2000+(MY_NODE_NUM>>2)))){
 					printf("trying to join network\r\n");
 					router_send_join_request();
 					last_timer_children_checked=halGetMACTimer();
@@ -47,7 +47,7 @@ void router_FSM(){
 			}
 			break;
 		case ROUTER_STATE_CHECK_PARENT:
-			if(halMACTimerNowDelta(last_timer_parent_checked_me)>=MSECS_TO_MACTICKS(INTERVAL_OF_MY_PARENT_CHECK_ME*1000)){
+			if(halMACTimerNowDelta(last_timer_parent_checked_me)>=(INTERVAL_OF_MY_PARENT_CHECK_ME*1000)){
 				printf("no parent's ping for a while, check it\r\n");
 				if(0xff==macTxCustomPing(my_parent, PING_DIRECTION_TO_PARENT, 2, 200)){
 					isOffline=TRUE;
@@ -60,7 +60,7 @@ void router_FSM(){
 			router_FSM_state=ROUTER_STATE_CHECK_CHILDREN;
 			break;
 		case ROUTER_STATE_CHECK_CHILDREN:
-			if(halMACTimerNowDelta(last_timer_children_checked)>=MSECS_TO_MACTICKS(INTERVAL_OF_CHECKING_CHILDREN*1000)){
+			if(halMACTimerNowDelta(last_timer_children_checked)>=(INTERVAL_OF_CHECKING_CHILDREN*1000)){
 				check_my_children_online();
 				update_route_cache_and_find_difference();
 				if(route_response_offset>3)

@@ -29,7 +29,7 @@ void coord_FSM(){
 			isOffline=FALSE;
 			break;
 		case COORD_STATE_SEND_BEACON:
-			if(halMACTimerNowDelta(last_timer_beacon_sent)>=MSECS_TO_MACTICKS(INTERVAL_OF_SENDING_BEACON*1000)){
+			if(halMACTimerNowDelta(last_timer_beacon_sent)>=(INTERVAL_OF_SENDING_BEACON*1000)){
 				// TODO: clear all coord nodes
 				//coord_send_beacon();
 				last_timer_beacon_sent=halGetMACTimer();
@@ -37,10 +37,11 @@ void coord_FSM(){
 			coord_FSM_state=COORD_STATE_CHECK_CHILDREN;
 			break;
 		case COORD_STATE_CHECK_CHILDREN:
-			if(halMACTimerNowDelta(last_timer_children_checked)>=MSECS_TO_MACTICKS(INTERVAL_OF_CHECKING_CHILDREN*1000)){
+			if(halMACTimerNowDelta(last_timer_children_checked)>=(INTERVAL_OF_CHECKING_CHILDREN*1000)){
 				check_my_children_online();
 				display_all_nodes();
 				last_timer_children_checked=halGetMACTimer();
+				printf("--%u\r\n",last_timer_children_checked);
 			}
 			coord_FSM_state=COORD_STATE_SEND_BEACON;
 			break;

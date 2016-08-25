@@ -64,9 +64,9 @@ void EXTI_config_for_A7190(){
 	EXTI_Init(&EXTI_InitStructure);
 	/* Enable the EXTI9_5 Interrupt */
 	// TODO: 关注无线接收和串口中断的优先级顺序，我觉得应该是无线优先级高于串口 2016年7月27日 下午3:37:05
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
 	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure); 
 }

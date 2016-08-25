@@ -11,6 +11,7 @@
 #include "usart.h"
 #include "A7190.h"
 #include "misc.h"
+#include "timer2.h"
 // --------stack--------------
 #include "FSM_coord.h"
 #include "FSM_router.h"
@@ -49,6 +50,9 @@ int main(){
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	// init delay timer
 	init_delay();
+
+	// init timer2(system_msecond)
+	TIM2_Init();
 
 	// init USART
 	USART1_init();
