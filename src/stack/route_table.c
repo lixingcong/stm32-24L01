@@ -26,8 +26,9 @@ static unsigned char payload_custom[LRWPAN_MAX_FRAME_SIZE];
 
 BOOL isOffline;
 
-// 我的角色：协调器 or 路由器？
+// 我的角色：协调器 or 路由器，还有角色对应的状态机函数
 MY_ROLE_ENUM my_role;
+void (*mainFSM)();
 
 unsigned int last_timer_beacon_sent;
 unsigned int last_timer_children_checked;

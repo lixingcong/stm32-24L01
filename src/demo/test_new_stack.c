@@ -18,16 +18,18 @@
 #include "route_table.h"
 #include "route_AP_level.h"
 // --------USB-----------------
-#include "execute_PC_cmd.h"
+
 // --------LMX2581--------------
 #include "ctl_lmx2581.h"
 #include "stm32f10x_rcc.h"
 // --------pc_control-----------
+#include "execute_PC_cmd.h"
 
 int main(){
 	// TODO: remove 临时变量 2016年8月25日 上午11:22:24
 	unsigned char payload[512];
 	unsigned int my_timer,i;
+
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	// init delay timer
 	init_delay();
@@ -41,6 +43,7 @@ int main(){
 	SPI1_Init();
 	EXTI_config_for_A7190();
 	initRF();
+	printf("A7190 init done, PLL channel=%u\r\n",LRWPAN_DEFAULT_START_CHANNEL);
 
 	// init lmx2581
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);
@@ -49,17 +52,16 @@ int main(){
 	ctl_lmx2581_init();
 	ctl_frequency_set(400);
 
-	// init
-	printf("A7190 init done, PLL channel=%u\r\n",LRWPAN_DEFAULT_START_CHANNEL);
-
 	dynamic_freq_mode=0xff; // 这个必须要设置0xff，否则无法接收东西
 
 #ifdef LRWPAN_COORDINATOR
 	my_role=ROLE_COORDINATOR;
 	coord_FSM_state=COORD_STATE_INITAILIZE_ALL_NODES;
+	mainFSM=coord_FSM;
 #else
 	my_role=ROLE_ROUTER;
 	router_FSM_state=ROUTER_STATE_INITAILIZE_ALL_NODES;
+	mainFSM=router_FSM;
 #endif
 
 	payload[0]='h';
@@ -69,25 +71,14 @@ int main(){
 	payload[4]='o';
 
 	while(1){
-		if(my_role==ROLE_COORDINATOR){
-			my_timer=halGetMACTimer();
-			while(1){
-				coordFSM();
-				if(dynamic_freq_mode!=0xff)
-					work_under_dynamic_mode();
-			}
-		}
+		do{
+			mainFSM();// 组网、入网状态机
+		}while(isOffline==TRUE);
 
-		else{
-			while(1){
-				do{
-					router_FSM();
-				}while(isOffline==TRUE);
-//				aplSendCustomMSG(0,5,payload);
-//				DelayMs(2000);
-			}
-		}
-
+#ifdef LRWPAN_COORDINATOR
+		if(dynamic_freq_mode!=0xff)
+			work_under_dynamic_mode();
+#endif
 	}
 	return 0;
 }

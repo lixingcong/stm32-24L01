@@ -15,7 +15,7 @@ COORD_STATE_ENUM coord_FSM_state;
 
 unsigned char coord_nodes_list[MAX_COORD_NUM];
 
-void coordFSM(){
+void coord_FSM(){
 	unsigned char i;
 	switch(coord_FSM_state){
 		case COORD_STATE_INITAILIZE_ALL_NODES:

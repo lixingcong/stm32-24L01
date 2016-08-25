@@ -20,6 +20,6 @@ extern COORD_STATE_ENUM coord_FSM_state;
 
 void coord_send_beacon();
 
-void coordFSM();
+void coord_FSM();
 
 #endif /* SRC_STACK_COORD_FSM_H_ */
