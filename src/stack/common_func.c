@@ -8,6 +8,7 @@
 #include "common_func.h"
 #include "hal.h"
 
+
 MY_ROLE_ENUM my_role;
 
 unsigned int last_timer_beacon_sent;

@@ -194,15 +194,19 @@ void send_route_increasing_change_to_parent(){
 
 // 把dst作为Payload,发送到协调器，然后由协调器上传给PC绘制路径图，该路径表示发送者到dst的路径
 void send_custom_routine_to_coord(unsigned char dst){
-	static unsigned char routine_payload;
+	static unsigned char routine_payload[4];
+	if(my_role==ROLE_COORDINATOR){ // src=0, directly upload to PC
+		//upload_route_for_PC(0, dst);
+		return;
+	}
 #ifdef ROUTE_TABLE_OUTPUT_DEBUG
 	printf("in send routine path to coord\r\n");
 #endif
-	routine_payload=dst;
-	if(MY_NODE_NUM==0) // src=0, directly upload to PC
-		upload_route_for_PC(0, dst);
-	else
-		send_custom_packet(MY_NODE_NUM, 0, 1, &routine_payload, CUSTOM_FRAME_TYPE_UPLOADROUTEPATH_TO_PC);
+	routine_payload[0]=FRAME_TYPE_SHORT_SEND_PATH_TO_PC;
+	routine_payload[1]=0; // send to coord
+	routine_payload[2]=MY_NODE_NUM;
+	routine_payload[3]=dst;
+	halSendPacket(4, routine_payload, TRUE);
 }
 
 // 标准包的转发 多跳
@@ -290,6 +294,10 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 			case FRAME_TYPE_SHORT_ROUTE_UPDATE:
 				if(*(ptr+3)==MY_NODE_NUM || *(ptr+4)==my_parent)
 					merge_grandsons(ptr);
+				break;
+			case FRAME_TYPE_SHORT_SEND_PATH_TO_PC:
+				if(*(ptr+3)==MY_NODE_NUM)
+					printf("recv a path for PC: #%u -> #%u\r\n",*(ptr+4),*(ptr+5));
 				break;
 			default:
 				break;

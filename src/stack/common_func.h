@@ -32,9 +32,12 @@ extern unsigned int last_timer_children_checked;
 #define FRAME_TYPE_SHORT_ROUTE_UPDATE 0xf4
 #define FRAME_TYPE_SHORT_CHANGE_ROLE 0xf8
 
-// 长帧类型（帧长较长，小于500）
+// 长帧类型（帧长较长，长度为256~512）
 #define FRAME_TYPE_LONG_MSG 0x00
-#define FRAME_TYPE_LONG_BROADCAST 0xff
+#define FRAME_TYPE_LONG_ACK 0x02
+#define FRAME_TYPE_LONG_BROADCAST 0x04
+#define FRAME_TYPE_LONG_MSG_WITH_ACK 0xf0
+
 
 // 请求入网的标志
 #define FRAME_FLAG_JOIN_REQUEST 0x01
