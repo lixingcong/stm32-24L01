@@ -18,14 +18,13 @@ VPATH+=drivers
 OBJS+=usart.o
 OBJS+=sys.o
 OBJS+=SPI1.o
-#OBJS+=SPI2.o
+OBJS+=SPI2.o
 OBJS+=delay.o
-#OBJS+=my_console.o
 
 VPATH+=drivers/pc_control
 OBJS+=usart_scanf_irq.o
-#OBJS+=execute_PC_cmd.o
-#OBJS+=parse_PC_cmd.o
+OBJS+=execute_PC_cmd.o
+OBJS+=parse_PC_cmd.o
 
 VPATH+=drivers/a7190
 OBJS+=spi1_irq.o
@@ -39,9 +38,9 @@ OBJS+=route_table.o
 OBJS+=route_AP_level.o
 OBJS+=route_ping.o
 
-#VPATH+=drivers/lmx2581
-#OBJS+=lmx2581.o
-#OBJS+=ctl_lmx2581.o
+VPATH+=drivers/lmx2581
+OBJS+=lmx2581.o
+OBJS+=ctl_lmx2581.o
 
 #VPATH+=drivers/usb
 #OBJS+=usb_desc.o

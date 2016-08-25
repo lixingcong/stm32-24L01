@@ -4,8 +4,7 @@
 #include "stdint.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_rcc.h"
-#include "lrwpan_config.h"
-#include "halStack.h"
+#include "hal.h"
 
 // Description:LMX2581控制程序
 // File Name:lmx2581.c
