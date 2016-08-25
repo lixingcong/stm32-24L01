@@ -23,10 +23,10 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h"
+#include "exti8_irq.h"
 #include "stm32f10x_usart.h"
 #include "stm32f10x_tim.h"
 #include "stm32f10x_exti.h"
-#include "spi1_irq.h"
 #include "usart_scanf_irq.h"
 #include "SPI1.h"
 #include "usb_istr.h"
@@ -214,7 +214,7 @@ void EXTI9_5_IRQHandler(void)
 {
 	if(EXTI_GetITStatus(EXTI_Line8)!=RESET)
 	{
-		spi1_irq_a7190();
+		EXTI8_irq_a7190();
 		EXTI_ClearITPendingBit(EXTI_Line8);
 	}
 	

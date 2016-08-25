@@ -29,7 +29,7 @@ OBJS+=execute_PC_cmd.o
 OBJS+=parse_PC_cmd.o
 
 VPATH+=drivers/a7190
-OBJS+=spi1_irq.o
+OBJS+=exti8_irq.o
 OBJS+=A7190.o
 
 VPATH+=stack

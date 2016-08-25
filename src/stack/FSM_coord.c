@@ -41,7 +41,6 @@ void coord_FSM(){
 				check_my_children_online();
 				display_all_nodes();
 				last_timer_children_checked=halGetMACTimer();
-				printf("--%u\r\n",last_timer_children_checked);
 			}
 			coord_FSM_state=COORD_STATE_SEND_BEACON;
 			break;

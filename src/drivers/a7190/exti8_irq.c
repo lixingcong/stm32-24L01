@@ -1,16 +1,16 @@
 #include "hal.h"
-#include "spi1_irq.h"
+#include "exti8_irq.h"
 #include "A7190.h"
 #include "A7190reg.h"
 #include "SPI1.h"
 #include "route_table.h"
 
+extern unsigned char dynamic_freq_mode;
+unsigned char recv_buffer_a7190[LRWPAN_MAX_FRAME_SIZE]; // max len
 
-unsigned char ack_bytes[LRWPAN_MAX_FRAME_SIZE]; // max len
-
-
+// 外部中断PA8服务函数，当a7190有发送（接收）活动时调用
 //This interrupt used for both TX and RX
-void spi1_irq_a7190(void) {
+void EXTI8_irq_a7190(void) {
 	unsigned char flen,i;
 	unsigned short total_flen;
 	if (A7190_read_state() == IDLE) {
@@ -22,23 +22,23 @@ void spi1_irq_a7190(void) {
 		A7190_set_state(BUSY_RX);
 		flen = ReadFIFO1(1);  //read the length
 
-		ack_bytes[0]=flen;
-		ack_bytes[1]=ReadFIFO1(1);
+		recv_buffer_a7190[0]=flen;
+		recv_buffer_a7190[1]=ReadFIFO1(1);
 
 		do_rx:
 		if ((flen&0xfe)==0xf0) { // long
-			total_flen=((flen&0x01)<<8)|ack_bytes[1];
-			ReadFIFO(&ack_bytes[2],total_flen-2);
-			macRxCustomPacketCallback(ack_bytes,FALSE,total_flen);
+			total_flen=((flen&0x01)<<8)|recv_buffer_a7190[1];
+			ReadFIFO(&recv_buffer_a7190[2],total_flen-2);
+			macRxCustomPacketCallback(recv_buffer_a7190,FALSE,total_flen);
 		}else if((flen&0xff)==0x00){ // short
-			ReadFIFO(&ack_bytes[2],ack_bytes[1]);
+			ReadFIFO(&recv_buffer_a7190[2],recv_buffer_a7190[1]);
 #if 0
-			printf("%x %x ",ack_bytes[0],ack_bytes[1]);
-			for(i=2;i<ack_bytes[1];++i)
-				printf("%x ",ack_bytes[i]);
+			printf("%x %x ",recv_buffer_a7190[0],recv_buffer_a7190[1]);
+			for(i=2;i<recv_buffer_a7190[1];++i)
+				printf("%x ",recv_buffer_a7190[i]);
 			printf("\r\n");
 #endif
-			macRxCustomPacketCallback(ack_bytes,TRUE,ack_bytes[1]);
+			macRxCustomPacketCallback(recv_buffer_a7190,TRUE,recv_buffer_a7190[1]);
 		}else{
 			goto do_rxflush; // drop invalid packet
 		}

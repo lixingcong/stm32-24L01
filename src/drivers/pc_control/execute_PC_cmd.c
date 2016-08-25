@@ -5,11 +5,11 @@
  *      Author: lixingcong
  */
 
+#include <exti8_irq.h>
 #include "execute_PC_cmd.h"
 #include "define_songlu.h"
 #include "route_table.h"
 #include "A7190.h"
-#include "spi1_irq.h"
 #include "ctl_lmx2581.h"
 
 
@@ -45,12 +45,12 @@ void work_under_dynamic_mode(){
 	freq_step_in=(LMX2581_MAX_FREQ-LMX2581_MIN_FREQ)/steps;
 	last_timer=halGetMACTimer();
 	// reset first three bytes to avoid received by other nodes incidentally
-	ack_bytes[0]=ack_bytes[1]=ack_bytes[2]=0;
+	recv_buffer_a7190[0]=recv_buffer_a7190[1]=recv_buffer_a7190[2]=0;
 	while(1){
 		if(dynamic_freq_mode==0xff)// 定频模式：跳出
 			break;
 
-		halSendPacket(((unsigned short)LRWPAN_MAX_FRAME_SIZE), ack_bytes,FALSE); // 往死里发包
+		halSendPacket(((unsigned short)LRWPAN_MAX_FRAME_SIZE), recv_buffer_a7190,FALSE); // 往死里发包
 		// TODO: 跳频模式下发送间隔，频谱仪上显示不稳定 2016年8月18日 下午1:01:51
 		if (halMACTimerNowDelta(last_timer) > 10){ // 每10ms改变VCO频率
 			freq=(freq<(LMX2581_MAX_FREQ-freq_step_in)?(freq+freq_step_in):LMX2581_MIN_FREQ);
