@@ -151,7 +151,7 @@ void send_custom_packet(unsigned char src, unsigned char dst,unsigned short flen
 	if(dst!=0xff){ // broadcast packet
 		nexthop=dst;
 		if(0xff==macTxPing(nexthop, TRUE, PING_DIRECTION_TO_OTHERS)) // first try to send it as next hop
-			nexthop=get_next_hop(nexthop, MY_NODE_NUM); // if ping time out, choose next hop in normal way
+			nexthop=get_next_hop(MY_NODE_NUM,dst); // if ping time out, choose next hop in normal way
 		printf("send_custom_packet: nexthop=#%u, dst=#%u\r\n",nexthop,dst);
 	}else
 		nexthop=0xff;
