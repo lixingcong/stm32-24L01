@@ -2,7 +2,7 @@
  * execute_PC_cmd.h
  *
  *  Created on: 2016年7月27日
- *      Author: li
+ *      Author: lixingcong
  */
 
 #ifndef _EXECUTE_PC_CMD_H_

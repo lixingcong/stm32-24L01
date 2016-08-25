@@ -2,7 +2,7 @@
  * usart_scanf_irq.h
  *
  *  Created on: 2016年7月20日
- *      Author: li
+ *      Author: lixingcong
  */
 
 #ifndef _USART_SCANF_IRQ_H_

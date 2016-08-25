@@ -1,4 +1,11 @@
-// 根据songlu的指令预处理 固定变量
+/*
+ * define_songlu.h
+ *
+ *  Created on: 2016年7月20日
+ *      Author: lixingcong
+ *      根据songlu的指令预处理 固定变量
+ */
+
 
 #ifndef _DEFINE_SONGLU_H_
 #define _DEFINE_SONGLU_H_

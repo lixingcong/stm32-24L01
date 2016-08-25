@@ -2,7 +2,7 @@
  * router_FSM.h
  *
  *  Created on: 2016年8月23日
- *      Author: li
+ *      Author: lixingcong
  */
 
 #ifndef SRC_STACK_ROUTER_FSM_H_

@@ -2,7 +2,7 @@
  * execute_PC_cmd.c
  *
  *  Created on: 2016年7月27日
- *      Author: li
+ *      Author: lixingcong
  */
 
 #include "execute_PC_cmd.h"

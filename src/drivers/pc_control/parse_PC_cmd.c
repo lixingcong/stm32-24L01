@@ -1,6 +1,11 @@
-//Time-stamp: < 1.c 2016-07-19 13:40:13 >
-/*功能：根据上位机发送的指令解析出命令参数
+/*
+ * parse_PC_cmd.c
+ *
+ *  Created on: 2016年7月19日
+ *      Author: lixingcong
+ *      根据上位机发送的指令解析出命令参数
  */
+
 
 #include "define_songlu.h"
 #include "parse_PC_cmd.h"

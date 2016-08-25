@@ -2,8 +2,8 @@
  * route_table.c
  *
  *  Created on: 2016年8月4日
- *      Author: li
- *     	实现路由表更新，基于路由表
+ *      Author: lixingcong
+ *     	Core functions for this stack.
  */
 
 

@@ -2,7 +2,7 @@
  * route_ping.h
  *
  *  Created on: 2016年8月16日
- *      Author: li
+ *      Author: lixingcong
  */
 
 #ifndef SRC_DRIVERS_ROUTE_TABLE_ROUTE_PING_H_

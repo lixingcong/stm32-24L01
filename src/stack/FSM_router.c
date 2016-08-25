@@ -2,7 +2,8 @@
  * router_FSM.c
  *
  *  Created on: 2016年8月23日
- *      Author: li
+ *      Author: lixingcong
+ *      This is a FSM(Finite State Machine) for router
  */
 
 

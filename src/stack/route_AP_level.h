@@ -3,7 +3,6 @@
  *
  *  Created on: 2016年8月12日
  *      Author: lixingcong
- *      自定义的发送API，原创
  */
 
 #ifndef _APL_CUSTOM_FUNCTION_H_
@@ -16,7 +15,7 @@ typedef struct _APS_CUSTOM_FRAME{
 	unsigned char src_addr;
 	unsigned char *data;
 	unsigned short flen;
-	BOOL frame_type;
+	unsigned char frame_type;
 }APS_CUSTOM_FRAME;
 
 extern APS_CUSTOM_FRAME my_custom_frame;

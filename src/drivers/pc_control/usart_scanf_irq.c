@@ -2,7 +2,7 @@
  * usart_scanf_irq.c
  *
  *  Created on: 2016年7月20日
- *      Author: li
+ *      Author: lixingcong
  *      串口中断服务回调函数，处理来自上位机的命令
  */
 

@@ -2,15 +2,13 @@
  * hal.c
  *
  *  Created on: 2016年8月23日
- *      Author: li
+ *      Author: lixingcong
+ *      HAL(Hardware Abstract Layer) functions. send via A7190, etc.
  */
 
 
 #include "hal.h"
 #include "A7190.h"
-
-
-unsigned char hal_payload[LRWPAN_MAX_FRAME_SIZE];
 
 unsigned int halGetMACTimer(void) {
 	return systick_count;

@@ -2,7 +2,8 @@
  * route_AP_level.c
  *
  *  Created on: 2016年8月12日
- *      Author: li
+ *      Author: lixingcong
+ *      Working on Application Layer, providing API for user: sendCustomMsg, etc.
  */
 
 #include "route_AP_level.h"

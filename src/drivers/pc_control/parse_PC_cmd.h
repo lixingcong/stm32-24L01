@@ -2,7 +2,7 @@
  * parse_PC_cmd.h
  *
  *  Created on: 2016年7月20日
- *      Author: li
+ *      Author: lixingcong
  */
 
 #ifndef _PARSE_CONTROL_CMD_H_

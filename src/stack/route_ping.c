@@ -2,8 +2,8 @@
  * route_ping.c
  *
  *  Created on: 2016年8月16日
- *      Author: li
- *      Ping时延
+ *      Author: lixingcong
+ *      Send a ping query to make sure destination node is online
  */
 
 #include "route_ping.h"

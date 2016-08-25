@@ -2,7 +2,7 @@
  * redirect_file_stream.c
  *
  *  Created on: 2016年8月2日
- *      Author: li
+ *      Author: lixingcong
  * 
  * redirect stdout and stderr to USART1 and USART2 seperately
  * use Micro Lib
