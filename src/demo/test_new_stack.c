@@ -18,7 +18,12 @@
 #include "route_table.h"
 #include "route_AP_level.h"
 // --------USB-----------------
-
+#include "usb_1.h"
+#include "usb_lib.h"
+#include "hw_config.h"
+#include "usbio.h"
+#include "app_cfg.h"
+#include "usb_pwr.h"
 // --------LMX2581--------------
 #include "ctl_lmx2581.h"
 #include "stm32f10x_rcc.h"
@@ -51,6 +56,14 @@ int main(){
 	DelayMs(600);
 	ctl_lmx2581_init();
 	ctl_frequency_set(400);
+	printf("LMX2581 init done\r\n");
+
+	// init USB
+	init_USB_GPIO();
+	USB_Interrupts_Config();
+	Set_USBClock(); 	//时钟设置并使能，USB时钟为48MHz
+	USB_Init();
+	printf("USB init done\r\n");
 
 	dynamic_freq_mode=0xff; // 这个必须要设置0xff，否则无法接收东西
 

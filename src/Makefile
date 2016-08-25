@@ -20,6 +20,7 @@ OBJS+=sys.o
 OBJS+=SPI1.o
 OBJS+=SPI2.o
 OBJS+=delay.o
+OBJS+=usb_1.o
 
 VPATH+=drivers/pc_control
 OBJS+=usart_scanf_irq.o
@@ -42,14 +43,14 @@ VPATH+=drivers/lmx2581
 OBJS+=lmx2581.o
 OBJS+=ctl_lmx2581.o
 
-#VPATH+=drivers/usb
-#OBJS+=usb_desc.o
-#OBJS+=usb_prop.o
-#OBJS+=usb_pwr.o
-#OBJS+=hw_config.o
-#OBJS+=usb_istr.o
-#OBJS+=usb_endp.o
-#OBJS+=usbio.o
+VPATH+=drivers/usb
+OBJS+=usb_desc.o
+OBJS+=usb_prop.o
+OBJS+=usb_pwr.o
+OBJS+=hw_config.o
+OBJS+=usb_istr.o
+OBJS+=usb_endp.o
+OBJS+=usbio.o
 
 OBJS+=stm32f10x_it.o
 
