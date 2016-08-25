@@ -23,17 +23,13 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h"
-
-#include <define.h>
 #include "stm32f10x_usart.h"
 #include "stm32f10x_exti.h"
-#include "stm32f10x_tim.h"
 #include "spi1_irq.h"
 #include "usart_scanf_irq.h"
 #include "SPI1.h"
-#include "usb_lib.h"
 #include "usb_istr.h"
-#include "usb_pwr.h"
+#include "stdio.h"
 
 
 unsigned int systick_count=0;
