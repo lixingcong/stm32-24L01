@@ -17,8 +17,10 @@ typedef unsigned char BOOL;
 
 extern unsigned int systick_count;
 
-// A7190频道，设置不同的频道可以避免干扰
-#define LRWPAN_DEFAULT_START_CHANNEL 120
+// A7190频道，设置不同的频道可以避免干扰，值范围：1~256
+#ifndef LRWPAN_DEFAULT_START_CHANNEL
+#define LRWPAN_DEFAULT_START_CHANNEL 62
+#endif
 
 // 单个packet最大长度，根据A7910手册设置
 #define LRWPAN_MAX_FRAME_SIZE 512
