@@ -109,7 +109,7 @@ void merge_grandsons(unsigned char *ptr);
 // send function
 // LONG msg
 void send_custom_packet(unsigned char src, unsigned char dst, unsigned short flen, unsigned char *frm, unsigned char frm_type, unsigned char TTL);
-void send_custom_packet_relay(unsigned char src, unsigned char dst, unsigned char flen, unsigned char *frm, unsigned char frm_type, unsigned char TTL);
+void send_custom_packet_relay(unsigned char src, unsigned char dst, unsigned short flen, unsigned char *frm, unsigned char frm_type, unsigned char TTL);
 // SHORT msg
 void send_custom_routine_to_coord(unsigned char dst);
 void send_join_network_response(unsigned char dst, BOOL isACK);

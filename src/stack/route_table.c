@@ -204,7 +204,7 @@ void send_custom_routine_to_coord(unsigned char dst) {
 }
 
 // 标准包的转发 多跳 每经过一跳 TTL减一
-void send_custom_packet_relay(unsigned char src, unsigned char dst, unsigned char flen, unsigned char *frm, unsigned char frm_type, unsigned char TTL) {
+void send_custom_packet_relay(unsigned char src, unsigned char dst, unsigned short flen, unsigned char *frm, unsigned char frm_type, unsigned char TTL) {
 	unsigned char i, *ptr;
 
 	if (src != MY_NODE_NUM)

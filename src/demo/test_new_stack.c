@@ -36,8 +36,7 @@
 // --------pc_control-----------
 #include "execute_PC_cmd.h"
 
-#define USB_FROM_PHONE_MAX_LEN 162
-unsigned char usb_recv_buffer[USB_FROM_PHONE_MAX_LEN];
+unsigned char usb_recv_buffer[USB_FROM_PHONE_MAX_LEN]; // symbol USB_FROM_PHONE_MAX_LEN was defined in usb_1.h
 
 typedef enum _USB_APP_STATE_ENUM {
 	USB_APP_STATE_SELF_CHECK, USB_APP_STATE_WAIT_FOR_USER_INPUT, USB_APP_STATE_SEND_DATA
@@ -160,10 +159,10 @@ void aplRxCustomCallBack() {
 	ptr = aplGetRxMsgData();
 	len = aplGetRxMsgLen();
 
-#if 0
+#if 1
 	for (i = 0; i < len; ++i)
-	putchar(*(ptr + i));
-	printf("\r\n");
+	printf("%u: %x\r\n",i,*(ptr + i));
+
 #else
 	// move pointer to USB msg offset 24
 	ptr += 24;

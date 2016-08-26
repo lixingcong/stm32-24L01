@@ -32,9 +32,9 @@ uint8_t *USB_RevTmp;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Public variables ---------------------------------------------------------*/
-uint8_t USB_EP2_Receive_Buffer[256];
+uint8_t USB_EP2_Receive_Buffer[USB_FROM_PHONE_MAX_LEN];
 uint8_t USB_EP1_Receive_Buffer[100];
-uint8_t USB_Send_Buffer[256];
+uint8_t USB_Send_Buffer[USB_FROM_PHONE_MAX_LEN];
 
 /* Private functions ---------------------------------------------------------*/
 
