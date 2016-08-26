@@ -3,6 +3,11 @@
  *
  *  Created on: 2016年8月16日
  *      Author: lixingcong
+ *
+ *      This is part of LixingcongPAN stack, release on Aug 26th, 2016
+ *      Version 20160826
+ *
+ *      Copyright 2016 xingcong-li@foxmail.com
  */
 
 #ifndef SRC_DRIVERS_ROUTE_TABLE_ROUTE_PING_H_

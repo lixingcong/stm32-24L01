@@ -4,6 +4,11 @@
  *  Created on: 2016年8月23日
  *      Author: lixingcong
  *      HAL(Hardware Abstract Layer) functions. send via A7190, etc.
+ *
+ *      This is part of LixingcongPAN stack, release on Aug 26th, 2016
+ *      Version 20160826
+ *
+ *      Copyright 2016 xingcong-li@foxmail.com
  */
 
 #include "hal.h"

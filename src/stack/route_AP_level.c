@@ -4,6 +4,11 @@
  *  Created on: 2016年8月12日
  *      Author: lixingcong
  *      Working on Application Layer, providing API for user: sendCustomMsg, etc.
+ *
+ *      This is part of LixingcongPAN stack, release on Aug 26th, 2016
+ *      Version 20160826
+ *
+ *      Copyright 2016 xingcong-li@foxmail.com
  */
 
 #include "route_AP_level.h"

@@ -4,6 +4,11 @@
  *  Created on: 2016年8月4日
  *      Author: lixingcong
  *     	Core functions for this stack.
+ *
+ *     	This is part of LixingcongPAN stack, release on Aug 26th, 2016
+ *      Version 20160826
+ *
+ *      Copyright 2016 xingcong-li@foxmail.com
  */
 
 #include "route_table.h"
@@ -107,12 +112,16 @@ void merge_grandsons(unsigned char *ptr) {
 				break;
 		case FRAME_FLAG_UPDATE_ROUTE_ADD:
 			all_nodes[*(my_ptr)] = *(my_ptr + 1);
+#ifdef ROUTE_TABLE_OUTPUT_DEBUG
 			printf("updated: node #%u 's parent is #%u\r\n", *(my_ptr), *(my_ptr + 1));
+#endif
 			break;
 		case FRAME_FLAG_UPDATE_ROUTE_REMOVE:
 			if (all_nodes[*(my_ptr)] == *(my_ptr + 1)) {
 				all_nodes[*(my_ptr)] = 0xff;
+#ifdef ROUTE_TABLE_OUTPUT_DEBUG
 				printf("deleted: node #%u 's last parent is #%u\r\n", *(my_ptr), *(my_ptr + 1));
+#endif
 			}
 			break;
 		default:
@@ -150,7 +159,9 @@ void send_custom_packet(unsigned char src, unsigned char dst, unsigned short fle
 		nexthop = dst;
 		if (0xff == macTxPing(nexthop, TRUE, PING_DIRECTION_TO_OTHERS))  // first try to send it as next hop
 			nexthop = get_next_hop(MY_NODE_NUM, dst);  // if ping time out, choose next hop in normal way
-		printf("send_custom_packet: nexthop=#%u, dst=#%u\r\n", nexthop, dst);
+#ifdef ROUTE_TABLE_OUTPUT_DEBUG
+					printf("send_custom_packet: nexthop=#%u, dst=#%u\r\n", nexthop, dst);
+#endif
 	} else
 		nexthop = 0xff;
 
@@ -197,10 +208,10 @@ void send_custom_packet_relay(unsigned char src, unsigned char dst, unsigned cha
 	unsigned char i, *ptr;
 
 	if (src != MY_NODE_NUM)
-		printf("Routing ");
+	printf("Routing ");
 	else
-		printf("Sending ");
-	printf("packet...frm_type=0x%x, TTL=%u\r\n", frm_type, TTL);
+	printf("Sending ");
+	printf("packet...frm_type=0x%x, dst=%u, TTL=%u\r\n", frm_type, dst, TTL);
 
 	if (TTL == 0) {
 		printf("relay FAIL: TTL is 0, drop packet\r\n");
@@ -209,12 +220,12 @@ void send_custom_packet_relay(unsigned char src, unsigned char dst, unsigned cha
 
 #if 0 // print the msg
 	for (i = 0; i < flen; ++i)
-		printf("%c", *(frm + i));
+	printf("%c", *(frm + i));
 	printf("\r\n");
 #else // print the USB msg, offset is 24
 	ptr = frm + 24;
 	while (*ptr != 0)
-	printf("%c", *(ptr++));
+		printf("%c", *(ptr++));
 	printf("\r\n");
 #endif
 

@@ -3,6 +3,11 @@
  *
  *  Created on: 2016年7月28日
  *      Author: lixingcong
+ *
+ *      This is part of LixingcongPAN stack, release on Aug 26th, 2016
+ *      Version 20160826
+ *
+ *      Copyright 2016 xingcong-li@foxmail.com
  */
 
 #ifndef _ROUTE_TABLE_H_
@@ -26,8 +31,10 @@ extern BOOL isOffline;
 
 // 最多允许存放的协调器数目
 #define MAX_COORD_NUM 3
-// 最大孩子数目
-#define MAX_CHILDREN_NUM 1
+
+// 某个节点的最大孩子数目，该值影响着网络拓朴的形状
+// 若想连成一条线，设置为1
+#define MAX_CHILDREN_NUM 2
 
 // 短帧的长度，不含2个头字节flen，因为头字节是由halSendPacket()函数修改的
 #define FRAME_LENGTH_BEACON 3
@@ -70,16 +77,16 @@ extern BOOL isOffline;
 #define FRAME_FLAG_UPDATE_ROUTE_ADD 0xf0
 #define FRAME_FLAG_UPDATE_ROUTE_REMOVE 0x0f
 
-// 所有节点，含有路由器
+// 所有节点数目，连同协调器也要算入
 #define ALL_NODES_NUM 20
 
-// 我的孩子数目
+// 当前我的孩子数目
 extern unsigned char my_children_number;
 
-// 路由更新增量数组下标的偏移值
+// 路由更新增量数组的下标偏移值
 extern unsigned char route_response_offset;
 
-// 数组下标[1...ALL_NODES_NUM-1]是指向父亲
+// 路由表。数组下标[1...ALL_NODES_NUM-1]是指向父亲
 // all_nodes[0]无定义
 extern unsigned char all_nodes[ALL_NODES_NUM];
 extern unsigned char all_nodes_cache[ALL_NODES_NUM];

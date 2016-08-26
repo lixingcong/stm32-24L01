@@ -3,6 +3,11 @@
  *
  *  Created on: 2016年8月23日
  *     Author: lixingcong
+ *
+ *     This is part of LixingcongPAN stack, release on Aug 26th, 2016
+ *     Version 20160826
+ *
+ *     Copyright 2016 xingcong-li@foxmail.com
  */
 
 // --------hardware--------------
@@ -80,7 +85,7 @@ int main() {
 	USB_Init();
 	printf("USB init done\r\n");
 
-	dynamic_freq_mode = 0xff;  // 这个必须要设置0xff，否则无法接收东西
+	dynamic_freq_mode = 0xff;  // 这个必须要设置0xff，否则A7190强行工作跳频模式无法接收东西
 
 #ifdef LRWPAN_COORDINATOR
 	my_role = ROLE_COORDINATOR;
@@ -138,7 +143,7 @@ int main() {
 void aplRxCustomCallBack() {
 	unsigned short len, i;
 	unsigned char *ptr;
-	printf("recv a custom packet, type=");
+	printf("aplRxCustomCallBack(): recv a packet, type=");
 
 	switch (aplGetRxMsgType()) {
 		case FRAME_TYPE_LONG_BROADCAST:
@@ -156,13 +161,13 @@ void aplRxCustomCallBack() {
 
 #if 0
 	for (i = 0; i < len; ++i)
-		putchar(*(ptr + i));
+	putchar(*(ptr + i));
 	printf("\r\n");
 #else
-	// move pointer to USB msg offset
-	ptr+=24;
-	while(*ptr!=0)
-	printf("%c",*(ptr++));
+	// move pointer to USB msg offset 24
+	ptr += 24;
+	while (*ptr != 0)
+		printf("%c", *(ptr++));
 	printf("\r\n");
 #endif
 }

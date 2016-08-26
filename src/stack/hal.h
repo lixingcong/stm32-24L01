@@ -3,6 +3,11 @@
  *
  *  Created on: 2016年8月23日
  *      Author: lixingcong
+ *
+ *      This is part of LixingcongPAN stack, release on Aug 26th, 2016
+ *      Version 20160826
+ *
+ *      Copyright 2016 xingcong-li@foxmail.com
  */
 
 #ifndef SRC_STACK_HAL_H_

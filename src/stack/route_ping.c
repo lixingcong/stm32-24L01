@@ -4,6 +4,11 @@
  *  Created on: 2016年8月16日
  *      Author: lixingcong
  *      Send a ping query to make sure destination node is online
+ *
+ *      This is part of LixingcongPAN stack, release on Aug 26th, 2016
+ *      Version 20160826
+ *
+ *      Copyright 2016 xingcong-li@foxmail.com
  */
 
 #include "route_ping.h"
