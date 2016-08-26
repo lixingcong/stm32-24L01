@@ -22,7 +22,7 @@ void set_datarate(unsigned char i);
 void send_test_msg_to_dst(unsigned char dst);
 
 #ifdef LRWPAN_COORDINATOR
-void work_under_dynamic_mode();
+void work_under_dynamic_freq_mode();
 #endif
 
 // after parsing, we need to execute commands sent from PC

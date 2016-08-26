@@ -175,7 +175,6 @@ void SysTick_Handler(void)
 #ifndef USE_USART1_AS_OUTPUT_DEBUG
 void USART1_IRQHandler(void)
 {
-	unsigned char Res;
 	if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET) {
 		// WARNING: spaces were ignore by scanf()
 		scanf("%s", usart_scanf_data);
@@ -193,7 +192,6 @@ void USART2_IRQHandler(void)
 #else
 void USART2_IRQHandler(void)
 {
-	unsigned char Res;
 	if (USART_GetITStatus(USART2, USART_IT_RXNE) != RESET) {
 		// WARNING: spaces were ignore by scanf()
 		scanf("%s", usart_scanf_data);

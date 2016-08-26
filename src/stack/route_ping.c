@@ -131,7 +131,7 @@ void macRxPingCallback(unsigned char *ptr) {
 		} else if ((*(ptr + 5) & 0xf0) == 0x00) {  // receive a ping response, mark mac_ping_data.ackpending as FALSE
 			if (*(ptr + 4) == route_ping_data.dst) {
 #ifdef MAC_OUTPUT_DEBUG_PING
-				printf("macRxPingCallback(): ok dsn in macPingcallback()\r\n");
+				printf("macRxPingCallback(): dst replied ACK ok\r\n");
 #endif
 				route_ping_data.ackPending = FALSE;
 			}

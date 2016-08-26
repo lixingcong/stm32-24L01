@@ -317,9 +317,7 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 						send_join_network_response(*(ptr + 4), FALSE);
 					}
 
-				}
-
-				else if (*(ptr + 5) == FRAME_FLAG_JOIN_RESPONSE) {  // join response
+				} else if (*(ptr + 5) == FRAME_FLAG_JOIN_RESPONSE) {  // join response
 					if (isOffline == TRUE) {
 						isOffline = FALSE;
 						my_parent = *(ptr + 4);
@@ -339,8 +337,11 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 				}
 				break;
 			case FRAME_TYPE_SHORT_SEND_PATH_TO_PC:
-				if (*(ptr + 3) == MY_NODE_NUM)
+				if (*(ptr + 3) == MY_NODE_NUM){
 					printf("recv a path for PC: #%u -> #%u\r\n", *(ptr + 4), *(ptr + 5));
+					upload_route_for_PC(*(ptr+4), *(ptr+5));
+				}
+
 				break;
 			default:
 				break;

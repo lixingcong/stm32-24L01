@@ -27,12 +27,14 @@ void coord_FSM() {
 			init_all_nodes();
 			coord_FSM_state = COORD_STATE_FORM_NETWORK;
 			break;
+
 		case COORD_STATE_FORM_NETWORK:
 			printf("Coordinator, my addr is %u, Network formed\r\n", MY_NODE_NUM);
 			coord_FSM_state = COORD_STATE_SEND_BEACON;
 			last_timer_children_checked = last_timer_beacon_sent = halGetMACTimer();
 			isOffline = FALSE;
 			break;
+
 		case COORD_STATE_SEND_BEACON:
 			if (halMACTimerNowDelta(last_timer_beacon_sent) >= (INTERVAL_OF_SENDING_BEACON * 1000)) {
 				// TODO: clear all coord nodes
@@ -41,6 +43,7 @@ void coord_FSM() {
 			}
 			coord_FSM_state = COORD_STATE_CHECK_CHILDREN;
 			break;
+
 		case COORD_STATE_CHECK_CHILDREN:
 			if (halMACTimerNowDelta(last_timer_children_checked) >= (INTERVAL_OF_CHECKING_CHILDREN * 1000)) {
 				check_my_children_online();
@@ -49,12 +52,14 @@ void coord_FSM() {
 			}
 			coord_FSM_state = COORD_STATE_SEND_BEACON;
 			break;
+
 		case COORD_STATE_DOWNGRADE_TO_ROUTER:
 			// TODO: 降级为路由器，在什么条件下触发 2016年8月23日 下午11:31:38
 			mainFSM = router_FSM;
 			isOffline = TRUE;
 			router_FSM_state = ROUTER_STATE_JOIN_NETWORK;
 			break;
+
 		default:
 			coord_FSM_state = COORD_STATE_INITAILIZE_ALL_NODES;
 			break;

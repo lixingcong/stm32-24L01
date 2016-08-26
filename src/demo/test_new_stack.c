@@ -45,7 +45,7 @@ typedef enum _USB_APP_STATE_ENUM {
 
 int main() {
 	unsigned char *usb_recv_ptr, j;
-	unsigned char ep2_rev_ok;  // received ok flag
+	unsigned char usb_recv_ok_flag;  // received ok flag
 
 	USB_APP_STATE_ENUM my_usb_stage;
 	my_usb_stage = USB_APP_STATE_WAIT_FOR_USER_INPUT;
@@ -62,14 +62,14 @@ int main() {
 	USART2_init();
 	USART_scanf_config_EXT();
 
-	// init SP1+A7190
+	// init SPI1+A7190
 	SPI1_Init();
 	EXTI_config_for_A7190();
 	initRF();
 	printf("A7190 init done, PLL channel=%u\r\n", LRWPAN_DEFAULT_START_CHANNEL);
 
 #if 0
-	// init lmx2581
+	// init SPI2+lmx2581
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);
 	ctl_lmx2581_init();
 	DelayMs(600);
@@ -92,9 +92,9 @@ int main() {
 	coord_FSM_state = COORD_STATE_INITAILIZE_ALL_NODES;
 	mainFSM = coord_FSM;
 #else
-	my_role=ROLE_ROUTER;
-	router_FSM_state=ROUTER_STATE_INITAILIZE_ALL_NODES;
-	mainFSM=router_FSM;
+	my_role = ROLE_ROUTER;
+	router_FSM_state = ROUTER_STATE_INITAILIZE_ALL_NODES;
+	mainFSM = router_FSM;
 #endif
 
 	while (1) {
@@ -109,8 +109,8 @@ int main() {
 				break;
 				// wait for recv
 			case USB_APP_STATE_WAIT_FOR_USER_INPUT:
-				ep2_rev_ok = USB_GetData(ENDP2, usb_recv_buffer, USB_FROM_PHONE_MAX_LEN);
-				if (ep2_rev_ok) {
+				usb_recv_ok_flag = USB_GetData(ENDP2, usb_recv_buffer, USB_FROM_PHONE_MAX_LEN);
+				if (usb_recv_ok_flag) {
 					printf("recv USB data !!!!!\r\n");
 					// move pointer to msg offset
 					usb_recv_ptr = &usb_recv_buffer[24];
@@ -118,7 +118,7 @@ int main() {
 						printf("%c", *(usb_recv_ptr++));
 					printf("\r\n");
 
-					ep2_rev_ok = 0;
+					usb_recv_ok_flag = 0;
 					my_usb_stage = USB_APP_STATE_SEND_DATA;
 				}
 				break;
@@ -134,7 +134,7 @@ int main() {
 
 #ifdef LRWPAN_COORDINATOR
 		if (dynamic_freq_mode != 0xff)
-			work_under_dynamic_mode();
+			work_under_dynamic_freq_mode();
 #endif
 	}
 	return 0;
@@ -153,9 +153,10 @@ void aplRxCustomCallBack() {
 			printf("msg: \r\n");
 			break;
 		default:
-			printf("unsupport msg in RxCallback\r\n");
+			printf("unsupported msg, ignore it\r\n");
 			return;
 	}
+
 	ptr = aplGetRxMsgData();
 	len = aplGetRxMsgLen();
 

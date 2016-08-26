@@ -33,7 +33,7 @@ void send_test_msg_to_dst(unsigned char dst) {
 
 #ifdef LRWPAN_COORDINATOR
 // 跳频模式，暂时失去协调器的组网功能（在spi1_irq.c中屏蔽接收处理过程，收到任何东西都将丢弃）
-void work_under_dynamic_mode() {
+void work_under_dynamic_freq_mode() {
 	unsigned short freq, freq_step_in;
 	unsigned char steps;
 	unsigned int last_timer;

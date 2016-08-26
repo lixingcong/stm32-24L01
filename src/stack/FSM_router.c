@@ -38,9 +38,10 @@ void router_FSM() {
 			printf("Router, my addr is %u\r\n", MY_NODE_NUM);
 			isOffline = TRUE;
 			break;
+
 		case ROUTER_STATE_JOIN_NETWORK:
 			if (isOffline == TRUE) {  // offline
-				if (halMACTimerNowDelta(last_timer_children_checked) >= ((2000 + (MY_NODE_NUM >> 2)))) {
+				if (halMACTimerNowDelta(last_timer_children_checked) >= ((2000 + (MY_NODE_NUM << 1)))) {
 					printf("trying to join network\r\n");
 					router_send_join_request();
 					last_timer_children_checked = halGetMACTimer();
@@ -51,6 +52,7 @@ void router_FSM() {
 				last_timer_parent_checked_me = halGetMACTimer();
 			}
 			break;
+
 		case ROUTER_STATE_CHECK_PARENT:
 			if (halMACTimerNowDelta(last_timer_parent_checked_me) >= (INTERVAL_OF_MY_PARENT_CHECK_ME * 1000)) {
 				printf("no parent's ping for a while, check it\r\n");
@@ -64,6 +66,7 @@ void router_FSM() {
 			}
 			router_FSM_state = ROUTER_STATE_CHECK_CHILDREN;
 			break;
+
 		case ROUTER_STATE_CHECK_CHILDREN:
 			if (halMACTimerNowDelta(last_timer_children_checked) >= (INTERVAL_OF_CHECKING_CHILDREN * 1000)) {
 				check_my_children_online();
@@ -75,11 +78,13 @@ void router_FSM() {
 			}
 			router_FSM_state = ROUTER_STATE_CHECK_PARENT;
 			break;
+
 		case ROUTER_STATE_UPGRADE_TO_COORD:
 			// TODO: 升级为协调器，在什么条件下触发 2016年8月25日 上午10:15:39
 			mainFSM = coord_FSM;
 			coord_FSM_state = COORD_STATE_FORM_NETWORK;
 			break;
+
 		default:
 			break;
 	}

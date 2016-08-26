@@ -31,9 +31,6 @@ extern APS_CUSTOM_FRAME my_custom_frame;
 #define aplGetRxMsgSrcAddr() (my_custom_frame.src_addr)
 #define aplGetRxMsgType() (my_custom_frame.frame_type)
 
-// 发送函数帧长flen最大为256-5=251
-// 定义宏 MAX_CUSTOM_FRAME_LENGTH数值251在route_table.h
-
 // 发送消息，自动路由，支持多跳，点对点。
 #define aplSendMSG(dst,flen,frm) \
 		send_custom_packet_relay(MY_NODE_NUM,dst,flen,frm,FRAME_TYPE_LONG_MSG,LONG_MSG_DEFAULT_TTL)
