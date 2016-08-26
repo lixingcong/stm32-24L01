@@ -26,7 +26,7 @@ void halSendPacket(unsigned short flen, unsigned char *ptr, BOOL isShortDataLeng
 	unsigned char last_a7190_state;
 	flen_real = flen + 2;
 
-	if (flen_real + 1 > LRWPAN_MAX_FRAME_SIZE) {
+	if (flen_real > LRWPAN_MAX_FRAME_SIZE) {
 		printf("halSendPacket: packet too long, drop\r\n");
 		return;
 	}

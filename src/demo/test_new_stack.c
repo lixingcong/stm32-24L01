@@ -35,17 +35,17 @@
 unsigned char usb_recv_buffer[USB_FROM_PHONE_MAX_LEN];
 
 typedef enum _USB_APP_STATE_ENUM {
-	USB_APP_STATE_SELF_CHECK,
-	USB_APP_STATE_WAIT_FOR_USER_INPUT,
-	USB_APP_STATE_SEND_DATA
-}USB_APP_STATE_ENUM;
+	USB_APP_STATE_SELF_CHECK, USB_APP_STATE_WAIT_FOR_USER_INPUT, USB_APP_STATE_SEND_DATA
+} USB_APP_STATE_ENUM;
 
-int main(){
-	unsigned char *usb_recv_ptr,j;
-	unsigned char ep2_rev_ok; // received ok flag
+int main() {
+	unsigned char *usb_recv_ptr, j;
+	unsigned char ep2_rev_ok;  // received ok flag
+	unsigned int my_timer;
+	unsigned char payload[10];
 
 	USB_APP_STATE_ENUM my_usb_stage;
-	my_usb_stage=USB_APP_STATE_WAIT_FOR_USER_INPUT;
+	my_usb_stage = USB_APP_STATE_WAIT_FOR_USER_INPUT;
 
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	// init delay timer
@@ -63,8 +63,9 @@ int main(){
 	SPI1_Init();
 	EXTI_config_for_A7190();
 	initRF();
-	printf("A7190 init done, PLL channel=%u\r\n",LRWPAN_DEFAULT_START_CHANNEL);
+	printf("A7190 init done, PLL channel=%u\r\n", LRWPAN_DEFAULT_START_CHANNEL);
 
+#if 0
 	// init lmx2581
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);
 	ctl_lmx2581_init();
@@ -72,6 +73,7 @@ int main(){
 	ctl_lmx2581_init();
 	ctl_frequency_set(400);
 	printf("LMX2581 init done\r\n");
+#endif
 
 	// init USB
 	init_USB_GPIO();
@@ -80,22 +82,32 @@ int main(){
 	USB_Init();
 	printf("USB init done\r\n");
 
-	dynamic_freq_mode=0xff; // 这个必须要设置0xff，否则无法接收东西
+	dynamic_freq_mode = 0xff;  // 这个必须要设置0xff，否则无法接收东西
 
 #ifdef LRWPAN_COORDINATOR
-	my_role=ROLE_COORDINATOR;
-	coord_FSM_state=COORD_STATE_INITAILIZE_ALL_NODES;
-	mainFSM=coord_FSM;
+	my_role = ROLE_COORDINATOR;
+	coord_FSM_state = COORD_STATE_INITAILIZE_ALL_NODES;
+	mainFSM = coord_FSM;
 #else
 	my_role=ROLE_ROUTER;
 	router_FSM_state=ROUTER_STATE_INITAILIZE_ALL_NODES;
 	mainFSM=router_FSM;
 #endif
 
-	while(1){
-		do{
-			mainFSM();// 组网、入网状态机
-		}while(isOffline==TRUE);
+	my_timer = halGetMACTimer();
+	while (1) {
+		do {
+			mainFSM();  // 组网、入网状态机
+		} while (isOffline == TRUE);
+
+		if (my_role == ROLE_ROUTER) {
+			if (halMACTimerNowDelta(my_timer) >= 3000) {
+				payload[0] = 'h';
+				payload[1] = 'i';
+				aplSendMSG(0, 2, payload);
+				my_timer = halGetMACTimer();
+			}
+		}
 
 		// usb loop
 		switch (my_usb_stage) {
@@ -134,7 +146,7 @@ int main(){
 				// after recv, go to send
 			case USB_APP_STATE_SEND_DATA:
 
-				aplSendMSG(usb_recv_buffer[23],USB_FROM_PHONE_MAX_LEN,usb_recv_buffer);
+				aplSendMSG(usb_recv_buffer[23], USB_FROM_PHONE_MAX_LEN, usb_recv_buffer);
 
 				//send_custom_routine_to_coord(usb_recv_buffer[23]);
 				my_usb_stage = USB_APP_STATE_WAIT_FOR_USER_INPUT;
@@ -142,19 +154,19 @@ int main(){
 		}
 
 #ifdef LRWPAN_COORDINATOR
-		if(dynamic_freq_mode!=0xff)
+		if (dynamic_freq_mode != 0xff)
 			work_under_dynamic_mode();
 #endif
 	}
 	return 0;
 }
 
-void aplRxCustomCallBack(){
-	unsigned short len,i;
+void aplRxCustomCallBack() {
+	unsigned short len, i;
 	unsigned char *ptr;
 	printf("recv a custom packet, type=");
 
-	switch(aplGetRxMsgType()){
+	switch (aplGetRxMsgType()) {
 		case FRAME_TYPE_LONG_BROADCAST:
 			printf("broadcast: \r\n");
 			break;
@@ -165,18 +177,18 @@ void aplRxCustomCallBack(){
 			printf("unsupport msg in RxCallback\r\n");
 			return;
 	}
-	ptr=aplGetRxMsgData();
-	len=aplGetRxMsgLen();
+	ptr = aplGetRxMsgData();
+	len = aplGetRxMsgLen();
 
-	// move pointer to msg offset
+#if 1
+	for (i = 0; i < len; ++i)
+		putchar(*(ptr + i));
+	printf("\r\n");
+#else
+	// move pointer to USB msg offset
 	ptr+=24;
 	while(*ptr!=0)
-		printf("%c",*(ptr++));
-	printf("\r\n");
-
-#if 0
-	for(i=0;i<len;++i)
-		putchar(*(ptr+i));
+	printf("%c",*(ptr++));
 	printf("\r\n");
 #endif
 }

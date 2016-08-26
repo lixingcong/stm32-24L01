@@ -137,14 +137,14 @@ void send_custom_packet(unsigned char src, unsigned char dst, unsigned short fle
 	unsigned short total_len, i;
 	unsigned char nexthop;
 
-	if (flen > LRWPAN_MAX_FRAME_SIZE - 7) {
+	if (flen > (LRWPAN_MAX_FRAME_SIZE - 2 - FRAME_LENGTH_HEADER)) {  // total len = 2Bytes of len + header len + payload len
 #ifdef ROUTE_TABLE_OUTPUT_DEBUG
-		printf("send_custom_packet(): packet too big, send fail\r\n");
+			printf("send_custom_packet(): packet too big, send fail\r\n");
 #endif
 		return;
 	}
 
-	total_len = 5 + flen;
+	total_len = FRAME_LENGTH_HEADER + flen;
 
 	if (dst != 0xff) {  // broadcast packet
 		nexthop = dst;
@@ -158,10 +158,10 @@ void send_custom_packet(unsigned char src, unsigned char dst, unsigned short fle
 	payload_custom[1] = nexthop;
 	payload_custom[2] = dst;
 	payload_custom[3] = src;
-	payload_custom[4] = TTL; // Time to Live
+	payload_custom[4] = TTL;  // Time to Live
 
 	for (i = 0; i < flen; ++i)
-		payload_custom[i + 4] = *(frm + i);
+		payload_custom[i + FRAME_LENGTH_HEADER] = *(frm + i);
 
 	halSendPacket(total_len, payload_custom, FALSE);
 //	printf("in send custom: ");
@@ -207,19 +207,19 @@ void send_custom_packet_relay(unsigned char src, unsigned char dst, unsigned cha
 		printf("Sending ");
 	printf("packet...frm_type=0x%x, TTL=%u\r\n", frm_type, TTL);
 
-	if(TTL==0){
+	if (TTL == 0) {
 		printf("relay FAIL: TTL is 0, drop packet\r\n");
 		return;
 	}
 
-#if 0 // print the msg
-	for(i=0;i<flen;++i)
-	printf("%c",*(frm+i));
+#if 1 // print the msg
+	for (i = 0; i < flen; ++i)
+		printf("%c", *(frm + i));
 	printf("\r\n");
 #else // print the USB msg, offset is 24
 	ptr = frm + 24;
 	while (*ptr != 0)
-		printf("%c", *(ptr++));
+	printf("%c", *(ptr++));
 	printf("\r\n");
 #endif
 
@@ -271,7 +271,7 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 					if (*(ptr + 4) == MY_NODE_NUM) {  // dst is me, recv it as a broadcast
 						update_AP_msg(ptr, flen);
 						aplRxCustomCallBack();
-						send_custom_packet_relay(MY_NODE_NUM,0xff,flen-7,ptr+7,FRAME_TYPE_LONG_BROADCAST,LONG_MSG_DEFAULT_TTL);  // send broadcast to my grandsons
+						send_custom_packet_relay(MY_NODE_NUM, 0xff, flen - 7, ptr + 7, FRAME_TYPE_LONG_BROADCAST, *(ptr + 6));  // send broadcast to my grandsons
 					} else {  // dst is not me, relay it
 						send_custom_packet_relay(*(ptr + 5), *(ptr + 4), flen - 7, ptr + 7, *(ptr + 2), *(ptr + 6));
 					}
@@ -279,7 +279,7 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 					if (*(ptr + 3) == 0xff) {  // next hop is 0xff: all children's broadcast
 						update_AP_msg(ptr, flen);
 						aplRxCustomCallBack();
-						send_custom_packet_relay(MY_NODE_NUM,0xff,flen-7,ptr+7,FRAME_TYPE_LONG_BROADCAST,LONG_MSG_DEFAULT_TTL);  // send broadcast to my grandsons
+						send_custom_packet_relay(MY_NODE_NUM, 0xff, flen - 7, ptr + 7, FRAME_TYPE_LONG_BROADCAST, *(ptr + 6));  // send broadcast to my grandsons
 					}
 				} else {
 					// invalid broadcast(not from my parent)

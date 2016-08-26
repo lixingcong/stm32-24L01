@@ -36,6 +36,9 @@ extern BOOL isOffline;
 #define FRAME_LENGTH_SEND_TO_PC 4
 #define FRAME_LENGTH_ROUTE_CHANGE_RESPONSE (ALL_NODES_NUM*3+3)
 
+// 长帧的包头长度
+#define FRAME_LENGTH_HEADER 5
+
 // 短帧类型（帧长小于256）
 #define FRAME_TYPE_SHORT_PING 0x00
 #define FRAME_TYPE_SHORT_SEND_PATH_TO_PC  0x01
@@ -108,6 +111,5 @@ void display_all_nodes();
 
 // callback for ext8_irq_a7190()
 void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned short flen);
-
 
 #endif /* _DEFINE_ROUTE_TABLE_H_ */
