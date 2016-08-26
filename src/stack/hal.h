@@ -28,7 +28,8 @@ extern unsigned int systick_count;
 // 求出距离上次的毫秒数x之差，限制为0xffff即为65535ms
 #define halMACTimerNowDelta(x) ((halGetMACTimer()-(x))& 0xffff)
 
-//修改为合适的网络地址，也可以使用make传递宏定义
+// 修改为合适的网络地址，理论上值范围0~255，协调器默认地址为0
+// 实际上该地址最大值不能超过ALL_NODES_NUM
 #ifndef IEEE_ADDRESS_ARRAY_COORD
 #define IEEE_ADDRESS_ARRAY_COORD   0x00
 #endif
