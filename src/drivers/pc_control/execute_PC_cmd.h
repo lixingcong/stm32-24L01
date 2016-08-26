@@ -29,6 +29,6 @@ void work_under_dynamic_mode();
 void execute_PC_command(control_from_pc_t *in);
 
 // draw the path on PC
-void upload_route_for_PC(unsigned char src,unsigned char dst);
+void upload_route_for_PC(unsigned char src, unsigned char dst);
 
 #endif /* SRC_DRIVERS_PC_CONTROL_EXECUTE_PC_CMD_H_ */

@@ -10,7 +10,7 @@
 
 #include "define_songlu.h"
 
-char parse_command(char *in1,control_from_pc_t *in2);
+char parse_command(char *in1, control_from_pc_t *in2);
 void str2case(char *in, char *out);
 
 #endif /* SRC_DRIVERS_PC_CONTROL_PARSE_CONTROL_CMD_H_ */

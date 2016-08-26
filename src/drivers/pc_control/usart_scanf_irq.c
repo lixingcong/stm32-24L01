@@ -16,7 +16,7 @@
 
 // 设置存储
 control_from_pc_t my_control_from_pc;
-control_from_pc_t *my_control_from_pc_ptr=&my_control_from_pc;
+control_from_pc_t *my_control_from_pc_ptr = &my_control_from_pc;
 
 unsigned char usart_scanf_data[MAX_USART1_BUFFER_LEN];
 
@@ -29,14 +29,14 @@ void usart_irq_scanf_callback() {
 	int i;
 	fprintf(stderr, "in usart1 callback, len=%d, str:\r\n", strlen(usart_scanf_data));
 	for (i = 0; i < len; i++)
-		fprintf(stderr, "%x ", usart_scanf_data[i]);
+	fprintf(stderr, "%x ", usart_scanf_data[i]);
 	fprintf(stderr, "\r\n");
 #endif
 
 	// parse
-	res=parse_command(usart_scanf_data, my_control_from_pc_ptr);
-	switch(res){
-		case 0: // 设置工作模式
+	res = parse_command(usart_scanf_data, my_control_from_pc_ptr);
+	switch (res) {
+		case 0:  // 设置工作模式
 			execute_PC_command(my_control_from_pc_ptr);
 			fprintf(stderr, "ZZIFSET OK!@\r\n");
 			break;
@@ -46,7 +46,7 @@ void usart_irq_scanf_callback() {
 		case 2:  //上报状态
 			upload_self_check_status();
 			break;
-		default: // 未识别命令
+		default:  // 未识别命令
 			fprintf(stderr, "ZZIFInvalid Command@\r\n");
 			break;
 	}

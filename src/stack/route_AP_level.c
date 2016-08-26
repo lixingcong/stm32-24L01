@@ -15,14 +15,10 @@
 
 APS_CUSTOM_FRAME my_custom_frame;
 
-void update_AP_msg(unsigned char *ptr,unsigned short flen){
-	unsigned char i;
-	my_custom_frame.data=ptr+6;
-	my_custom_frame.flen=flen-6;
-	my_custom_frame.src_addr=*(ptr+5);
-
-	// frame type
-	my_custom_frame.frame_type=*(ptr+2);
+void update_AP_msg(unsigned char *ptr, unsigned short flen) {
+	my_custom_frame.data = ptr + 6;
+	my_custom_frame.flen = flen - 6;
+	my_custom_frame.src_addr = *(ptr + 5);
+	my_custom_frame.frame_type = *(ptr + 2);
 }
-
 

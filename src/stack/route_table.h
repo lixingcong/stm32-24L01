@@ -10,9 +10,8 @@
 #include "hal.h"
 
 typedef enum _MY_ROLE_ENUM {
-	ROLE_COORDINATOR,
-	ROLE_ROUTER
-}MY_ROLE_ENUM;
+	ROLE_COORDINATOR, ROLE_ROUTER
+} MY_ROLE_ENUM;
 
 extern MY_ROLE_ENUM my_role;
 extern void (*mainFSM)();
@@ -51,7 +50,6 @@ extern BOOL isOffline;
 #define FRAME_TYPE_LONG_BROADCAST 0x04
 #define FRAME_TYPE_LONG_MSG_WITH_ACK 0xf0
 
-
 // 请求入网的标志
 #define FRAME_FLAG_JOIN_REQUEST 0x01
 #define FRAME_FLAG_JOIN_RESPONSE 0x02
@@ -72,9 +70,8 @@ extern BOOL isOffline;
 // 我的孩子数目
 extern unsigned char my_children_number;
 
-// 偏移值
+// 路由更新增量数组下标的偏移值
 extern unsigned char route_response_offset;
-
 
 // 数组下标[1...ALL_NODES_NUM-1]是指向父亲
 // all_nodes[0]无定义
@@ -83,32 +80,31 @@ extern unsigned char all_nodes_cache[ALL_NODES_NUM];
 
 void init_all_nodes();
 
-// 获取下一跳的长地址
-unsigned char get_next_hop(unsigned char this_hop,unsigned char dst);
+// 获取下一跳
+unsigned char get_next_hop(unsigned char this_hop, unsigned char dst);
 
+// 检查自己孩子
 void check_my_children_online();
 
-void merge_grandsons(unsigned char *ptr);
-
-
-// send function
-void send_custom_broadcast(unsigned char flen,unsigned char *frm);
-void send_custom_packet(unsigned char src, unsigned char dst,unsigned short flen,unsigned char *frm, unsigned char frm_type);
-void send_custom_packet_relay(unsigned char src,unsigned char dst,unsigned char flen,unsigned char *frm,unsigned char frm_type);
-void send_custom_routine_to_coord(unsigned char dst);
 // 增量更新路由表
+void update_route_response_content(BOOL isAdd, unsigned char child, unsigned char parent);
 void send_route_increasing_change_to_parent();
 
+// 根据增量路由表合并孙子
+void merge_grandsons(unsigned char *ptr);
+
+// send function
+void send_custom_broadcast(unsigned char flen, unsigned char *frm);
+void send_custom_packet(unsigned char src, unsigned char dst, unsigned short flen, unsigned char *frm, unsigned char frm_type);
+void send_custom_packet_relay(unsigned char src, unsigned char dst, unsigned char flen, unsigned char *frm, unsigned char frm_type);
+void send_custom_routine_to_coord(unsigned char dst);
+
 void display_all_nodes();
-void update_route_response_content(BOOL isAdd, unsigned char child, unsigned char parent);
 
-
-// callback for spi1_irq()
-void macRxCustomPacketCallback(unsigned char *ptr,BOOL isShortMSG, unsigned short flen);
+// callback for ext8_irq_a7190()
+void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned short flen);
 
 // 入网回复
 void send_join_network_response(unsigned char dst, BOOL isACK);
-
-
 
 #endif /* _DEFINE_ROUTE_TABLE_H_ */

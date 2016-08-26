@@ -45,16 +45,12 @@ extern unsigned int systick_count;
 //  节点编号
 #define MY_NODE_NUM (IEEE_ADDRESS_ARRAY&0xff)
 
-
 #ifndef _BOOL_TYPE_
 #define _BOOL_TYPE_
-typedef enum
-{
-  FALSE = 0, TRUE  = !FALSE
-}
-bool;
+typedef enum {
+	FALSE = 0, TRUE = !FALSE
+} bool;
 #endif
-
 
 #ifndef NULL
 #define NULL ((void *)0)

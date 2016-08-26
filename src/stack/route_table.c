@@ -6,7 +6,6 @@
  *     	Core functions for this stack.
  */
 
-
 #include "route_table.h"
 #include "route_ping.h"
 #include "route_AP_level.h"
@@ -17,11 +16,11 @@
 //#define ROUTE_TABLE_OUTPUT_DEBUG
 
 extern void aplRxCustomCallBack(void);
-unsigned char all_nodes[ALL_NODES_NUM];// 存放实时更新路由表，用于转发数据包等操作
-unsigned char all_nodes_cache[ALL_NODES_NUM];// 路由表缓存
+unsigned char all_nodes[ALL_NODES_NUM];  // 存放实时更新路由表，用于转发数据包等操作
+unsigned char all_nodes_cache[ALL_NODES_NUM];  // 路由表缓存
 
-unsigned char route_response[FRAME_LENGTH_ROUTE_CHANGE_RESPONSE];// 缓冲区专门存放待发送的增量路由表，前面有3个帧头
-unsigned char route_response_offset;// 增量路由表偏移量
+unsigned char route_response[FRAME_LENGTH_ROUTE_CHANGE_RESPONSE];  // 缓冲区专门存放待发送的增量路由表，前面有3个帧头
+unsigned char route_response_offset;  // 增量路由表偏移量
 
 static unsigned char payload_custom[LRWPAN_MAX_FRAME_SIZE];
 
@@ -36,13 +35,13 @@ unsigned int last_timer_children_checked;
 
 unsigned char my_children_number;
 
-void init_all_nodes(){
+void init_all_nodes() {
 	unsigned char i;
-	for(i=0;i<ALL_NODES_NUM;++i){
-		all_nodes[i]=all_nodes_cache[i]=0xff;
+	for (i = 0; i < ALL_NODES_NUM; ++i) {
+		all_nodes[i] = all_nodes_cache[i] = 0xff;
 	}
-	route_response_offset=3;
-	my_children_number=0;
+	route_response_offset = 3;
+	my_children_number = 0;
 }
 
 // 寻找下一跳，基于all_nodes路由表
@@ -50,7 +49,7 @@ unsigned char get_next_hop(unsigned char this_hop, unsigned char dst) {
 	unsigned char next_hop, next_hop_last;
 
 	// check the range if valid
-	if(dst >= ALL_NODES_NUM)
+	if (dst >= ALL_NODES_NUM)
 		return 0xff;
 
 	// loopback
@@ -83,44 +82,43 @@ unsigned char get_next_hop(unsigned char this_hop, unsigned char dst) {
 void check_my_children_online() {
 	unsigned char children_counter;
 	unsigned char i;
-	children_counter=0;
+	children_counter = 0;
 	for (i = 1; i < ALL_NODES_NUM; ++i) {
 		if (all_nodes[i] == (MY_NODE_NUM)) {  // my child
-			if(0xff==macTxCustomPing(i, PING_DIRECTION_TO_CHILDREN, 2, 300)){
-				all_nodes[i]=0xff;
+			if (0xff == macTxCustomPing(i, PING_DIRECTION_TO_CHILDREN, 2, 300)) {
+				all_nodes[i] = 0xff;
 #ifdef ROUTE_TABLE_OUTPUT_DEBUG
-				printf("Delete child #%u\r\n",i);
+				printf("check_my_children_online(): deleted child #%u\r\n",i);
 #endif
-			}else
+			} else
 				++children_counter;
 		}
 	}
-	my_children_number=children_counter;
+	my_children_number = children_counter;
 }
 
-
 // 合并孙子，默认覆盖。
-void merge_grandsons(unsigned char *ptr){
-	unsigned char i,*my_ptr;
-	my_ptr=ptr+5;
-	for(i=0;i<(*(ptr+1)-5);i+=3){
-		switch(*(my_ptr++)){
-			if(*(my_ptr)>=ALL_NODES_NUM || *(my_ptr+1)>=ALL_NODES_NUM)
+void merge_grandsons(unsigned char *ptr) {
+	unsigned char i, *my_ptr;
+	my_ptr = ptr + 5;
+	for (i = 0; i < (*(ptr + 1) - 5); i += 3) {
+		switch (*(my_ptr++)) {
+			if (*(my_ptr) >= ALL_NODES_NUM || *(my_ptr + 1) >= ALL_NODES_NUM)
 				break;
-			case FRAME_FLAG_UPDATE_ROUTE_ADD:
-				all_nodes[*(my_ptr)]=*(my_ptr+1);
-				printf("updated: node #%u 's parent is #%u\r\n",*(my_ptr),*(my_ptr+1));
-				break;
-			case FRAME_FLAG_UPDATE_ROUTE_REMOVE:
-				if(all_nodes[*(my_ptr)]==*(my_ptr+1)){
-					all_nodes[*(my_ptr)]=0xff;
-					printf("deleted: node #%u 's last parent is #%u\r\n",*(my_ptr),*(my_ptr+1));
-				}
-				break;
-			default:
-				break;
+		case FRAME_FLAG_UPDATE_ROUTE_ADD:
+			all_nodes[*(my_ptr)] = *(my_ptr + 1);
+			printf("updated: node #%u 's parent is #%u\r\n", *(my_ptr), *(my_ptr + 1));
+			break;
+		case FRAME_FLAG_UPDATE_ROUTE_REMOVE:
+			if (all_nodes[*(my_ptr)] == *(my_ptr + 1)) {
+				all_nodes[*(my_ptr)] = 0xff;
+				printf("deleted: node #%u 's last parent is #%u\r\n", *(my_ptr), *(my_ptr + 1));
+			}
+			break;
+		default:
+			break;
 		}
-		my_ptr+=2;
+		my_ptr += 2;
 	}
 
 }
@@ -135,36 +133,36 @@ void merge_grandsons(unsigned char *ptr){
  */
 
 // 注意dst为0xff为广播，谨慎使用
-void send_custom_packet(unsigned char src, unsigned char dst,unsigned short flen,unsigned char *frm, unsigned char frm_type){
-	unsigned short total_len,i;
+void send_custom_packet(unsigned char src, unsigned char dst, unsigned short flen, unsigned char *frm, unsigned char frm_type) {
+	unsigned short total_len, i;
 	unsigned char nexthop;
 
-	if(flen>LRWPAN_MAX_FRAME_SIZE-6){
+	if (flen > LRWPAN_MAX_FRAME_SIZE - 6) {
 #ifdef ROUTE_TABLE_OUTPUT_DEBUG
 		printf("send_custom_packet(): packet too big, send fail\r\n");
 #endif
 		return;
 	}
 
-	total_len=4+flen;
+	total_len = 4 + flen;
 
-	if(dst!=0xff){ // broadcast packet
-		nexthop=dst;
-		if(0xff==macTxPing(nexthop, TRUE, PING_DIRECTION_TO_OTHERS)) // first try to send it as next hop
-			nexthop=get_next_hop(MY_NODE_NUM,dst); // if ping time out, choose next hop in normal way
-		printf("send_custom_packet: nexthop=#%u, dst=#%u\r\n",nexthop,dst);
-	}else
-		nexthop=0xff;
+	if (dst != 0xff) {  // broadcast packet
+		nexthop = dst;
+		if (0xff == macTxPing(nexthop, TRUE, PING_DIRECTION_TO_OTHERS))  // first try to send it as next hop
+			nexthop = get_next_hop(MY_NODE_NUM, dst);  // if ping time out, choose next hop in normal way
+		printf("send_custom_packet: nexthop=#%u, dst=#%u\r\n", nexthop, dst);
+	} else
+		nexthop = 0xff;
 
-	payload_custom[0]=frm_type;
-	payload_custom[1]=nexthop;
-	payload_custom[2]=dst;
-	payload_custom[3]=src;
+	payload_custom[0] = frm_type;
+	payload_custom[1] = nexthop;
+	payload_custom[2] = dst;
+	payload_custom[3] = src;
 
-	for(i=0;i<flen;++i)
-		payload_custom[i+4]=*(frm+i);
+	for (i = 0; i < flen; ++i)
+		payload_custom[i + 4] = *(frm + i);
 
-	halSendPacket(total_len, payload_custom , FALSE);
+	halSendPacket(total_len, payload_custom, FALSE);
 //	printf("in send custom: ");
 //	for(i=0;i<5;++i)
 //		printf("%x ",payload_custom[i]);
@@ -173,95 +171,93 @@ void send_custom_packet(unsigned char src, unsigned char dst,unsigned short flen
 }
 
 // 给孩子和孙子们发递归广播
-void send_custom_broadcast(unsigned char flen,unsigned char *frm){
+void send_custom_broadcast(unsigned char flen, unsigned char *frm) {
 	// TODO: use DSN to avoid last broadcast 2016年8月10日 上午8:23:12
 	send_custom_packet(MY_NODE_NUM, 0xff, flen, frm, FRAME_TYPE_LONG_BROADCAST);
 }
 
 // 向父亲上传自己的路由表，增量更新
-void send_route_increasing_change_to_parent(){
-	route_response[0]=FRAME_TYPE_SHORT_ROUTE_UPDATE;
-	route_response[1]=my_parent;
-	route_response[2]=MY_NODE_NUM;
+void send_route_increasing_change_to_parent() {
+	route_response[0] = FRAME_TYPE_SHORT_ROUTE_UPDATE;
+	route_response[1] = my_parent;
+	route_response[2] = MY_NODE_NUM;
 	halSendPacket(route_response_offset, &route_response[0], TRUE);
-	route_response_offset=3;
+	route_response_offset = 3;
 }
 
 // 把dst作为Payload,发送到协调器，然后由协调器上传给PC绘制路径图，该路径表示发送者到dst的路径
-void send_custom_routine_to_coord(unsigned char dst){
+void send_custom_routine_to_coord(unsigned char dst) {
 	static unsigned char routine_payload[FRAME_LENGTH_SEND_TO_PC];
-	if(my_role==ROLE_COORDINATOR){ // src=0, directly upload to PC
+	if (my_role == ROLE_COORDINATOR) {  // src=0, directly upload to PC
 		//upload_route_for_PC(0, dst);
 		return;
 	}
 #ifdef ROUTE_TABLE_OUTPUT_DEBUG
 	printf("in send routine path to coord\r\n");
 #endif
-	routine_payload[0]=FRAME_TYPE_SHORT_SEND_PATH_TO_PC;
-	routine_payload[1]=0; // send to coord
-	routine_payload[2]=MY_NODE_NUM;
-	routine_payload[3]=dst;
+	routine_payload[0] = FRAME_TYPE_SHORT_SEND_PATH_TO_PC;
+	routine_payload[1] = 0;  // send to coord
+	routine_payload[2] = MY_NODE_NUM;
+	routine_payload[3] = dst;
 	halSendPacket(FRAME_LENGTH_SEND_TO_PC, routine_payload, TRUE);
 }
 
 // 标准包的转发 多跳
-void send_custom_packet_relay(unsigned char src,unsigned char dst,unsigned char flen,unsigned char *frm,unsigned char frm_type){
-	unsigned char i,*ptr;
-	if(src!=MY_NODE_NUM)
+void send_custom_packet_relay(unsigned char src, unsigned char dst, unsigned char flen, unsigned char *frm, unsigned char frm_type) {
+	unsigned char i, *ptr;
+	if (src != MY_NODE_NUM)
 		printf("Routing ");
 	else
 		printf("Sending ");
-	printf("packet...frm_type=0x%x, msg=",frm_type);
-#if 0
+	printf("packet...frm_type=0x%x, msg=", frm_type);
+#if 0 // print the msg
 	for(i=0;i<flen;++i)
-		printf("%c",*(frm+i));
+	printf("%c",*(frm+i));
 	printf("\r\n");
-#else
-	ptr=frm+24;
-	while(*ptr!=0)
-		printf("%c",*(ptr++));
+#else // print the USB msg, offset is 24
+	ptr = frm + 24;
+	while (*ptr != 0)
+		printf("%c", *(ptr++));
 	printf("\r\n");
 #endif
 
 	send_custom_packet(src, dst, flen, frm, frm_type);
 }
 
-void display_all_nodes(){
+void display_all_nodes() {
 	unsigned char i;
-	for(i=1;i<ALL_NODES_NUM;++i)
-		if(all_nodes[i]!=0xff)
-			printf("- Node #%u 's parent is #%u\r\n",i,all_nodes[i]);
+	for (i = 1; i < ALL_NODES_NUM; ++i)
+		if (all_nodes[i] != 0xff)
+			printf("- Node #%u 's parent is #%u\r\n", i, all_nodes[i]);
 	printf("-\r\n");
 }
 
-
-void update_route_response_content(BOOL isAdd, unsigned char child, unsigned char parent){
-	if(route_response_offset>=FRAME_LENGTH_ROUTE_CHANGE_RESPONSE) // excceed max len
+void update_route_response_content(BOOL isAdd, unsigned char child, unsigned char parent) {
+	if (route_response_offset >= FRAME_LENGTH_ROUTE_CHANGE_RESPONSE)  // excceed max len
 		return;
-	if(isAdd==TRUE)
-		route_response[route_response_offset++]=FRAME_FLAG_UPDATE_ROUTE_ADD; // 增量添加
+	if (isAdd == TRUE)
+		route_response[route_response_offset++] = FRAME_FLAG_UPDATE_ROUTE_ADD;  // 增量添加
 	else
-		route_response[route_response_offset++]=FRAME_FLAG_UPDATE_ROUTE_REMOVE; // 增量删除
-	route_response[route_response_offset++]=child;
-	route_response[route_response_offset++]=parent;
+		route_response[route_response_offset++] = FRAME_FLAG_UPDATE_ROUTE_REMOVE;  // 增量删除
+	route_response[route_response_offset++] = child;
+	route_response[route_response_offset++] = parent;
 }
 
-void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned short flen){
+void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned short flen) {
 	unsigned short i;
-	if(isShortMSG==FALSE){
-		switch(*(ptr+2)){ // switch frame type [LONG]
+	if (isShortMSG == FALSE) {
+		switch (*(ptr + 2)) {  // switch frame type [LONG]
 			case FRAME_TYPE_LONG_MSG:
 			case FRAME_TYPE_LONG_MSG_WITH_ACK:
-				if(*(ptr+3)==MY_NODE_NUM){ // next hop is me
-					if(*(ptr+4)==MY_NODE_NUM){ // dst is me, recv it
-						if(*(ptr+2)==FRAME_TYPE_LONG_MSG_WITH_ACK){
-							// reply an ACK
-							// TODO: ACK 2016年8月25日 上午9:40:21
+				if (*(ptr + 3) == MY_NODE_NUM) {  // next hop is me
+					if (*(ptr + 4) == MY_NODE_NUM) {  // dst is me, recv it
+						if (*(ptr + 2) == FRAME_TYPE_LONG_MSG_WITH_ACK) {
+							// TODO: reply an ACK 2016年8月25日 上午9:40:21
 						}
 						update_AP_msg(ptr, flen);
 						aplRxCustomCallBack();
-					}else{ // dst is not me, relay it
-						send_custom_packet_relay(*(ptr+5), *(ptr+4), flen-6, ptr+6, *(ptr+2));
+					} else {  // dst is not me, relay it
+						send_custom_packet_relay(*(ptr + 5), *(ptr + 4), flen - 6, ptr + 6, *(ptr + 2));
 					}
 				}
 				break;
@@ -269,29 +265,29 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 				// recv a ACK respons, now compare dsn
 				break;
 			case FRAME_TYPE_LONG_BROADCAST:
-				if(*(ptr+3)==MY_NODE_NUM){ // next hop is me
-					if(*(ptr+4)==MY_NODE_NUM){ // dst is me, recv it as a broadcast
-						update_AP_msg(ptr,flen);
+				if (*(ptr + 3) == MY_NODE_NUM) {  // next hop is me
+					if (*(ptr + 4) == MY_NODE_NUM) {  // dst is me, recv it as a broadcast
+						update_AP_msg(ptr, flen);
 						aplRxCustomCallBack();
-						send_custom_broadcast(flen-6, ptr+6);  // send broadcast to my grandsons
-					}else{ // dst is not me, relay it
-						send_custom_packet_relay(*(ptr+5), *(ptr+4), flen-6, ptr+6, *(ptr+2));
+						send_custom_broadcast(flen - 6, ptr + 6);  // send broadcast to my grandsons
+					} else {  // dst is not me, relay it
+						send_custom_packet_relay(*(ptr + 5), *(ptr + 4), flen - 6, ptr + 6, *(ptr + 2));
 					}
-				}else if (*(ptr + 5) == my_parent) {  // src is my parent
-					if(*(ptr+3)==0xff){ // next hop is 0xff: all children's broadcast
-						update_AP_msg(ptr,flen);
+				} else if (*(ptr + 5) == my_parent) {  // src is my parent
+					if (*(ptr + 3) == 0xff) {  // next hop is 0xff: all children's broadcast
+						update_AP_msg(ptr, flen);
 						aplRxCustomCallBack();
-						send_custom_broadcast(flen-6, ptr+6);  // send broadcast to my grandsons
+						send_custom_broadcast(flen - 6, ptr + 6);  // send broadcast to my grandsons
 					}
-				}else{
+				} else {
 					// invalid broadcast(not from my parent)
 				}
 				break;
 			default:
 				break;
 		}
-	}else{
-		switch(*(ptr+2)){ // switch frame type [SHORT]
+	} else {
+		switch (*(ptr + 2)) {  // switch frame type [SHORT]
 			case FRAME_TYPE_SHORT_BEACON:
 				// TODO: beacon callback 2016年8月23日 下午11:53:12
 				break;
@@ -299,45 +295,44 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 				macRxPingCallback(ptr);
 				break;
 			case FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL:
-				if(*(ptr+5)==FRAME_FLAG_JOIN_REQUEST){ // join req
-					if(my_parent==*(ptr+4))// sender is my parent, not allow to join(loopback)
+				if (*(ptr + 5) == FRAME_FLAG_JOIN_REQUEST) {  // join requesst
+					if (my_parent == *(ptr + 4))  // sender is my parent, not allow to join(loopback)
 						break;
-					if(*(ptr+4)==MY_NODE_NUM) // conflict address, not allow(this situation should not appear in reality)
+					if (*(ptr + 4) == MY_NODE_NUM)  // conflict address, not allow(this situation should not appear in reality)
 						break;
-					if(all_nodes[*(ptr+4)]==MY_NODE_NUM){ // if dst was my son before, let him join again
-						send_join_network_response(*(ptr+4),FALSE);
+					if (all_nodes[*(ptr + 4)] == MY_NODE_NUM) {  // if dst was my son before, let him join again
+						send_join_network_response(*(ptr + 4), FALSE);
 						break;
 					}
-					if(my_children_number<MAX_CHILDREN_NUM){
-						DelayMs(1); // slow down for a while
-						send_join_network_response(*(ptr+4),FALSE);
+					if (my_children_number < MAX_CHILDREN_NUM) {
+						DelayMs(1);  // wait for a while
+						send_join_network_response(*(ptr + 4), FALSE);
 					}
 
 				}
 
-				else if(*(ptr+5)==FRAME_FLAG_JOIN_RESPONSE){ // join response
+				else if (*(ptr + 5) == FRAME_FLAG_JOIN_RESPONSE) {  // join response
 					if (isOffline == TRUE) {
 						isOffline = FALSE;
 						my_parent = *(ptr + 4);
-						send_join_network_response(*(ptr+4),TRUE);
+						send_join_network_response(*(ptr + 4), TRUE);
 					}
-				}else{ // a join ACK
-					all_nodes[*(ptr+4)]=*(ptr+3);
-					if(*(ptr+3)==MY_NODE_NUM){ // new child
-						printf("Node #%u joined\r\n",*(ptr+4));
+				} else {  // join ACK
+					all_nodes[*(ptr + 4)] = *(ptr + 3);
+					if (*(ptr + 3) == MY_NODE_NUM) {  // it is my new child
+						printf("Node #%u joined\r\n", *(ptr + 4));
 					}
 
 				}
 				break;
 			case FRAME_TYPE_SHORT_ROUTE_UPDATE:
-				if(*(ptr+3)==MY_NODE_NUM || *(ptr+4)==my_parent){
+				if (*(ptr + 3) == MY_NODE_NUM || *(ptr + 4) == my_parent) {
 					merge_grandsons(ptr);
-
 				}
 				break;
 			case FRAME_TYPE_SHORT_SEND_PATH_TO_PC:
-				if(*(ptr+3)==MY_NODE_NUM)
-					printf("recv a path for PC: #%u -> #%u\r\n",*(ptr+4),*(ptr+5));
+				if (*(ptr + 3) == MY_NODE_NUM)
+					printf("recv a path for PC: #%u -> #%u\r\n", *(ptr + 4), *(ptr + 5));
 				break;
 			default:
 				break;
@@ -345,15 +340,14 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 	}
 }
 
-
-void send_join_network_response(unsigned char dst, BOOL isACK){
+void send_join_network_response(unsigned char dst, BOOL isACK) {
 	static unsigned char join_response_payload[FRAME_LENGTH_JOIN_INFO];
-	join_response_payload[0]=FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL;
-	join_response_payload[1]=dst;
-	join_response_payload[2]=MY_NODE_NUM;
-	if(isACK==FALSE)
-		join_response_payload[3]=FRAME_FLAG_JOIN_RESPONSE;
+	join_response_payload[0] = FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL;
+	join_response_payload[1] = dst;
+	join_response_payload[2] = MY_NODE_NUM;
+	if (isACK == FALSE)
+		join_response_payload[3] = FRAME_FLAG_JOIN_RESPONSE;
 	else
-		join_response_payload[3]=FRAME_FLAG_JOIN_RESPONSE_ACK;
+		join_response_payload[3] = FRAME_FLAG_JOIN_RESPONSE_ACK;
 	halSendPacket(FRAME_LENGTH_JOIN_INFO, join_response_payload, TRUE);
 }

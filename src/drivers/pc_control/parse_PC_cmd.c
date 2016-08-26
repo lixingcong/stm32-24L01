@@ -6,7 +6,6 @@
  *      根据上位机发送的指令解析出命令参数
  */
 
-
 #include "define_songlu.h"
 #include "parse_PC_cmd.h"
 #include "string.h"
@@ -16,18 +15,18 @@
 #if 0
 int hex2dec(char in) {
 	if (in <= '9' && in >= '0')
-		return in - 48;
+	return in - 48;
 	if (in <= 'f' && in >= 'a')
-		return in - 87;
+	return in - 87;
 	return -1;
 }
 
 char dec2hex(int in) {
 	if (in >= 0) {
 		if (in < 10)
-			return in + 48;
+		return in + 48;
 		if (in < 16)
-			return in + 87;
+		return in + 87;
 	}
 	return -1;
 }
@@ -36,9 +35,9 @@ void str2case(char *in, char *out) {
 	char *ptr = in, *ptr_out = out;
 	while (*ptr) {
 		if ((*ptr <= 'Z' && *ptr >= 'A') || (*ptr <= 'z' && *ptr >= 'a'))
-			*ptr_out = (*ptr) + 32;
+		*ptr_out = (*ptr) + 32;
 		else
-			*ptr_out = *ptr;
+		*ptr_out = *ptr;
 		++ptr;
 		++ptr_out;
 	}
@@ -84,27 +83,27 @@ char parse_command(char *in1, control_from_pc_t *in2) {
 	len = *(ptr++);
 	if (strlen(in1) != len) {
 		printf("parse_command error: invalid len, drop packet\r\n");
-		printf("packet[0] len is %d, but in fact len is %d\r\n",len,strlen(in1));
+		printf("packet[0] len is %d, but in fact len is %d\r\n", len, strlen(in1));
 		return -1;
 	}
-	if (*(ptr) == 'S' && *(ptr+1) == 'Z') {
+	if (*(ptr) == 'S' && *(ptr + 1) == 'Z') {
 		// skip 'SZ'
-		ptr+=2;
+		ptr += 2;
 		/* work mode */
 		if (*(ptr++) == MODE_OPTION_FLAG) {
 			switch (*(ptr++)) {
 				case MODE_STATIC_FREQ:
 					// input a 3-digit num
 					in2->mode = 0;
-					in2->freq =((*ptr++)-48)*100;
-					in2->freq+=((*ptr++)-48)*10;
-					in2->freq+=((*ptr++)-48);
+					in2->freq = ((*ptr++) - 48) * 100;
+					in2->freq += ((*ptr++) - 48) * 10;
+					in2->freq += ((*ptr++) - 48);
 					break;
 				case MODE_DYNAMIC_FREQ:
 					// input a M0x
 					in2->mode = 1;
-					in2->freq=*(ptr+2);
-					ptr+=3;
+					in2->freq = *(ptr + 2);
+					ptr += 3;
 					break;
 				default:
 					printf("error work mode, drop.\r\n");
@@ -185,39 +184,36 @@ char parse_command(char *in1, control_from_pc_t *in2) {
 		}
 
 		return 0;
-	}else if (*(ptr) == 'Z' && *(ptr+1) == 'T') {
+	} else if (*(ptr) == 'Z' && *(ptr + 1) == 'T') {
 		printf("uploading route table.\r\n");
 		return 1;
-	}else if( *(ptr) == 'S' && *(ptr+1) == 'C'){
+	} else if (*(ptr) == 'S' && *(ptr + 1) == 'C') {
 		printf("uploading self check status\r\n");
 		return 2;
-	}
-	else{
+	} else {
 		printf("invalid command from PC, drop.\r\n");
 		return -1;
 	}
 }
 
-
-
 /*
-// 演示程序： 运行在PC机上，不是stm32上
-int  main()
-{
-	int len;
-	char buffer1[MAX_BUF_LEN];
-	char buffer2[MAX_BUF_LEN];
-	control_from_pc_t *my_control_from_pc_ptr=&my_control_from_pc;
-	while(1){
-		printf("input a hex\r\n");
-		scanf("%s",buffer1);
-		len=strlen(buffer1);
-		str2case(buffer1,buffer2);
-		hex2str(buffer2,buffer1,len);
-		len>>=1;
-		parse_command(buffer1,my_control_from_pc_ptr);
-		print_command(my_control_from_pc_ptr);
-	}
-	return 0;
-}
+ // 演示程序： 运行在PC机上，不是stm32上
+ int  main()
+ {
+ int len;
+ char buffer1[MAX_BUF_LEN];
+ char buffer2[MAX_BUF_LEN];
+ control_from_pc_t *my_control_from_pc_ptr=&my_control_from_pc;
+ while(1){
+ printf("input a hex\r\n");
+ scanf("%s",buffer1);
+ len=strlen(buffer1);
+ str2case(buffer1,buffer2);
+ hex2str(buffer2,buffer1,len);
+ len>>=1;
+ parse_command(buffer1,my_control_from_pc_ptr);
+ print_command(my_control_from_pc_ptr);
+ }
+ return 0;
+ }
  */

@@ -12,50 +12,49 @@
 #include "A7190.h"
 #include "ctl_lmx2581.h"
 
-
 unsigned char dynamic_freq_mode;
 
-void set_payload_len(unsigned char i){
-/*
-	PAYLOAD_SET_LEN=PAYLOAD_SET_LEN_LIST[i];
-	// fprintf(stdout,"payload has been set to %d\r\n",PAYLOAD_MAX_LEN);
-*/
-}
-
-void set_datarate(unsigned char i){
+void set_payload_len(unsigned char i) {
 	/*
-	RATE_DELAY_MS=(unsigned int)RATE_DELAY_MS_LIST[i];
-	*/
+	 PAYLOAD_SET_LEN=PAYLOAD_SET_LEN_LIST[i];
+	 // fprintf(stdout,"payload has been set to %d\r\n",PAYLOAD_MAX_LEN);
+	 */
 }
 
-void send_test_msg_to_dst(unsigned char dst){
+void set_datarate(unsigned char i) {
+	/*
+	 RATE_DELAY_MS=(unsigned int)RATE_DELAY_MS_LIST[i];
+	 */
+}
+
+void send_test_msg_to_dst(unsigned char dst) {
 
 }
 
 #ifdef LRWPAN_COORDINATOR
 // 跳频模式，暂时失去协调器的组网功能（在spi1_irq.c中屏蔽接收处理过程，收到任何东西都将丢弃）
-void work_under_dynamic_mode(){
-	unsigned short freq,freq_step_in;
+void work_under_dynamic_mode() {
+	unsigned short freq, freq_step_in;
 	unsigned char steps;
 	unsigned int last_timer;
-	steps=DIVISION_OF_DYNAMIC_FREQ[dynamic_freq_mode];
+	steps = DIVISION_OF_DYNAMIC_FREQ[dynamic_freq_mode];
 #define LMX2581_MAX_FREQ 700
 #define LMX2581_MIN_FREQ 400
-	freq=LMX2581_MIN_FREQ;
-	freq_step_in=(LMX2581_MAX_FREQ-LMX2581_MIN_FREQ)/steps;
-	last_timer=halGetMACTimer();
+	freq = LMX2581_MIN_FREQ;
+	freq_step_in = (LMX2581_MAX_FREQ - LMX2581_MIN_FREQ) / steps;
+	last_timer = halGetMACTimer();
 	// reset first three bytes to avoid received by other nodes incidentally
-	recv_buffer_a7190[0]=recv_buffer_a7190[1]=recv_buffer_a7190[2]=0;
-	while(1){
-		if(dynamic_freq_mode==0xff)// 定频模式：跳出
+	recv_buffer_a7190[0] = recv_buffer_a7190[1] = recv_buffer_a7190[2] = 0;
+	while (1) {
+		if (dynamic_freq_mode == 0xff)  // 定频模式：跳出
 			break;
 
-		halSendPacket(((unsigned short)LRWPAN_MAX_FRAME_SIZE), recv_buffer_a7190,FALSE); // 往死里发包
+		halSendPacket(((unsigned short) LRWPAN_MAX_FRAME_SIZE), recv_buffer_a7190, FALSE);  // 往死里发包
 		// TODO: 跳频模式下发送间隔，频谱仪上显示不稳定 2016年8月18日 下午1:01:51
-		if (halMACTimerNowDelta(last_timer) > 10){ // 每10ms改变VCO频率
-			freq=(freq<(LMX2581_MAX_FREQ-freq_step_in)?(freq+freq_step_in):LMX2581_MIN_FREQ);
+		if (halMACTimerNowDelta(last_timer) > 10) {  // 每10ms改变VCO频率
+			freq = (freq < (LMX2581_MAX_FREQ - freq_step_in) ? (freq + freq_step_in) : LMX2581_MIN_FREQ);
 			ctl_frequency_set(freq);
-			last_timer=halGetMACTimer();
+			last_timer = halGetMACTimer();
 		}
 	}
 	ctl_frequency_set(my_control_from_pc.freq);
@@ -65,28 +64,28 @@ void work_under_dynamic_mode(){
 #endif
 
 // 成功上报1，失败上报0
-void upload_self_check_status(){
-	if(isOffline==FALSE){
+void upload_self_check_status() {
+	if (isOffline == FALSE) {
 #ifdef LRWPAN_COORDINATOR
-		fprintf(stderr,"ZZCK1,C,%u@\r\n",MY_NODE_NUM);
+		fprintf(stderr, "ZZCK1,C,%u@\r\n", MY_NODE_NUM);
 #else
 		fprintf(stderr,"ZZCK1,R,%u@\r\n",MY_NODE_NUM);
 #endif
-	}else{
-		fprintf(stderr,"ZZCK0@\r\n");
+	} else {
+		fprintf(stderr, "ZZCK0@\r\n");
 	}
 }
 
 // 上传路由表
-void upload_route_table(){
+void upload_route_table() {
 	unsigned char i;
-	fprintf(stderr,"ZZST");
-	fprintf(stderr,"$,R0,ADDR0, ,&0,#");
-	for(i=1;i<=ALL_NODES_NUM;++i){
-		if(all_nodes[i]<ALL_NODES_NUM)// todo: no ping info (ALL
-			fprintf(stderr,"$,R%u,ADDR%u,%u,&%u,#",i,i,0xff,all_nodes[i]);
+	fprintf(stderr, "ZZST");
+	fprintf(stderr, "$,R0,ADDR0, ,&0,#");
+	for (i = 1; i <= ALL_NODES_NUM; ++i) {
+		if (all_nodes[i] < ALL_NODES_NUM)  // todo: no ping info (ALL
+			fprintf(stderr, "$,R%u,ADDR%u,%u,&%u,#", i, i, 0xff, all_nodes[i]);
 	}
-	fprintf(stderr,"@\r\n");
+	fprintf(stderr, "@\r\n");
 }
 
 // 执行这个函数前,必须保证parse_command是正确返回值0的！！
@@ -107,7 +106,7 @@ void execute_PC_command(control_from_pc_t *in) {
 
 	printf("\r\nfreq:\t");
 	if (in->freq > 100) {
-		dynamic_freq_mode=0xff; // 取消跳频模式
+		dynamic_freq_mode = 0xff;  // 取消跳频模式
 		printf("%u\r\n", in->freq);
 		// to 彭朋：这里设置定频工作
 		ctl_frequency_set(in->freq);
@@ -126,7 +125,7 @@ void execute_PC_command(control_from_pc_t *in) {
 				puts("not set yet");
 				return;
 		}
-		dynamic_freq_mode=((in->freq)-'1');
+		dynamic_freq_mode = ((in->freq) - '1');
 	}
 
 	printf("\r\nto:\t");
@@ -179,9 +178,8 @@ void execute_PC_command(control_from_pc_t *in) {
 	printf("\r\n--------------\r\n");
 }
 
-
-void upload_route_for_PC(unsigned char src,unsigned char dst){
-	fprintf(stderr,"ZZRT%u,%u@\r\n",src,dst);
-	printf("--PC: Node #%u -> Node#%u@\r\n",src,dst);
+void upload_route_for_PC(unsigned char src, unsigned char dst) {
+	fprintf(stderr, "ZZRT%u,%u@\r\n", src, dst);
+	printf("--PC: Node #%u -> Node#%u@\r\n", src, dst);
 }
 
