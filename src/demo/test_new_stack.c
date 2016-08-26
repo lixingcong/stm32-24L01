@@ -47,7 +47,8 @@ int main() {
 	unsigned char usb_recv_ok_flag;  // received ok flag
 
 	USB_APP_STATE_ENUM my_usb_stage;
-	my_usb_stage = USB_APP_STATE_WAIT_FOR_USER_INPUT;
+//	my_usb_stage = USB_APP_STATE_WAIT_FOR_USER_INPUT; // 跳过自检
+	my_usb_stage = USB_APP_STATE_SELF_CHECK; // 自检通过后才能进行收发
 
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	// init delay timer
@@ -104,15 +105,30 @@ int main() {
 		// usb loop
 		switch (my_usb_stage) {
 			case USB_APP_STATE_SELF_CHECK:
-				// TODO: self check
+				usb_recv_ok_flag = USB_GetData(ENDP2, usb_recv_buffer, USB_FROM_PHONE_MAX_LEN);
+				if (usb_recv_ok_flag) {
+					if (usb_recv_buffer[7] == 1) {      //组网检验
+						usb_recv_buffer[7] = all_nodes[MY_NODE_NUM];
+						USB_SendData(ENDP2, usb_recv_buffer, USB_FROM_PHONE_MAX_LEN);
+					} else {
+						usb_recv_buffer[7] = 0x20;
+						USB_SendData(ENDP2, usb_recv_buffer, USB_FROM_PHONE_MAX_LEN);
+					}
+					for (j = 0; j < USB_FROM_PHONE_MAX_LEN; j++) {
+						usb_recv_buffer[j] = 0;
+					}
+					usb_recv_ok_flag = 0;
+					my_usb_stage = USB_APP_STATE_WAIT_FOR_USER_INPUT;
+				}
 				break;
+
 				// wait for recv
 			case USB_APP_STATE_WAIT_FOR_USER_INPUT:
 				usb_recv_ok_flag = USB_GetData(ENDP2, usb_recv_buffer, USB_FROM_PHONE_MAX_LEN);
 				if (usb_recv_ok_flag) {
 					printf("recv USB data !!!!!\r\n");
 					// move pointer to msg offset
-					usb_recv_ptr = &usb_recv_buffer[24];
+					usb_recv_ptr = &usb_recv_buffer[10];
 					while (*usb_recv_ptr != 0)
 						printf("%c", *(usb_recv_ptr++));
 					printf("\r\n");
@@ -121,14 +137,17 @@ int main() {
 					my_usb_stage = USB_APP_STATE_SEND_DATA;
 				}
 				break;
-				// after recv, go to send
+				// after recv, go to send23
 			case USB_APP_STATE_SEND_DATA:
 
-				aplSendMSG(usb_recv_buffer[23], USB_FROM_PHONE_MAX_LEN, usb_recv_buffer);
+				aplSendMSG(usb_recv_buffer[9], USB_FROM_PHONE_MAX_LEN, usb_recv_buffer);
 
-				//send_custom_routine_to_coord(usb_recv_buffer[23]);
+				if(usb_recv_buffer[6]==0x01) // 上传路径标志位
+					send_custom_routine_to_coord(usb_recv_buffer[9]);
+
 				my_usb_stage = USB_APP_STATE_WAIT_FOR_USER_INPUT;
 				break;
+
 		}
 
 #ifdef LRWPAN_COORDINATOR

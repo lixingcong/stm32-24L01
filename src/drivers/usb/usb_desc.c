@@ -56,7 +56,7 @@ const uint8_t CustomHID_DeviceDescriptor[CUSTOMHID_SIZ_DEVICE_DESC] =
 //    2,                          /*Index of string descriptor describing product*/
 //    3,                          /*Index of string descriptor describing the device serial number */
     0x71, 0x04,					// PHILIPS公司的设备ID,VID
-    0x99, 0x09,					// 设备制造商定的产品ID,PID
+    0x97, 0x09,					// 设备制造商定的产品ID,PID
     0x00, 0x01,					// 设备系列号
     0, 0, 0,					// 索引    
     0x01                        /*bNumConfigurations*/
