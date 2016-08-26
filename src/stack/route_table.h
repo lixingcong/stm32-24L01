@@ -53,8 +53,8 @@ extern BOOL isOffline;
 #define FRAME_TYPE_LONG_BROADCAST 0x04
 #define FRAME_TYPE_LONG_MSG_WITH_ACK 0xf0
 
-// 长帧的默认TTL，计算方法：树的最大深度为8，来回发送乘以2，即TTL为16
-#define LONG_MSG_DEFAULT_TTL 16
+// 长帧的默认TTL，最大跳8
+#define LONG_MSG_DEFAULT_TTL 8
 
 // 请求入网的标志
 #define FRAME_FLAG_JOIN_REQUEST 0x01

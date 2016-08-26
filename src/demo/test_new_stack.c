@@ -41,8 +41,6 @@ typedef enum _USB_APP_STATE_ENUM {
 int main() {
 	unsigned char *usb_recv_ptr, j;
 	unsigned char ep2_rev_ok;  // received ok flag
-	unsigned int my_timer;
-	unsigned char payload[10];
 
 	USB_APP_STATE_ENUM my_usb_stage;
 	my_usb_stage = USB_APP_STATE_WAIT_FOR_USER_INPUT;
@@ -94,39 +92,15 @@ int main() {
 	mainFSM=router_FSM;
 #endif
 
-	my_timer = halGetMACTimer();
 	while (1) {
 		do {
 			mainFSM();  // 组网、入网状态机
 		} while (isOffline == TRUE);
 
-		if (my_role == ROLE_ROUTER) {
-			if (halMACTimerNowDelta(my_timer) >= 3000) {
-				payload[0] = 'h';
-				payload[1] = 'i';
-				aplSendMSG(0, 2, payload);
-				my_timer = halGetMACTimer();
-			}
-		}
-
 		// usb loop
 		switch (my_usb_stage) {
 			case USB_APP_STATE_SELF_CHECK:
-				ep2_rev_ok = USB_GetData(ENDP2, usb_recv_buffer, USB_FROM_PHONE_MAX_LEN);
-				if (ep2_rev_ok) {
-					if (usb_recv_buffer[6] == 1 && usb_recv_buffer[7] == 1) {      //组网检验
-						usb_recv_buffer[7] = all_nodes[MY_NODE_NUM];
-						USB_SendData(ENDP2, usb_recv_buffer, USB_FROM_PHONE_MAX_LEN);
-					} else {
-						usb_recv_buffer[7] = 0x20;
-						USB_SendData(ENDP2, usb_recv_buffer, USB_FROM_PHONE_MAX_LEN);
-					}
-					for (j = 0; j < USB_FROM_PHONE_MAX_LEN; j++) {
-						usb_recv_buffer[j] = 0;
-					}
-					ep2_rev_ok = 0;
-					my_usb_stage = USB_APP_STATE_WAIT_FOR_USER_INPUT;
-				}
+				// TODO: self check
 				break;
 				// wait for recv
 			case USB_APP_STATE_WAIT_FOR_USER_INPUT:
@@ -180,7 +154,7 @@ void aplRxCustomCallBack() {
 	ptr = aplGetRxMsgData();
 	len = aplGetRxMsgLen();
 
-#if 1
+#if 0
 	for (i = 0; i < len; ++i)
 		putchar(*(ptr + i));
 	printf("\r\n");

@@ -164,11 +164,6 @@ void send_custom_packet(unsigned char src, unsigned char dst, unsigned short fle
 		payload_custom[i + FRAME_LENGTH_HEADER] = *(frm + i);
 
 	halSendPacket(total_len, payload_custom, FALSE);
-//	printf("in send custom: ");
-//	for(i=0;i<5;++i)
-//		printf("%x ",payload_custom[i]);
-//	printf("\r\n");
-
 }
 
 // 向父亲上传自己的路由表，增量更新
@@ -212,7 +207,7 @@ void send_custom_packet_relay(unsigned char src, unsigned char dst, unsigned cha
 		return;
 	}
 
-#if 1 // print the msg
+#if 0 // print the msg
 	for (i = 0; i < flen; ++i)
 		printf("%c", *(frm + i));
 	printf("\r\n");
