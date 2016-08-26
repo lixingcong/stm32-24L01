@@ -134,7 +134,7 @@ int main(){
 				// after recv, go to send
 			case USB_APP_STATE_SEND_DATA:
 
-				aplSendCustomMSG(usb_recv_buffer[23],USB_FROM_PHONE_MAX_LEN,usb_recv_buffer);
+				aplSendMSG(usb_recv_buffer[23],USB_FROM_PHONE_MAX_LEN,usb_recv_buffer);
 
 				//send_custom_routine_to_coord(usb_recv_buffer[23]);
 				my_usb_stage = USB_APP_STATE_WAIT_FOR_USER_INPUT;
@@ -154,7 +154,7 @@ void aplRxCustomCallBack(){
 	unsigned char *ptr;
 	printf("recv a custom packet, type=");
 
-	switch(aplGetCustomRxMsgType()){
+	switch(aplGetRxMsgType()){
 		case FRAME_TYPE_LONG_BROADCAST:
 			printf("broadcast: \r\n");
 			break;
@@ -165,8 +165,8 @@ void aplRxCustomCallBack(){
 			printf("unsupport msg in RxCallback\r\n");
 			return;
 	}
-	ptr=aplGetCustomRxMsgData();
-	len=aplGetCustomRxMsgLen();
+	ptr=aplGetRxMsgData();
+	len=aplGetRxMsgLen();
 
 	// move pointer to msg offset
 	ptr+=24;

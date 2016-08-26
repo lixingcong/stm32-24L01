@@ -50,6 +50,9 @@ extern BOOL isOffline;
 #define FRAME_TYPE_LONG_BROADCAST 0x04
 #define FRAME_TYPE_LONG_MSG_WITH_ACK 0xf0
 
+// 长帧的默认TTL，计算方法：树的最大深度为8，来回发送乘以2，即TTL为16
+#define LONG_MSG_DEFAULT_TTL 16
+
 // 请求入网的标志
 #define FRAME_FLAG_JOIN_REQUEST 0x01
 #define FRAME_FLAG_JOIN_RESPONSE 0x02
@@ -94,17 +97,17 @@ void send_route_increasing_change_to_parent();
 void merge_grandsons(unsigned char *ptr);
 
 // send function
-void send_custom_broadcast(unsigned char flen, unsigned char *frm);
-void send_custom_packet(unsigned char src, unsigned char dst, unsigned short flen, unsigned char *frm, unsigned char frm_type);
-void send_custom_packet_relay(unsigned char src, unsigned char dst, unsigned char flen, unsigned char *frm, unsigned char frm_type);
+// LONG msg
+void send_custom_packet(unsigned char src, unsigned char dst, unsigned short flen, unsigned char *frm, unsigned char frm_type, unsigned char TTL);
+void send_custom_packet_relay(unsigned char src, unsigned char dst, unsigned char flen, unsigned char *frm, unsigned char frm_type, unsigned char TTL);
+// SHORT msg
 void send_custom_routine_to_coord(unsigned char dst);
+void send_join_network_response(unsigned char dst, BOOL isACK);
 
 void display_all_nodes();
 
 // callback for ext8_irq_a7190()
 void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned short flen);
 
-// 入网回复
-void send_join_network_response(unsigned char dst, BOOL isACK);
 
 #endif /* _DEFINE_ROUTE_TABLE_H_ */

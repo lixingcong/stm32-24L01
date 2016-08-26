@@ -124,27 +124,27 @@ void merge_grandsons(unsigned char *ptr) {
 }
 
 /*
- * - - - -- - - - -- - - - -- - - - -- - - -- -  --
- * |         custom frame by lixingcong            |
- * - - -- - - - - - - -- - - -- - - - - - - -- - - -
- * | flen | frm_type |nexthop | dest | src | data  |
- * |   2  |     1    |   1    |   1  |  1  |  *    |
- *-- - - - - - - -- - - -- - - - - - - -- - - - - -
+ * - - - -- - - - -- - - - -- - - - -- - - -- -  -- - - - - - - -
+ * |                  custom frame by lixingcong                 |
+ * - - -- - - - - - - -- - - -- - - - - - - -- - - - - - - - -- --
+ * | name  | flen | frm_type |nexthop | dest | src | TTL | data  |
+ * | Bytes |  2   |     1    |   1    |   1  |  1  |  1  |   *   |
+ *-- - - - - - - -- - - -- - - - - - - -- - - - - - - - - - - - -
  */
 
 // 注意dst为0xff为广播，谨慎使用
-void send_custom_packet(unsigned char src, unsigned char dst, unsigned short flen, unsigned char *frm, unsigned char frm_type) {
+void send_custom_packet(unsigned char src, unsigned char dst, unsigned short flen, unsigned char *frm, unsigned char frm_type, unsigned char TTL) {
 	unsigned short total_len, i;
 	unsigned char nexthop;
 
-	if (flen > LRWPAN_MAX_FRAME_SIZE - 6) {
+	if (flen > LRWPAN_MAX_FRAME_SIZE - 7) {
 #ifdef ROUTE_TABLE_OUTPUT_DEBUG
 		printf("send_custom_packet(): packet too big, send fail\r\n");
 #endif
 		return;
 	}
 
-	total_len = 4 + flen;
+	total_len = 5 + flen;
 
 	if (dst != 0xff) {  // broadcast packet
 		nexthop = dst;
@@ -158,6 +158,7 @@ void send_custom_packet(unsigned char src, unsigned char dst, unsigned short fle
 	payload_custom[1] = nexthop;
 	payload_custom[2] = dst;
 	payload_custom[3] = src;
+	payload_custom[4] = TTL; // Time to Live
 
 	for (i = 0; i < flen; ++i)
 		payload_custom[i + 4] = *(frm + i);
@@ -168,12 +169,6 @@ void send_custom_packet(unsigned char src, unsigned char dst, unsigned short fle
 //		printf("%x ",payload_custom[i]);
 //	printf("\r\n");
 
-}
-
-// 给孩子和孙子们发递归广播
-void send_custom_broadcast(unsigned char flen, unsigned char *frm) {
-	// TODO: use DSN to avoid last broadcast 2016年8月10日 上午8:23:12
-	send_custom_packet(MY_NODE_NUM, 0xff, flen, frm, FRAME_TYPE_LONG_BROADCAST);
 }
 
 // 向父亲上传自己的路由表，增量更新
@@ -189,7 +184,7 @@ void send_route_increasing_change_to_parent() {
 void send_custom_routine_to_coord(unsigned char dst) {
 	static unsigned char routine_payload[FRAME_LENGTH_SEND_TO_PC];
 	if (my_role == ROLE_COORDINATOR) {  // src=0, directly upload to PC
-		//upload_route_for_PC(0, dst);
+		upload_route_for_PC(0, dst);
 		return;
 	}
 #ifdef ROUTE_TABLE_OUTPUT_DEBUG
@@ -202,14 +197,21 @@ void send_custom_routine_to_coord(unsigned char dst) {
 	halSendPacket(FRAME_LENGTH_SEND_TO_PC, routine_payload, TRUE);
 }
 
-// 标准包的转发 多跳
-void send_custom_packet_relay(unsigned char src, unsigned char dst, unsigned char flen, unsigned char *frm, unsigned char frm_type) {
+// 标准包的转发 多跳 每经过一跳 TTL减一
+void send_custom_packet_relay(unsigned char src, unsigned char dst, unsigned char flen, unsigned char *frm, unsigned char frm_type, unsigned char TTL) {
 	unsigned char i, *ptr;
+
 	if (src != MY_NODE_NUM)
 		printf("Routing ");
 	else
 		printf("Sending ");
-	printf("packet...frm_type=0x%x, msg=", frm_type);
+	printf("packet...frm_type=0x%x, TTL=%u\r\n", frm_type, TTL);
+
+	if(TTL==0){
+		printf("relay FAIL: TTL is 0, drop packet\r\n");
+		return;
+	}
+
 #if 0 // print the msg
 	for(i=0;i<flen;++i)
 	printf("%c",*(frm+i));
@@ -221,7 +223,7 @@ void send_custom_packet_relay(unsigned char src, unsigned char dst, unsigned cha
 	printf("\r\n");
 #endif
 
-	send_custom_packet(src, dst, flen, frm, frm_type);
+	send_custom_packet(src, dst, flen, frm, frm_type, (TTL - 1));
 }
 
 void display_all_nodes() {
@@ -257,7 +259,7 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 						update_AP_msg(ptr, flen);
 						aplRxCustomCallBack();
 					} else {  // dst is not me, relay it
-						send_custom_packet_relay(*(ptr + 5), *(ptr + 4), flen - 6, ptr + 6, *(ptr + 2));
+						send_custom_packet_relay(*(ptr + 5), *(ptr + 4), flen - 7, ptr + 7, *(ptr + 2), *(ptr + 6));
 					}
 				}
 				break;
@@ -269,15 +271,15 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 					if (*(ptr + 4) == MY_NODE_NUM) {  // dst is me, recv it as a broadcast
 						update_AP_msg(ptr, flen);
 						aplRxCustomCallBack();
-						send_custom_broadcast(flen - 6, ptr + 6);  // send broadcast to my grandsons
+						send_custom_packet_relay(MY_NODE_NUM,0xff,flen-7,ptr+7,FRAME_TYPE_LONG_BROADCAST,LONG_MSG_DEFAULT_TTL);  // send broadcast to my grandsons
 					} else {  // dst is not me, relay it
-						send_custom_packet_relay(*(ptr + 5), *(ptr + 4), flen - 6, ptr + 6, *(ptr + 2));
+						send_custom_packet_relay(*(ptr + 5), *(ptr + 4), flen - 7, ptr + 7, *(ptr + 2), *(ptr + 6));
 					}
 				} else if (*(ptr + 5) == my_parent) {  // src is my parent
 					if (*(ptr + 3) == 0xff) {  // next hop is 0xff: all children's broadcast
 						update_AP_msg(ptr, flen);
 						aplRxCustomCallBack();
-						send_custom_broadcast(flen - 6, ptr + 6);  // send broadcast to my grandsons
+						send_custom_packet_relay(MY_NODE_NUM,0xff,flen-7,ptr+7,FRAME_TYPE_LONG_BROADCAST,LONG_MSG_DEFAULT_TTL);  // send broadcast to my grandsons
 					}
 				} else {
 					// invalid broadcast(not from my parent)
