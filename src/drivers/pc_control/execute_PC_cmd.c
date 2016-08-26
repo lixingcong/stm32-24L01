@@ -13,6 +13,8 @@
 #include "ctl_lmx2581.h"
 
 unsigned char dynamic_freq_mode;
+BOOL isBroadcastRegularly;
+unsigned int last_broadcast_timer;
 
 void set_payload_len(unsigned char i) {
 	/*
@@ -109,7 +111,7 @@ void execute_PC_command(control_from_pc_t *in) {
 		dynamic_freq_mode = 0xff;  // 取消跳频模式
 		printf("%u\r\n", in->freq);
 		// to 彭朋：这里设置定频工作
-		ctl_frequency_set(in->freq);
+		// ctl_frequency_set(in->freq);
 	} else {
 		switch (in->freq) {
 			case MODE_DYNAMIC_FREQ_32CH:
@@ -129,10 +131,17 @@ void execute_PC_command(control_from_pc_t *in) {
 	}
 
 	printf("\r\nto:\t");
-	if (in->dst == 0xffff)
+	if (in->dst == 0xffff){
 		puts("boardcast");
-	else if ((in->dst) & 0x100)
+		isBroadcastRegularly=TRUE;
+		last_broadcast_timer=halGetMACTimer();
+	}
+
+	else if ((in->dst) & 0x100){
 		printf("#%d\r\n", (in->dst) & 0xff);
+		isBroadcastRegularly=FALSE;
+	}
+
 	else {
 		puts("not set yet");
 		return;

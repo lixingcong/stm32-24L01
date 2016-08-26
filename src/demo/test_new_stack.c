@@ -36,7 +36,7 @@
 // --------pc_control-----------
 #include "execute_PC_cmd.h"
 
-unsigned char usb_recv_buffer[USB_FROM_PHONE_MAX_LEN]; // symbol USB_FROM_PHONE_MAX_LEN was defined in usb_1.h
+unsigned char usb_recv_buffer[USB_FROM_PHONE_MAX_LEN];  // symbol USB_FROM_PHONE_MAX_LEN was defined in usb_1.h
 
 typedef enum _USB_APP_STATE_ENUM {
 	USB_APP_STATE_SELF_CHECK, USB_APP_STATE_WAIT_FOR_USER_INPUT, USB_APP_STATE_SEND_DATA
@@ -45,10 +45,11 @@ typedef enum _USB_APP_STATE_ENUM {
 int main() {
 	unsigned char *usb_recv_ptr, j;
 	unsigned char usb_recv_ok_flag;  // received ok flag
+	unsigned char broadcast_buffer_for_pc_control[8] = { 0xff, 0xff, 'h', 'e', 'l', 'l', 'o', 0 };
 
 	USB_APP_STATE_ENUM my_usb_stage;
 //	my_usb_stage = USB_APP_STATE_WAIT_FOR_USER_INPUT; // 跳过自检
-	my_usb_stage = USB_APP_STATE_SELF_CHECK; // 自检通过后才能进行收发
+	my_usb_stage = USB_APP_STATE_SELF_CHECK;  // 自检通过后才能进行收发
 
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	// init delay timer
@@ -85,7 +86,9 @@ int main() {
 	USB_Init();
 	printf("USB init done\r\n");
 
+	// configuration flags for pc_control
 	dynamic_freq_mode = 0xff;  // 这个必须要设置0xff，否则A7190强行工作跳频模式无法接收东西
+	isBroadcastRegularly = FALSE;  // 默认禁用上位机广播
 
 #ifdef LRWPAN_COORDINATOR
 	my_role = ROLE_COORDINATOR;
@@ -142,7 +145,7 @@ int main() {
 
 				aplSendMSG(usb_recv_buffer[9], USB_FROM_PHONE_MAX_LEN, usb_recv_buffer);
 
-				if(usb_recv_buffer[6]==0x01) // 上传路径标志位
+				if (usb_recv_buffer[6] == 0x01)  // 上传路径标志位
 					send_custom_routine_to_coord(usb_recv_buffer[9]);
 
 				my_usb_stage = USB_APP_STATE_WAIT_FOR_USER_INPUT;
@@ -152,7 +155,15 @@ int main() {
 
 #ifdef LRWPAN_COORDINATOR
 		if (dynamic_freq_mode != 0xff)
-			work_under_dynamic_freq_mode();
+		work_under_dynamic_freq_mode();
+
+		if(isBroadcastRegularly == TRUE) {  // 周期性发送广播
+			if(halMACTimerNowDelta(last_broadcast_timer) >= (3000)) {
+				fprintf(stderr,"ZZIFsending broadcast...@\r\n");
+				aplSendBROADCAST(8,broadcast_buffer_for_pc_control);
+				last_broadcast_timer=halGetMACTimer();
+			}
+		}
 #endif
 	}
 	return 0;
@@ -180,13 +191,18 @@ void aplRxCustomCallBack() {
 
 #if 1
 	for (i = 0; i < len; ++i)
-	printf("%u: %x\r\n",i,*(ptr + i));
+		printf("%u: %x\r\n", i, *(ptr + i));
 
 #else
 	// move pointer to USB msg offset 24
 	ptr += 24;
 	while (*ptr != 0)
-		printf("%c", *(ptr++));
+	printf("%c", *(ptr++));
 	printf("\r\n");
 #endif
+
+	// 上位机发送的广播，打印到上位机
+	if ((aplGetRxMsgType() == FRAME_TYPE_LONG_BROADCAST) && *(ptr) == 0xff && *(ptr + 1) == 0xff) {
+		fprintf(stderr, "ZZIFrecv a broadcast: %s@\r\n", ptr + 2);
+	}
 }

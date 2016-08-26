@@ -9,11 +9,13 @@
 #define _EXECUTE_PC_CMD_H_
 
 #include "define_songlu.h"
+#include "hal.h"
 
 // 是否工作在跳频模式下,0xff代表不工作在跳频，0~2代表三个频段
 extern unsigned char dynamic_freq_mode;
 
-extern unsigned char is_self_check_ok;
+extern BOOL isBroadcastRegularly;
+extern unsigned int last_broadcast_timer;
 
 void upload_self_check_status();
 void upload_route_table();
