@@ -61,5 +61,6 @@ typedef enum {
 unsigned int halGetMACTimer(void);
 void halSendPacket(unsigned short flen, unsigned char *ptr, BOOL isShortDataLengthMode);
 unsigned short halGetRandomShortByte(void);
+void check_if_exceed_max_node_range();
 
 #endif /* SRC_STACK_HAL_H_ */

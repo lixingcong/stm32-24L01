@@ -27,11 +27,7 @@ void update_route_cache_and_find_difference();
 void router_FSM() {
 	switch (router_FSM_state) {
 		case ROUTER_STATE_INITAILIZE_ALL_NODES:
-			if (MY_NODE_NUM >= ALL_NODES_NUM) {  // 超过节点。
-				printf("ERROR: max allow nodes num is %u, but my addr is %u\r\n", ALL_NODES_NUM, MY_NODE_NUM);
-				while (1)
-					;  // stop here infinitely
-			}
+			check_if_exceed_max_node_range();
 			init_all_nodes();
 			router_FSM_state = ROUTER_STATE_JOIN_NETWORK;
 			last_timer_children_checked = halGetMACTimer();

@@ -24,11 +24,7 @@ unsigned char coord_nodes_list[MAX_COORD_NUM];
 void coord_FSM() {
 	switch (coord_FSM_state) {
 		case COORD_STATE_INITAILIZE_ALL_NODES:
-			if (MY_NODE_NUM >= ALL_NODES_NUM) {  // 超过节点。
-				printf("ERROR: max allow nodes num is %u, but my addr is %u\r\n", ALL_NODES_NUM, MY_NODE_NUM);
-				while (1)
-					;  // stop here infinitely
-			}
+			check_if_exceed_max_node_range();
 			init_all_nodes();
 			coord_FSM_state = COORD_STATE_FORM_NETWORK;
 			break;
