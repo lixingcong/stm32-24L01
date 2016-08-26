@@ -43,7 +43,7 @@ void router_FSM() {
 					last_timer_children_checked = halGetMACTimer();
 				}
 			} else {  // online
-				printf("join succuessfully, parent is #%u\r\n", my_parent);
+				printf("join successfully, parent is #%u\r\n", my_parent);
 				router_FSM_state = ROUTER_STATE_CHECK_PARENT;
 				last_timer_parent_checked_me = halGetMACTimer();
 			}
@@ -82,6 +82,7 @@ void router_FSM() {
 			break;
 
 		default:
+			router_FSM_state = ROUTER_STATE_INITAILIZE_ALL_NODES;
 			break;
 	}
 }

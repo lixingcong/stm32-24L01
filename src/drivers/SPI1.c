@@ -71,19 +71,6 @@ void EXTI_config_for_A7190(){
 	NVIC_Init(&NVIC_InitStructure); 
 }
 
-void EXTI8_disable_NVIC(){
-	NVIC_InitTypeDef NVIC_InitStructure;
-	EXTI_InitTypeDef EXTI_InitStructure;
-
-	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
-	NVIC_Init(&NVIC_InitStructure);
-
-	EXTI_InitStructure.EXTI_Line = EXTI_Line8;
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	EXTI_InitStructure.EXTI_LineCmd = DISABLE;
-	EXTI_Init(&EXTI_InitStructure);
-}
 
 unsigned char SPI1_ReadWriteByte(unsigned char TxData) {
 	unsigned char retry = 0;

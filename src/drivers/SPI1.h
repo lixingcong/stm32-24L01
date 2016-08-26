@@ -12,7 +12,6 @@ typedef enum{
 	SPI_DONE,
 }spi_mode_t;
 
-void EXTI8_disable_NVIC();
 void SPI1_Init(void);
 void EXTI_config_for_A7190(void);
 

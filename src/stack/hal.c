@@ -14,7 +14,7 @@
 #include "hal.h"
 #include "A7190.h"
 #include "timer2.h"
-#include "SPI1.h"
+#include "sys.h"
 #include "route_table.h"
 
 extern unsigned int systick_count;
@@ -63,8 +63,8 @@ void halSendPacket(unsigned short flen, unsigned char *ptr, BOOL isShortDataLeng
 // all_nodes[]数组的下标不能被越界，否则stm32会死机，因此做启动检查地址是否合法
 void check_if_exceed_max_node_range() {
 	if (MY_NODE_NUM >= ALL_NODES_NUM) {  // 超过节点。
-		printf("FATAL ERROR: max allow nodes num is %u, but my addr is %u\r\n", ALL_NODES_NUM, MY_NODE_NUM);
-		EXTI8_disable_NVIC();  // turn off a7190 interupt
+		printf("FATAL ERROR: max allow nodes num is %u, but my addr is %u\r\nProgram was forced to stop\r\n", ALL_NODES_NUM, MY_NODE_NUM);
+		INTX_DISABLE();  // disable all interrupts
 		while (1)
 			;  // stop here infinitely
 	}
