@@ -43,7 +43,8 @@ typedef enum _USB_APP_STATE_ENUM {
 } USB_APP_STATE_ENUM;
 
 int main() {
-	unsigned char *usb_recv_ptr, j;
+	unsigned char *usb_recv_ptr;
+	unsigned short j;
 	unsigned char usb_recv_ok_flag;  // received ok flag
 	unsigned char broadcast_buffer_for_pc_control[8] = { 0xff, 0xff, 'h', 'e', 'l', 'l', 'o', 0 };
 
