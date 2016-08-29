@@ -99,7 +99,7 @@ void router_send_join_request() {
 // 查找路由表差异，以便于传输增量路由表
 void update_route_cache_and_find_difference() {
 	unsigned char i;
-	for (i = 1; i < ALL_NODES_NUM; ++i) {
+	for (i = 0; i < ALL_NODES_NUM; ++i) {
 		if (all_nodes[i] != all_nodes_cache[i]) {
 			if (all_nodes_cache[i] == 0xff)
 				update_route_response_content(TRUE, i, all_nodes[i]);  // add

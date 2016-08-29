@@ -24,7 +24,7 @@ extern void aplRxCustomCallBack(void);
 unsigned char all_nodes[ALL_NODES_NUM];  // 存放实时更新路由表，用于转发数据包等操作
 unsigned char all_nodes_cache[ALL_NODES_NUM];  // 路由表缓存
 
-unsigned char route_response[FRAME_LENGTH_ROUTE_CHANGE_RESPONSE];  // 缓冲区专门存放待发送的增量路由表，前面有3个帧头
+unsigned char route_response[FRAME_LENGTH_ROUTE_CHANGE_RESPONSE];  // 缓冲区专门存放待发送的增量路由表，前面有3个字节的帧头
 unsigned char route_response_offset;  // 增量路由表偏移量
 
 static unsigned char payload_custom[LRWPAN_MAX_FRAME_SIZE];
@@ -88,7 +88,7 @@ void check_my_children_online() {
 	unsigned char children_counter;
 	unsigned char i;
 	children_counter = 0;
-	for (i = 1; i < ALL_NODES_NUM; ++i) {
+	for (i = 0; i < ALL_NODES_NUM; ++i) {
 		if (all_nodes[i] == (MY_NODE_NUM)) {  // my child
 			if (0xff == macTxCustomPing(i, PING_DIRECTION_TO_CHILDREN, 2, 300)) {
 				all_nodes[i] = 0xff;
@@ -234,7 +234,7 @@ void send_custom_packet_relay(unsigned char src, unsigned char dst, unsigned sho
 
 void display_all_nodes() {
 	unsigned char i;
-	for (i = 1; i < ALL_NODES_NUM; ++i)
+	for (i = 0; i < ALL_NODES_NUM; ++i)
 		if (all_nodes[i] != 0xff)
 			printf("- Node #%u 's parent is #%u\r\n", i, all_nodes[i]);
 	printf("-\r\n");
