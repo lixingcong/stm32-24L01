@@ -22,7 +22,7 @@ extern unsigned char all_nodes_ping[ALL_NODES_NUM];
 #define PING_DIRECTION_TO_PARENT 0x02
 #define PING_DIRECTION_TO_OTHERS 0x04
 
-unsigned char macTxPing(unsigned char dst, unsigned char dsn, BOOL isRequest);
+unsigned char macTxPing(unsigned char dst, BOOL isRequest, unsigned char direction);
 void macRxPingCallback(unsigned char *ptr,BOOL isLongPing);
 // ping
 unsigned char macTxCustomPing(unsigned char dst, unsigned char direction, unsigned char retry_times, unsigned short retry_interval);

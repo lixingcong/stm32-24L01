@@ -101,7 +101,6 @@ int main() {
 	mainFSM = router_FSM;
 #endif
 
-	my_timer=halGetMACTimer();
 	while (1) {
 		do {
 			mainFSM();  // 组网、入网状态机
