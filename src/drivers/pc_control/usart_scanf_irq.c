@@ -12,7 +12,9 @@
 #include "stdio.h"
 #include "string.h"
 #include "route_table.h"
+#include "route_ping.h"
 #include "delay.h"
+
 
 // 设置存储
 control_from_pc_t my_control_from_pc;
@@ -43,6 +45,7 @@ void usart_irq_scanf_callback() {
 			break;
 		case 1:  // 上报路由
 			upload_route_table();
+			ping_all_nodes();
 			break;
 		case 2:  //上报状态
 			upload_self_check_status();

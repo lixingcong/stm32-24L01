@@ -18,6 +18,7 @@
 #include "stdio.h"
 
 extern unsigned int last_timer_parent_checked_me;  // defined in FSM_router.c
+unsigned char all_nodes_ping[ALL_NODES_NUM];
 
 //used for ping
 typedef struct _ROUTE_PING_DATA {
@@ -143,4 +144,11 @@ void macRxPingCallback(unsigned char *ptr) {
 			all_nodes[*(ptr + 3)] = *(ptr + 4);
 		}
 	}
+}
+
+void ping_all_nodes(){
+	unsigned char i;
+	for(i=0;i<ALL_NODES_NUM;++i)
+		if(all_nodes[i]!=0xff)
+			all_nodes_ping[i]=macTxPing(i, TRUE, PING_DIRECTION_TO_OTHERS);
 }
