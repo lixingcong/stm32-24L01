@@ -34,7 +34,7 @@ extern BOOL isOffline;
 
 // 某个节点的最大孩子数目，该值影响着网络拓朴的形状
 // 若想连成一条线，设置为1
-#define MAX_CHILDREN_NUM 2
+#define MAX_CHILDREN_NUM 1
 
 // 短帧的长度，不含2个头字节flen，因为头字节是由halSendPacket()函数修改的
 #define FRAME_LENGTH_BEACON 3
@@ -59,6 +59,7 @@ extern BOOL isOffline;
 #define FRAME_TYPE_LONG_ACK 0x02
 #define FRAME_TYPE_LONG_BROADCAST 0x04
 #define FRAME_TYPE_LONG_MSG_WITH_ACK 0xf0
+#define FRAME_TYPE_LONG_PING 0xf1
 
 // 长帧的默认TTL，最大跳8
 #define LONG_MSG_DEFAULT_TTL 8
@@ -67,6 +68,10 @@ extern BOOL isOffline;
 #define FRAME_FLAG_JOIN_REQUEST 0x01
 #define FRAME_FLAG_JOIN_RESPONSE 0x02
 #define FRAME_FLAG_JOIN_RESPONSE_ACK 0x04
+
+// 多跳ping的帧标志
+#define FRAME_FLAG_LONGPING_REQUEST 0xf0
+#define FRAME_FLAG_LONGPING_RESPONSE 0x0f
 
 // 定期检查间隔
 #define INTERVAL_OF_SENDING_BEACON 10

@@ -43,10 +43,15 @@ extern APS_CUSTOM_FRAME my_custom_frame;
 #define aplSendDstBROADCAST(dst,flen,frm) \
 		send_custom_packet_relay(MY_NODE_NUM,dst,flen,frm,FRAME_TYPE_LONG_BROADCAST,LONG_MSG_DEFAULT_TTL)
 
+// 单跳ping
+#define aplSendPing(dst,retry_times,retry_interval) \
+		macTxCustomPing(dst, PING_DIRECTION_TO_OTHERS, retry_times,retry_interval)
+// 多跳ping
+#define aplSendLongPing(dst) \
+		macTxPingLongDistance(dst,1)
+
 // 更新AP层的接收信息，以便于对接aplRxCustomCallBack()
 void update_AP_msg(unsigned char *ptr, unsigned short flen);
 
-#define aplSendPing(dst,retry_times,retry_interval) \
-		macTxCustomPing(dst, PING_DIRECTION_TO_OTHERS, retry_times,retry_interval)
 
 #endif /* APL_CUSTOM_FUNCTION_H_ */

@@ -9,6 +9,7 @@
 #include "execute_PC_cmd.h"
 #include "define_songlu.h"
 #include "route_table.h"
+#include "route_ping.h"
 #include "A7190.h"
 #include "ctl_lmx2581.h"
 

@@ -28,6 +28,7 @@ typedef struct _ROUTE_PING_DATA {
 } ROUTE_PING_DATA;
 
 ROUTE_PING_DATA route_ping_data;
+ROUTE_PING_DATA route_longping_data;
 
 // ping时延
 
@@ -110,40 +111,51 @@ unsigned char macTxCustomPing(unsigned char dst, unsigned char direction, unsign
 	return result;
 }
 
-void macRxPingCallback(unsigned char *ptr) {
-	if (*(ptr + 3) == (MY_NODE_NUM)) {
-		if ((*(ptr + 5) & 0xf0) == 0xf0) {  // receive a ping request, make a response to him
-			switch ((*(ptr + 5)) & 0x0f) {
-				case PING_DIRECTION_TO_CHILDREN:
-					macTxPing(*(ptr + 4), FALSE, PING_DIRECTION_TO_PARENT);
-					my_parent = *(ptr + 4);  // 父亲的给我发的，根据父亲的的ping方向改变路由
-					last_timer_parent_checked_me = halGetMACTimer();  // 更新定时器：父亲刚刚给我检查了！
-					isOffline = FALSE;
-					break;
-				case PING_DIRECTION_TO_PARENT:
-					all_nodes[*(ptr + 4)] = MY_NODE_NUM;  // 孩子发给我的东西，根据孩子的ping方向改变路由表
-					macTxPing(*(ptr + 4), FALSE, PING_DIRECTION_TO_CHILDREN);
-					break;
-				default:
-					macTxPing(*(ptr + 4), FALSE, PING_DIRECTION_TO_OTHERS);
-					break;
-			}
+void macRxPingCallback(unsigned char *ptr,BOOL isLongPing) {
+	if (isLongPing == FALSE) { // msg is [SHORT PING]
+		if (*(ptr + 3) == (MY_NODE_NUM)) {
+			if ((*(ptr + 5) & 0xf0) == 0xf0) {  // receive a ping request, make a response to him
+				switch ((*(ptr + 5)) & 0x0f) {
+					case PING_DIRECTION_TO_CHILDREN:
+						macTxPing(*(ptr + 4), FALSE, PING_DIRECTION_TO_PARENT);
+						my_parent = *(ptr + 4);  // 父亲的给我发的，根据父亲的的ping方向改变路由
+						last_timer_parent_checked_me = halGetMACTimer();  // 更新定时器：父亲刚刚给我检查了！
+						isOffline = FALSE;
+						break;
+					case PING_DIRECTION_TO_PARENT:
+						all_nodes[*(ptr + 4)] = MY_NODE_NUM;  // 孩子发给我的东西，根据孩子的ping方向改变路由表
+						macTxPing(*(ptr + 4), FALSE, PING_DIRECTION_TO_CHILDREN);
+						break;
+					default:
+						macTxPing(*(ptr + 4), FALSE, PING_DIRECTION_TO_OTHERS);
+						break;
+				}
 
-		} else if ((*(ptr + 5) & 0xf0) == 0x00) {  // receive a ping response, mark mac_ping_data.ackpending as FALSE
-			if (*(ptr + 4) == route_ping_data.dst) {
+			} else if ((*(ptr + 5) & 0xf0) == 0x00) {  // receive a ping response, mark mac_ping_data.ackpending as FALSE
+				if (*(ptr + 4) == route_ping_data.dst) {
 #ifdef MAC_OUTPUT_DEBUG_PING
-				printf("macRxPingCallback(): dst replied ACK ok\r\n");
+					printf("macRxPingCallback(): dst replied ACK ok\r\n");
 #endif
-				route_ping_data.ackPending = FALSE;
+					route_ping_data.ackPending = FALSE;
+				}
+			} else {
+				// invalid ping packet
 			}
-		} else {
-			// invalid ping packet
+		} else {  // ping dst is not me
+			if ((*(ptr + 5) & 0x0f) == PING_DIRECTION_TO_CHILDREN) {  // 对于目标不是自己的packet，旁人可以偷听到。借此可以实现邻居更新
+				all_nodes[*(ptr + 3)] = *(ptr + 4);
+			}
 		}
-	} else {  // ping dst is not me
-		if ((*(ptr + 5) & 0x0f) == PING_DIRECTION_TO_CHILDREN) {  // 对于目标不是自己的packet，旁人可以偷听到。借此可以实现邻居更新
-			all_nodes[*(ptr + 3)] = *(ptr + 4);
+	}else{ // msg is [LONG PING]
+		if(*(ptr+7)==FRAME_FLAG_LONGPING_REQUEST){ // recv a long ping request, reply it
+			macTxPingLongDistance(*(ptr+5), FALSE);
+		}else{ // recv a long ping response
+			if(*(ptr+5)==route_longping_data.dst){ // src is my desired node
+				route_longping_data.ackPending=FALSE; // clear pending flag
+			}
 		}
 	}
+
 }
 
 void ping_all_nodes(){
@@ -151,4 +163,38 @@ void ping_all_nodes(){
 	for(i=0;i<ALL_NODES_NUM;++i)
 		if(all_nodes[i]!=0xff)
 			all_nodes_ping[i]=macTxPing(i, TRUE, PING_DIRECTION_TO_OTHERS);
+}
+
+unsigned char macTxPingLongDistance(unsigned char dst,BOOL isRequest){
+	unsigned char ping_long_flag;
+	unsigned int timer;
+
+	if(isRequest==TRUE)
+		ping_long_flag=FRAME_FLAG_LONGPING_REQUEST; // payload
+	else
+		ping_long_flag=FRAME_FLAG_LONGPING_RESPONSE;
+
+	// 调用长消息发送
+	send_custom_packet(MY_NODE_NUM, dst, 1, &ping_long_flag, FRAME_TYPE_LONG_PING, LONG_MSG_DEFAULT_TTL);
+
+	if (isRequest == TRUE) {
+		route_longping_data.ackPending = TRUE;
+		route_longping_data.last_tx_timer = halGetMACTimer();
+		route_longping_data.dst = dst;
+		while (1) {
+			timer = halMACTimerNowDelta(route_longping_data.last_tx_timer);
+			if (route_longping_data.ackPending == FALSE)
+				break;
+			// TODO: ping timeout=(10ms * default TTL)
+			if (timer > LONG_MSG_DEFAULT_TTL*10)
+				break;
+		}
+		if (route_longping_data.ackPending == FALSE)   // Successfully got ping ACK, return latency
+			return (unsigned char) (timer);
+
+	} else
+		return 0;
+
+	return 0xff;  //timeout
+
 }

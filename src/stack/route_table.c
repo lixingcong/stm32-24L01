@@ -291,6 +291,17 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 					// invalid broadcast(not from my parent)
 				}
 				break;
+
+			case FRAME_TYPE_LONG_PING:
+				if (*(ptr + 3) == MY_NODE_NUM) {  // next hop is me
+					if (*(ptr + 4) == MY_NODE_NUM) {  // dst is me, reply ping
+						macRxPingCallback(ptr,TRUE);
+					} else {  // dst is not me, relay it
+						send_custom_packet_relay(*(ptr + 5), *(ptr + 4), flen - 7, ptr + 7, *(ptr + 2), *(ptr + 6));
+					}
+				}
+				break;
+
 			default:
 				break;
 		}
@@ -300,7 +311,7 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 				// TODO: beacon callback 2016年8月23日 下午11:53:12
 				break;
 			case FRAME_TYPE_SHORT_PING:
-				macRxPingCallback(ptr);
+				macRxPingCallback(ptr,FALSE);
 				break;
 			case FRAME_TYPE_SHORT_JOIN_NETWORK_SIGNAL:
 				if (*(ptr + 5) == FRAME_FLAG_JOIN_REQUEST) {  // join requesst
