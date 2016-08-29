@@ -185,8 +185,8 @@ unsigned char macTxPingLongDistance(unsigned char dst,BOOL isRequest){
 			timer = halMACTimerNowDelta(route_longping_data.last_tx_timer);
 			if (route_longping_data.ackPending == FALSE)
 				break;
-			// TODO: ping timeout=(10ms * default TTL)
-			if (timer > LONG_MSG_DEFAULT_TTL*10)
+			// TODO: ping timeout=(20ms * default TTL)
+			if (timer > LONG_MSG_DEFAULT_TTL*20)
 				break;
 		}
 		if (route_longping_data.ackPending == FALSE)   // Successfully got ping ACK, return latency

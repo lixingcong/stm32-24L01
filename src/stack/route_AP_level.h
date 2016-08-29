@@ -43,10 +43,10 @@ extern APS_CUSTOM_FRAME my_custom_frame;
 #define aplSendDstBROADCAST(dst,flen,frm) \
 		send_custom_packet_relay(MY_NODE_NUM,dst,flen,frm,FRAME_TYPE_LONG_BROADCAST,LONG_MSG_DEFAULT_TTL)
 
-// 单跳ping
+// 单跳ping：返回值为0~255，单位毫秒
 #define aplSendPing(dst,retry_times,retry_interval) \
 		macTxCustomPing(dst, PING_DIRECTION_TO_OTHERS, retry_times,retry_interval)
-// 多跳ping
+// 多跳ping：返回值为0~255，单位毫秒
 #define aplSendLongPing(dst) \
 		macTxPingLongDistance(dst,1)
 
