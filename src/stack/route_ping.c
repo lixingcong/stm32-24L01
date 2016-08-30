@@ -158,12 +158,6 @@ void macRxPingCallback(unsigned char *ptr,BOOL isLongPing) {
 
 }
 
-void ping_all_nodes(){
-	unsigned char i;
-	for(i=0;i<ALL_NODES_NUM;++i)
-		if(all_nodes[i]!=0xff)
-			all_nodes_ping[i]=macTxPing(i, TRUE, PING_DIRECTION_TO_OTHERS);
-}
 
 unsigned char macTxPingLongDistance(unsigned char dst,BOOL isRequest){
 	unsigned char ping_long_flag;

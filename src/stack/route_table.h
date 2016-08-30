@@ -102,7 +102,7 @@ void init_all_nodes();
 unsigned char get_next_hop(unsigned char this_hop, unsigned char dst);
 
 // 检查自己孩子
-void check_my_children_online();
+void check_my_children_online(BOOL isPingAllGrandsons);
 
 // 增量更新路由表
 void update_route_response_content(BOOL isAdd, unsigned char child, unsigned char parent);

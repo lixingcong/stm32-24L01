@@ -45,7 +45,6 @@ void usart_irq_scanf_callback() {
 			break;
 		case 1:  // 上报路由
 			upload_route_table();
-			ping_all_nodes();
 			break;
 		case 2:  //上报状态
 			upload_self_check_status();

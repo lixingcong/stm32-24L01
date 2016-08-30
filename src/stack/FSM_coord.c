@@ -47,7 +47,7 @@ void coord_FSM() {
 
 		case COORD_STATE_CHECK_CHILDREN:
 			if (halMACTimerNowDelta(last_timer_children_checked) >= (INTERVAL_OF_CHECKING_CHILDREN * 1000)) {
-				check_my_children_online();
+				check_my_children_online(TRUE);
 				display_all_nodes();
 				last_timer_children_checked = halGetMACTimer();
 			}

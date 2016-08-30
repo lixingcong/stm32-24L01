@@ -26,7 +26,6 @@ unsigned char macTxPing(unsigned char dst, BOOL isRequest, unsigned char directi
 void macRxPingCallback(unsigned char *ptr,BOOL isLongPing);
 // ping
 unsigned char macTxCustomPing(unsigned char dst, unsigned char direction, unsigned char retry_times, unsigned short retry_interval);
-void ping_all_nodes();
 unsigned char macTxPingLongDistance(unsigned char dst,BOOL isRequest);
 
 #endif /* SRC_DRIVERS_ROUTE_TABLE_ROUTE_PING_H_ */

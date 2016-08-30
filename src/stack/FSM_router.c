@@ -65,7 +65,7 @@ void router_FSM() {
 
 		case ROUTER_STATE_CHECK_CHILDREN:
 			if (halMACTimerNowDelta(last_timer_children_checked) >= (INTERVAL_OF_CHECKING_CHILDREN * 1000)) {
-				check_my_children_online();
+				check_my_children_online(FALSE);
 				update_route_cache_and_find_difference();
 				if (route_response_offset > 3)  // if differences exists
 					send_route_increasing_change_to_parent();

@@ -84,20 +84,31 @@ unsigned char get_next_hop(unsigned char this_hop, unsigned char dst) {
 }
 
 // 使用ping检测孩子是否在线，不在线的将被删除
-void check_my_children_online() {
+void check_my_children_online(BOOL isPingAllGrandsons) {
 	unsigned char children_counter;
-	unsigned char i;
+	unsigned char i, ping_result;
 	children_counter = 0;
 	for (i = 0; i < ALL_NODES_NUM; ++i) {
+		if (all_nodes[i] == 0xff)
+			continue;
+
 		if (all_nodes[i] == (MY_NODE_NUM)) {  // my child
-			if (0xff == macTxCustomPing(i, PING_DIRECTION_TO_CHILDREN, 2, 300)) {
+			ping_result=macTxCustomPing(i, PING_DIRECTION_TO_CHILDREN, 2, 300);
+			if (0xff == ping_result) {
 				all_nodes[i] = 0xff;
 #ifdef ROUTE_TABLE_OUTPUT_DEBUG
 				printf("check_my_children_online(): deleted child #%u\r\n",i);
 #endif
 			} else
 				++children_counter;
+		} else if (isPingAllGrandsons == TRUE) {  // not my child, and ping all grandson, ping direction is to other
+			ping_result=macTxCustomPing(i, PING_DIRECTION_TO_OTHERS, 1, 300);
+			if (0xff == ping_result)
+				all_nodes[i] = 0xff;
 		}
+
+		all_nodes_ping[i]=ping_result; // update ping result, in order to upload to PC
+
 	}
 	my_children_number = children_counter;
 }
