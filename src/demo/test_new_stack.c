@@ -49,8 +49,8 @@ int main() {
 	unsigned char broadcast_buffer_for_pc_control[8] = { 0xff, 0xff, 'h', 'e', 'l', 'l', 'o', 0 };
 
 	USB_APP_STATE_ENUM my_usb_stage;
-//	my_usb_stage = USB_APP_STATE_WAIT_FOR_USER_INPUT; // 跳过自检
-	my_usb_stage = USB_APP_STATE_SELF_CHECK;  // 自检通过后才能进行收发
+	my_usb_stage = USB_APP_STATE_WAIT_FOR_USER_INPUT; // 跳过自检
+//	my_usb_stage = USB_APP_STATE_SELF_CHECK;  // 自检通过后才能进行收发
 
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	// init delay timer
@@ -190,11 +190,19 @@ void aplRxCustomCallBack() {
 
 	ptr = aplGetRxMsgData();
 	len = aplGetRxMsgLen();
+	
+	// 上位机发送的广播，打印到上位机，不往USB上面发送，return
+	if ((aplGetRxMsgType() == FRAME_TYPE_LONG_BROADCAST) && *(ptr) == 0xff && *(ptr + 1) == 0xff) {
+		fprintf(stderr, "ZZIFrecv a broadcast: %s@\r\n", ptr + 2);
+		return;
+	}
+	
+	USB_SendData(ENDP2, ptr, len);
 
+/*
 #if 1
 	for (i = 0; i < len; ++i)
 		printf("%u: %x\r\n", i, *(ptr + i));
-
 #else
 	// move pointer to USB msg offset 24
 	ptr += 24;
@@ -202,9 +210,6 @@ void aplRxCustomCallBack() {
 	printf("%c", *(ptr++));
 	printf("\r\n");
 #endif
+*/
 
-	// 上位机发送的广播，打印到上位机
-	if ((aplGetRxMsgType() == FRAME_TYPE_LONG_BROADCAST) && *(ptr) == 0xff && *(ptr + 1) == 0xff) {
-		fprintf(stderr, "ZZIFrecv a broadcast: %s@\r\n", ptr + 2);
-	}
 }
