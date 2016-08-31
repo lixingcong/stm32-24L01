@@ -141,7 +141,7 @@ int main() {
 					my_usb_stage = USB_APP_STATE_SEND_DATA;
 				}
 				break;
-				// after recv, go to send23
+				// after recv, go to send
 			case USB_APP_STATE_SEND_DATA:
 
 				aplSendMSG(usb_recv_buffer[9], USB_FROM_PHONE_MAX_LEN, usb_recv_buffer);
