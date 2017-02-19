@@ -17,7 +17,7 @@ VPATH+=drivers
 OBJS+=usart.o
 OBJS+=sys.o
 #OBJS+=SPI1.o
-#OBJS+=SPI2.o
+OBJS+=SPI2.o
 OBJS+=delay.o
 #OBJS+=usb_1.o
 #OBJS+=timer2.o
@@ -30,6 +30,9 @@ VPATH+=drivers/pc_control
 VPATH+=drivers/a7190
 #OBJS+=exti8_irq.o
 #OBJS+=A7190.o
+
+VPATH+=drivers/nrf24l01
+OBJS+=nrf24l01.o
 
 VPATH+=stack
 #OBJS+=hal.o

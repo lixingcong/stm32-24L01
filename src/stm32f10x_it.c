@@ -208,15 +208,14 @@ void USART1_IRQHandler(void)
 }
 #endif
 
-void EXTI9_5_IRQHandler(void)
-{
+//void EXTI9_5_IRQHandler(void)
+//{
 //	if(EXTI_GetITStatus(EXTI_Line8)!=RESET)
 //	{
 //		EXTI8_irq_a7190();
 //		EXTI_ClearITPendingBit(EXTI_Line8);
 //	}
-	
-}
+//}
 
 void USB_LP_CAN1_RX0_IRQHandler(void)
 {

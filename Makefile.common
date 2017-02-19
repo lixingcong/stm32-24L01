@@ -36,7 +36,7 @@ INCLUDE+=-I$(STMLIB)/CMSIS/Device/ST/STM32F10x/Include
 INCLUDE+=-I$(STMLIB)/CMSIS/Device/ST/STM32F10x/Source/Templates
 INCLUDE+=-I$(STMLIB)/STM32F10x_StdPeriph_Driver/inc
 INCLUDE+=-I$(STMLIB)/STM32_USB-FS-Device_Driver/inc
-INCLUDE+=-I$(TOP)/src/drivers -I$(TOP)/src/stack -I$(TOP)/src/drivers/a7190 -I$(TOP)/src/drivers/pc_control -I$(TOP)/src/drivers/route_table -I$(TOP)/src/demo -I$(TOP)/src/drivers/usb -I$(TOP)/src/drivers/lmx2581 
+INCLUDE+=-I$(TOP)/src/drivers -I$(TOP)/src/stack -I$(TOP)/src/drivers/nrf24l01 -I$(TOP)/src/drivers/pc_control -I$(TOP)/src/drivers/route_table -I$(TOP)/src/demo -I$(TOP)/src/drivers/usb -I$(TOP)/src/drivers/lmx2581 
 
 # symbols or marcos defined
 SYMBOLS_DEFINE = -DUSE_GCC_FOR_ARM -DLRWPAN_DEFAULT_START_CHANNEL=44
