@@ -6,7 +6,7 @@ MEMORY {
 	/*RAM (RWX) : ORIGIN = 0x20000000 , LENGTH = 20K*/
 	/*STM32F103RET --> 64K*/
 	/*STM32F103ZET --> 64K*/
-	RAM (RWX) : ORIGIN = 0x20000000 , LENGTH = 64K
+	RAM (RWX) : ORIGIN = 0x20000000 , LENGTH = 20K
 	
 	EXTSRAM (RWX) : ORIGIN = 0x68000000 , LENGTH = 0
 	
@@ -16,7 +16,7 @@ MEMORY {
 	
 	/*STM32F103RET --> 508K*/
 	/*STM32F103ZET --> 508K*/
-	FLASH (RX) : ORIGIN = 0x08000000 , LENGTH = 508K
+	FLASH (RX) : ORIGIN = 0x08000000 , LENGTH = 63K
 	
 	/*Adjust ORIGIN to (0x08000000 + (FLASHsize-FeePROMsize)) of target MCU*/
 	/*and adust LENGTH to FeePROMsize allocated:*/
@@ -24,7 +24,7 @@ MEMORY {
 	/*EEMUL (RWX) : ORIGIN = 0x08000000+126K, LENGTH = 2K*/
 	
 	/*STM32F103RET --> 0x08000000+508K, 4K*/
-	EEMUL (RWX) : ORIGIN = 0x08000000+508K, LENGTH = 4K
+	EEMUL (RWX) : ORIGIN = 0x08000000+63K, LENGTH = 1K
 }
 _estack	= ORIGIN(RAM)+LENGTH(RAM);	/* end of the stack */
 _seemul = ORIGIN(EEMUL);	/* start of the eeprom emulation area */

@@ -20,13 +20,13 @@ SIZE_ARM=$(TC)-size
 #STM32F103RET (512KB FLASH, 64KB RAM) --> STM32F10X_HD
 #STM32F103ZET (512KB FLASH, 64KB RAM) --> STM32F10X_HD
 #========================================#
-TypeOfMCU=STM32F10X_HD
+TypeOfMCU=STM32F10X_MD
 #========================================#
 
 # supported device for JLinkExe (Linux)
 # https://www.segger.com/jlink_supported_devices.html
 JLINKEXE_SCRIPT=/tmp/JLinkExe.script
-SUPPORTED_DEVICE=STM32F103VE
+SUPPORTED_DEVICE=STM32F103C8
 
 # include path
 INCLUDE+=-I.
