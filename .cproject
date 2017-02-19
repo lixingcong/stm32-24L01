@@ -50,6 +50,7 @@
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+			<storageModule moduleId="ilg.gnuarmeclipse.managedbuild.packs"/>
 		</cconfiguration>
 		<cconfiguration id="0.952438737.163575431">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="0.952438737.163575431" moduleId="org.eclipse.cdt.core.settings" name="COORD">
@@ -153,6 +154,57 @@
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 		</cconfiguration>
+		<cconfiguration id="0.952438737.163575431.207491357">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="0.952438737.163575431.207491357" moduleId="org.eclipse.cdt.core.settings" name="24L01-stm32f103c8">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.VCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildProperties="" description="" id="0.952438737.163575431.207491357" name="24L01-stm32f103c8" parent="org.eclipse.cdt.build.core.prefbase.cfg">
+					<folderInfo id="0.952438737.163575431.207491357." name="/" resourcePath="">
+						<toolChain id="org.eclipse.cdt.build.core.prefbase.toolchain.46695474" name="No ToolChain" resourceTypeBasedDiscovery="false" superClass="org.eclipse.cdt.build.core.prefbase.toolchain">
+							<targetPlatform id="org.eclipse.cdt.build.core.prefbase.toolchain.46695474.1375886653" name=""/>
+							<builder arguments="-j4 module=coord" command="make" id="org.eclipse.cdt.build.core.settings.default.builder.533032691" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="org.eclipse.cdt.build.core.settings.default.builder"/>
+							<tool id="org.eclipse.cdt.build.core.settings.holder.libs.1017628256" name="holder for library settings" superClass="org.eclipse.cdt.build.core.settings.holder.libs"/>
+							<tool id="org.eclipse.cdt.build.core.settings.holder.2073590362" name="Assembly" superClass="org.eclipse.cdt.build.core.settings.holder">
+								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.73162098" languageId="org.eclipse.cdt.core.assembly" languageName="Assembly" sourceContentType="org.eclipse.cdt.core.asmSource" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
+							</tool>
+							<tool id="org.eclipse.cdt.build.core.settings.holder.1623593062" name="GNU C++" superClass="org.eclipse.cdt.build.core.settings.holder">
+								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.783885072" languageId="org.eclipse.cdt.core.g++" languageName="GNU C++" sourceContentType="org.eclipse.cdt.core.cxxSource,org.eclipse.cdt.core.cxxHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
+							</tool>
+							<tool id="org.eclipse.cdt.build.core.settings.holder.1990148699" name="GNU C" superClass="org.eclipse.cdt.build.core.settings.holder">
+								<option id="org.eclipse.cdt.build.core.settings.holder.incpaths.2129035714" name="Include Paths" superClass="org.eclipse.cdt.build.core.settings.holder.incpaths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/mydata/toolchain/gcc-arm-none-eabi-5_3-2016q1/arm-none-eabi/include"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/new_lite/libs/STM32_USB-FS-Device_Lib_V4.0.0/Libraries/CMSIS/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/new_lite/libs/STM32_USB-FS-Device_Lib_V4.0.0/Libraries/CMSIS/Device/ST/STM32F10x/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/new_lite/libs/STM32_USB-FS-Device_Lib_V4.0.0/Libraries/CMSIS/Device/ST/STM32F10x/Source/Templates}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/new_lite/libs/STM32_USB-FS-Device_Lib_V4.0.0/Libraries/STM32_USB-FS-Device_Driver/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/new_lite/libs/STM32_USB-FS-Device_Lib_V4.0.0/Libraries/STM32F10x_StdPeriph_Driver/inc}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/new_lite/src/drivers}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/new_lite/src/drivers/a7190}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/new_lite/src/drivers/pc_control}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/new_lite/src/drivers/route_table}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/new_lite/src/stack}&quot;"/>
+								</option>
+								<option id="org.eclipse.cdt.build.core.settings.holder.symbols.1127684563" name="Symbols" superClass="org.eclipse.cdt.build.core.settings.holder.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="USE_GCC_FOR_ARM"/>
+									<listOptionValue builtIn="false" value="USE_USART1_AS_OUTPUT_DEBUG"/>
+								</option>
+								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1313430298" languageId="org.eclipse.cdt.core.gcc" languageName="GNU C" sourceContentType="org.eclipse.cdt.core.cSource,org.eclipse.cdt.core.cHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 		<project id="new_lite.null.659744029" name="new_lite"/>
@@ -161,17 +213,21 @@
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="COORD"/>
 		<configuration configurationName="ROUTER"/>
+		<configuration configurationName="24L01-stm32f103c8">
+			<resource resourceType="PROJECT" workspacePath="/cumt-24L01"/>
+		</configuration>
 		<configuration configurationName="Default">
 			<resource resourceType="PROJECT" workspacePath="/new_lite"/>
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.597715135.1710262867.1352547286;cdt.managedbuild.toolchain.gnu.cross.base.597715135.1710262867.1352547286.;cdt.managedbuild.tool.gnu.cross.c.compiler.969368164;cdt.managedbuild.tool.gnu.c.compiler.input.661550565">
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.597715135.1710262867.773889303;cdt.managedbuild.toolchain.gnu.cross.base.597715135.1710262867.773889303.;cdt.managedbuild.tool.gnu.cross.c.compiler.1031775810;cdt.managedbuild.tool.gnu.c.compiler.input.136363813">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.597715135.1710262867;cdt.managedbuild.toolchain.gnu.cross.base.597715135.1710262867.;cdt.managedbuild.tool.gnu.cross.c.compiler.1881570490;cdt.managedbuild.tool.gnu.c.compiler.input.13579688">
+		<scannerConfigBuildInfo instanceId="0.952438737">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="0.952438737.2140532636">
@@ -180,18 +236,20 @@
 		<scannerConfigBuildInfo instanceId="0.952438737.163575431">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.597715135;cdt.managedbuild.toolchain.gnu.cross.base.597715135.659961399;cdt.managedbuild.tool.gnu.cross.c.compiler.1601788814;cdt.managedbuild.tool.gnu.c.compiler.input.1052927481">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.597715135.1710262867.1297190400;cdt.managedbuild.toolchain.gnu.cross.base.597715135.1710262867.1297190400.;cdt.managedbuild.tool.gnu.cross.c.compiler.2094043981;cdt.managedbuild.tool.gnu.c.compiler.input.827393574">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="0.952438737">
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.597715135;cdt.managedbuild.toolchain.gnu.cross.base.597715135.659961399;cdt.managedbuild.tool.gnu.cross.c.compiler.1601788814;cdt.managedbuild.tool.gnu.c.compiler.input.1052927481">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.597715135.1710262867.773889303;cdt.managedbuild.toolchain.gnu.cross.base.597715135.1710262867.773889303.;cdt.managedbuild.tool.gnu.cross.c.compiler.1031775810;cdt.managedbuild.tool.gnu.c.compiler.input.136363813">
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.597715135.1710262867.1352547286;cdt.managedbuild.toolchain.gnu.cross.base.597715135.1710262867.1352547286.;cdt.managedbuild.tool.gnu.cross.c.compiler.969368164;cdt.managedbuild.tool.gnu.c.compiler.input.661550565">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.cross.base.597715135.1710262867;cdt.managedbuild.toolchain.gnu.cross.base.597715135.1710262867.;cdt.managedbuild.tool.gnu.cross.c.compiler.1881570490;cdt.managedbuild.tool.gnu.c.compiler.input.13579688">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="0.952438737.163575431.207491357">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 	</storageModule>
-	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 </cproject>

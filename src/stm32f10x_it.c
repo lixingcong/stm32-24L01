@@ -23,15 +23,15 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h"
-#include "exti8_irq.h"
+//#include "exti8_irq.h"
 #include "stm32f10x_usart.h"
 #include "stm32f10x_tim.h"
 #include "stm32f10x_exti.h"
-#include "usart_scanf_irq.h"
-#include "SPI1.h"
-#include "usb_istr.h"
+//#include "usart_scanf_irq.h"
+//#include "SPI1.h"
+//#include "usb_istr.h"
 #include "stdio.h"
-#include "timer2.h"
+//#include "timer2.h"
 
 unsigned int systick_count=0;
 
@@ -177,8 +177,8 @@ void USART1_IRQHandler(void)
 {
 	if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET) {
 		// WARNING: spaces were ignore by scanf()
-		scanf("%s", usart_scanf_data);
-		usart_irq_scanf_callback();
+//		scanf("%s", usart_scanf_data);
+//		usart_irq_scanf_callback();
 		USART_ClearITPendingBit(USART1, USART_IT_RXNE);
 	}
 
@@ -194,8 +194,8 @@ void USART2_IRQHandler(void)
 {
 	if (USART_GetITStatus(USART2, USART_IT_RXNE) != RESET) {
 		// WARNING: spaces were ignore by scanf()
-		scanf("%s", usart_scanf_data);
-		usart_irq_scanf_callback();
+//		scanf("%s", usart_scanf_data);
+//		usart_irq_scanf_callback();
 		USART_ClearITPendingBit(USART2, USART_IT_RXNE);
 	}
 
@@ -210,23 +210,23 @@ void USART1_IRQHandler(void)
 
 void EXTI9_5_IRQHandler(void)
 {
-	if(EXTI_GetITStatus(EXTI_Line8)!=RESET)
-	{
-		EXTI8_irq_a7190();
-		EXTI_ClearITPendingBit(EXTI_Line8);
-	}
+//	if(EXTI_GetITStatus(EXTI_Line8)!=RESET)
+//	{
+//		EXTI8_irq_a7190();
+//		EXTI_ClearITPendingBit(EXTI_Line8);
+//	}
 	
 }
 
 void USB_LP_CAN1_RX0_IRQHandler(void)
 {
-	USB_Istr();
+//	USB_Istr();
 }
 
 // 定时器2用于更新system_msecond
 void TIM2_IRQHandler(void){
-	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET){
-		++system_msecond;
-		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-	}
+//	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET){
+//		++system_msecond;
+//		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+//	}
 }
