@@ -16,6 +16,7 @@ int main(){
 	init_delay();
 	USART1_init();
 	NRF24L01_Init();
+
 //	USART_scanf_config_EXT();
 	printf("hello\n");
 	while(NRF24L01_Check())
