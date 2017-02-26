@@ -12,6 +12,8 @@
 #include "stdio.h"
 
 int main(){
+	unsigned char err;
+
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	init_delay();
 	USART1_init();
@@ -26,5 +28,25 @@ int main(){
 	}
 	printf("nrf24l01 ok\n");
 
-	while(1);
+//	while(1);
+
+#ifdef SENDING
+	NRF24L01_TX_Mode();
+	printf("send mode\n");
+#else
+	NRF24L01_RX_Mode();
+	printf("recv mode\n");
+#endif
+	while(1){
+#ifdef SENDING
+		if((err=NRF24L01_TxPacket("good"))==0x20){
+			printf("sent\n");
+		}else{
+			printf("error:%x\n",err);
+		}
+
+		printf("delaying..\n");
+		DelayMs(1000);
+#endif
+	}
 }

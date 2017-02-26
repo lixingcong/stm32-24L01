@@ -66,6 +66,12 @@ ifeq ($(usart1_debug),1)
 	SYMBOLS_DEFINE += -DUSE_USART1_AS_OUTPUT_DEBUG
 endif
 
+# debug for 24L01 communicate
+ifeq ($(sending),1)
+	SYMBOLS_DEFINE += -DSENDING
+endif
+
+
 COMMONFLAGS=-g -mcpu=cortex-m3 -mthumb
 COMMONFLAGSlib=$(COMMONFLAGS)
 
