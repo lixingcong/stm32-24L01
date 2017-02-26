@@ -27,6 +27,7 @@ TypeOfMCU=STM32F10X_MD
 # https://www.segger.com/jlink_supported_devices.html
 JLINKEXE_SCRIPT=/tmp/JLinkExe.script
 SUPPORTED_DEVICE=STM32F103C8
+#SUPPORTED_DEVICE=STM32F103ZE
 
 # include path
 INCLUDE+=-I.
