@@ -7,7 +7,7 @@ PROGRAM_NAME=bin/main
 LIBDIR=$(TOP)/libs
 STMLIB=$(LIBDIR)/STM32_USB-FS-Device_Lib_V4.0.0/Libraries
 
-TC=/mydata/toolchain/gcc-arm-none-eabi-5_3-2016q1/bin/arm-none-eabi
+TC=/mydata/toolchain/gcc-arm-none-eabi-5_4-2016q3/bin/arm-none-eabi
 CC=$(TC)-gcc
 LD=$(TC)-ld -v
 OBJCOPY=$(TC)-objcopy
