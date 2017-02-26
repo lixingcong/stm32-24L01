@@ -9,32 +9,32 @@ OBJS+=newlib_stubs.o
 CFLAGS_USE_NEWLIB=-ffunction-sections -fdata-sections -fno-builtin
 
 # Write down your source folder and obj-files
-VPATH+=demo
+#VPATH+=demo
 #	OBJS+=test_new_stack.o
-	OBJS+=test_24L01.o
+#	OBJS+=test_24L01.o
 
-VPATH+=drivers
-OBJS+=usart.o
-OBJS+=sys.o
+#VPATH+=drivers
+#OBJS+=usart.o
+#OBJS+=sys.o
 #OBJS+=SPI1.o
-OBJS+=SPI2.o
-OBJS+=delay.o
+#OBJS+=SPI2.o
+#OBJS+=delay.o
 #OBJS+=usb_1.o
 #OBJS+=timer2.o
 
-VPATH+=drivers/pc_control
+#VPATH+=drivers/pc_control
 #OBJS+=usart_scanf_irq.o
 #OBJS+=execute_PC_cmd.o
 #OBJS+=parse_PC_cmd.o
 
-VPATH+=drivers/a7190
+#VPATH+=drivers/a7190
 #OBJS+=exti8_irq.o
 #OBJS+=A7190.o
 
-VPATH+=drivers/nrf24l01
-OBJS+=nrf24l01.o
+#VPATH+=drivers/nrf24l01
+#OBJS+=nrf24l01.o
 
-VPATH+=stack
+#VPATH+=stack
 #OBJS+=hal.o
 #OBJS+=FSM_coord.o
 #OBJS+=FSM_router.o
@@ -42,11 +42,11 @@ VPATH+=stack
 #OBJS+=route_AP_level.o
 #OBJS+=route_ping.o
 
-VPATH+=drivers/lmx2581
+#VPATH+=drivers/lmx2581
 #OBJS+=lmx2581.o
 #OBJS+=ctl_lmx2581.o
 
-VPATH+=drivers/usb
+#VPATH+=drivers/usb
 #OBJS+=usb_desc.o
 #OBJS+=usb_prop.o
 #OBJS+=usb_pwr.o
@@ -55,7 +55,14 @@ VPATH+=drivers/usb
 #OBJS+=usb_endp.o
 #OBJS+=usbio.o
 
+#OBJS+=stm32f10x_it.o
+
+# new template
+VPATH+=user-new
+OBJS+=main.o
+OBJS+=NRF24L01.o
 OBJS+=stm32f10x_it.o
+
 
 all: src
 src: app.a

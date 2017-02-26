@@ -22,8 +22,6 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f10x_it.h"
-//#include "exti8_irq.h"
 #include "stm32f10x_usart.h"
 #include "stm32f10x_tim.h"
 #include "stm32f10x_exti.h"
@@ -31,6 +29,8 @@
 //#include "SPI1.h"
 //#include "usb_istr.h"
 #include "stdio.h"
+
+#include "stm32f10x_old.h"
 //#include "timer2.h"
 
 unsigned int systick_count=0;

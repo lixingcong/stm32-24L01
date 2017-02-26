@@ -37,11 +37,11 @@ MEMORY {
 	EEMUL (RWX) : ORIGIN = 0x08000000+63K, LENGTH = 1K
 	
 	/* ***************** STM32F103ZE ********************************* */
-	/*
+	/*	
 	RAM (RWX) : ORIGIN = 0x20000000 , LENGTH = 20K
 	FLASH (RX) : ORIGIN = 0x08000000 , LENGTH = 63K
 	EEMUL (RWX) : ORIGIN = 0x08000000+63K, LENGTH = 1K
-	*/
+	*/	
 }
 _estack	= ORIGIN(RAM)+LENGTH(RAM);	/* end of the stack */
 _seemul = ORIGIN(EEMUL);	/* start of the eeprom emulation area */
