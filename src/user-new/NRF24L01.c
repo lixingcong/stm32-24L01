@@ -333,7 +333,7 @@ void TX_Mode(void) {
 }
 
 /****************************************************************************
- * 名    称：NRF_Send_Data(uint8_t* data_buffer, uint8_t Nb_bytes)
+ * 名    称：NRF_Send_Data(BYTE* data_buffer, BYTE Nb_bytes)
  * 功    能：将保存在USB接收缓存区的32字节的数据通过NRF24L01+发送出去
  * 入口参数：data_buffer   待发送数据
  Nb_bytes	  待发送数据长度
@@ -341,7 +341,7 @@ void TX_Mode(void) {
  * 说    明：数据小于32，把有效数据外的空间用0填满
  * 调用方法：RX_Mode();
  ****************************************************************************/
-void NRF_Send_Data(uint8_t* data_buffer, uint8_t Nb_bytes) {
+void NRF_Send_Data(BYTE* data_buffer, BYTE Nb_bytes) {
 	unsigned char i = 0;
 	MODE_CE(0);								 //NRF 模式控制
 

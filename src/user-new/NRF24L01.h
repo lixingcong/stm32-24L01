@@ -49,12 +49,12 @@ typedef unsigned char BYTE;
 
 extern unsigned char rx_buf[TX_PLOAD_WIDTH];
 
-void NRF_Send_Data(unsigned char* data_buffer, unsigned char Nb_bytes);
+void NRF_Send_Data(BYTE* data_buffer, BYTE Nb_bytes);
 void RX_Mode(void);
 void TX_Mode(void);
 unsigned char SPI_Read(BYTE reg);
 unsigned char SPI_Read_Buf(BYTE reg, BYTE *pBuf, BYTE bytes);
 unsigned char SPI_Write_Buf(BYTE reg, BYTE *pBuf, BYTE bytes);
-unsigned char SPI_RW_Reg(unsigned char data1, unsigned char data2);
+unsigned char SPI_RW_Reg(BYTE data1, BYTE data2);
 
 #endif
