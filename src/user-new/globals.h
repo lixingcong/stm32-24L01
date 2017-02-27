@@ -15,12 +15,10 @@
 #define TX_PLOAD_WIDTH  32  // 1bytes TX payload
 NRF_EXT unsigned char it_msg,led_flash;
 
-NRF_EXT unsigned char TX_ADDRESS0[TX_ADR_WIDTH]; // Define a static TX address
-NRF_EXT unsigned char TX_ADDRESS1[TX_ADR_WIDTH]; // Define a static TX address
-NRF_EXT unsigned char TX_ADDRESS2[TX_ADR_WIDTH]; // Define a static TX address
-NRF_EXT unsigned char TX_ADDRESS3[TX_ADR_WIDTH]; // Define a static TX address
-NRF_EXT unsigned char TX_ADDRESS4[TX_ADR_WIDTH]; // Define a static TX address
-NRF_EXT unsigned char TX_ADDRESS5[TX_ADR_WIDTH]; // Define a static TX address
+// TODO 2017年2月27日上午10:13:17 写成类似于msstatePAN的一个int32型的赋值形式
+// 最好设定地址宽度为4字节 刚好能32位整数存下来
+NRF_EXT unsigned char TX_ADDRESS_LOCAL[TX_ADR_WIDTH]; // Define a static TX address
+NRF_EXT unsigned char TX_ADDRESS_DUMMY[TX_ADR_WIDTH]; // Define a static TX address
 
 NRF_EXT unsigned char rx_buf[TX_PLOAD_WIDTH];
 NRF_EXT unsigned char tx_buf[TX_PLOAD_WIDTH];

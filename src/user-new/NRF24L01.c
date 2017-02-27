@@ -221,61 +221,44 @@ void delay_ms(unsigned int x) {
  ****************************************************************************/
 
 void RX_Mode(void) {
+	unsigned char i;
+
 	nrf_baud = 0;							//默认速率2Mbps
-	TX_ADDRESS0[0] = 0x34;	            //通道0 发射地址
-	TX_ADDRESS0[1] = 0x43;
-	TX_ADDRESS0[2] = 0x10;
-	TX_ADDRESS0[3] = 0x10;
-	TX_ADDRESS0[4] = 0x01;
 
-	TX_ADDRESS1[0] = 0x01;				//通道1 发射地址
-	TX_ADDRESS1[1] = 0xE1;
-	TX_ADDRESS1[2] = 0xE2;
-	TX_ADDRESS1[3] = 0xE3;
-	TX_ADDRESS1[4] = 0x02;
+	TX_ADDRESS_LOCAL[0] = 0x34;	            //通道0 发射地址
+	TX_ADDRESS_LOCAL[1] = 0x43;
+	TX_ADDRESS_LOCAL[2] = 0x10;
+	TX_ADDRESS_LOCAL[3] = 0x10;
+	TX_ADDRESS_LOCAL[4] = 0x01;
 
-	TX_ADDRESS2[0] = 0x02;			   //通道2 发射地址
-	TX_ADDRESS2[1] = 0xE1;
-	TX_ADDRESS2[2] = 0xE2;
-	TX_ADDRESS2[3] = 0xE3;
-	TX_ADDRESS2[4] = 0x02;
+	TX_ADDRESS_DUMMY[0] = 0x01;				//通道1~5 发射地址（程序里面没有用到）
+	TX_ADDRESS_DUMMY[1] = 0xE1;
+	TX_ADDRESS_DUMMY[2] = 0xE2;
+	TX_ADDRESS_DUMMY[3] = 0xE3;
+	TX_ADDRESS_DUMMY[4] = 0x02;
 
-	TX_ADDRESS3[0] = 0x03;			   //通道3 发射地址
-	TX_ADDRESS3[1] = 0xE1;
-	TX_ADDRESS3[2] = 0xE2;
-	TX_ADDRESS3[3] = 0xE3;
-	TX_ADDRESS3[4] = 0x02;
-
-	TX_ADDRESS4[0] = 0x04;			   //通道4 发射地址
-	TX_ADDRESS4[1] = 0xE1;
-	TX_ADDRESS4[2] = 0xE2;
-	TX_ADDRESS4[3] = 0xE3;
-	TX_ADDRESS4[4] = 0x02;
-
-	TX_ADDRESS5[0] = 0x05;			   //通道5 发射地址
-	TX_ADDRESS5[1] = 0xE1;
-	TX_ADDRESS5[2] = 0xE2;
-	TX_ADDRESS5[3] = 0xE3;
-	TX_ADDRESS5[4] = 0x02;
 	MODE_CE(0);
 
-	SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0, TX_ADDRESS0, TX_ADR_WIDTH);  //数据通道0接收地址，最大5个字节， 此处接收地址和发送地址相同
-	SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P1, TX_ADDRESS1, TX_ADR_WIDTH);  //数据通道1接收地址，最大5个字节， 此处接收地址和发送地址相同
-	SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P2, TX_ADDRESS2, 1);  //数据通道2接收地址，5个字节， 高字节与TX_ADDRESS1[39:8]相同，低字节同TX_ADDRESS2[0]
-	SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P3, TX_ADDRESS3, 1);  //数据通道3接收地址，5个字节， 高字节与TX_ADDRESS1[39:8]相同，低字节同TX_ADDRESS3[0]
-	SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P4, TX_ADDRESS4, 1);  //数据通道4接收地址，5个字节， 高字节与TX_ADDRESS1[39:8]相同，低字节同TX_ADDRESS4[0]
-	SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P5, TX_ADDRESS5, 1);  //数据通道5接收地址，5个字节， 高字节与TX_ADDRESS1[39:8]相同，低字节同TX_ADDRESS5[0]
-
+	// 数据通道0
+	SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0, TX_ADDRESS_LOCAL, TX_ADR_WIDTH);  //数据通道0接收地址，最大5个字节， 此处接收地址和发送地址相同
 	SPI_RW_Reg(WRITE_REG1 + RX_PW_P0, TX_PLOAD_WIDTH);  // 接收数据通道0有效数据宽度32   范围1-32
-	SPI_RW_Reg(WRITE_REG1 + RX_PW_P1, TX_PLOAD_WIDTH);  // 接收数据通道1有效数据宽度32   范围1-32
-	SPI_RW_Reg(WRITE_REG1 + RX_PW_P2, TX_PLOAD_WIDTH);  // 接收数据通道2有效数据宽度32   范围1-32
-	SPI_RW_Reg(WRITE_REG1 + RX_PW_P3, TX_PLOAD_WIDTH);  // 接收数据通道3有效数据宽度32   范围1-32
-	SPI_RW_Reg(WRITE_REG1 + RX_PW_P4, TX_PLOAD_WIDTH);  // 接收数据通道4有效数据宽度32   范围1-32
-	SPI_RW_Reg(WRITE_REG1 + RX_PW_P5, TX_PLOAD_WIDTH);  // 接收数据通道5有效数据宽度32   范围1-32
 
-	SPI_RW_Reg(WRITE_REG1 + EN_AA, 0x3f);      // 使能通道0-通道5接收自动应答
-	SPI_RW_Reg(WRITE_REG1 + EN_RXADDR, 0x3f);  // 接收通道0-5 使能
-	SPI_RW_Reg(WRITE_REG1 + RF_CH, 0);         // 选择射频工作频道0   范围0-127  
+	// 数据通道1-5
+	for (i = 0; i < 5; i++) {
+		if (i == 0) {
+			//数据通道1接收地址 5字节
+			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, TX_ADR_WIDTH);
+		} else {
+			//数据通道i+1接收地址，1个字节， 高字节与TX_ADDRESS_LOCAL[39:8]相同
+			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, 1);
+		}
+		// 接收数据通道i+1有效数据宽度32   范围1-32
+		SPI_RW_Reg(WRITE_REG1 + RX_PW_P1 + i, TX_PLOAD_WIDTH);
+	}
+
+	SPI_RW_Reg(WRITE_REG1 + EN_AA, 0x00);      // 使能通道0-通道5接收关闭自动应答
+	SPI_RW_Reg(WRITE_REG1 + EN_RXADDR, 0x01);  // 接收通道0使能，关闭其他通道
+	SPI_RW_Reg(WRITE_REG1 + RF_CH, 0);         // 选择射频工作频道0   范围0-127
 
 	if (nrf_baud == 0)
 		SPI_RW_Reg(WRITE_REG1 + RF_SETUP, 0x0f);   // 0db, 2MPS   射频寄存器   无线速率bit5:bit3		   发射功率bit2-bit1
@@ -289,11 +272,11 @@ void RX_Mode(void) {
 
 	SPI_RW_Reg(WRITE_REG1 + CONFIG, 0x0f);     // bit6 接收中断产生时，IRQ引脚产生低电平
 											   // bit5 发送中断产生时，IRQ引脚产生低电平
-											   // bit4 最大重复发送次数完成时 IRQ引脚产生低电平 
+											   // bit4 最大重复发送次数完成时 IRQ引脚产生低电平
 											   // bit3 CRC校验允许
 											   // bit2 16位CRC
 											   // bit1 上电
-											   // bit0 接收模式  	
+											   // bit0 接收模式
 	MODE_CE(1);								   // 使能接收模式
 }
 
@@ -312,41 +295,26 @@ void TX_Mode(void) {
 	// TODO: 这是指定六个通道互相发送的关键 2017年2月26日 下午5:33:38
 	nrf_Pipe = 0;
 	
-	SPI_RW_Reg(WRITE_REG1 + SETUP_RETR, 0x1a);  // 自动重发延时500us + 86us,  自动重发计数10次
+	SPI_RW_Reg(WRITE_REG1 + SETUP_RETR, 0x00);  // 关闭自动重发
 
-	if (nrf_Pipe == 0)
-		SPI_Write_Buf(WRITE_REG1 + TX_ADDR, TX_ADDRESS0, TX_ADR_WIDTH);         //数据通道0发送地址，最大5个字节
-	else if (nrf_Pipe == 1)
-		SPI_Write_Buf(WRITE_REG1 + TX_ADDR, TX_ADDRESS1, TX_ADR_WIDTH);    //数据通道1发送地址，最大5个字节
-	else if (nrf_Pipe == 2)
-		SPI_Write_Buf(WRITE_REG1 + TX_ADDR, TX_ADDRESS2, TX_ADR_WIDTH);    //数据通道2发送地址，最大5个字节
-	else if (nrf_Pipe == 3)
-		SPI_Write_Buf(WRITE_REG1 + TX_ADDR, TX_ADDRESS3, TX_ADR_WIDTH);    //数据通道3发送地址，最大5个字节
-	else if (nrf_Pipe == 4)
-		SPI_Write_Buf(WRITE_REG1 + TX_ADDR, TX_ADDRESS4, TX_ADR_WIDTH);    //数据通道4发送地址，最大5个字节
-	else if (nrf_Pipe == 5)
-		SPI_Write_Buf(WRITE_REG1 + TX_ADDR, TX_ADDRESS5, TX_ADR_WIDTH);    //数据通道5发送地址，最大5个字节
-
-	if (nrf_Pipe == 0)
-		SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0, TX_ADDRESS0, TX_ADR_WIDTH);      // 将0通道的接收地址设置为 0通道的发射地址
-	else if (nrf_Pipe == 1)
-		SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0, TX_ADDRESS1, TX_ADR_WIDTH);  // 将0通道的接收地址设置为 1通道的发射地址
-	else if (nrf_Pipe == 2)
-		SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0, TX_ADDRESS2, TX_ADR_WIDTH);  // 将0通道的接收地址设置为 2通道的发射地址
-	else if (nrf_Pipe == 3)
-		SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0, TX_ADDRESS3, TX_ADR_WIDTH);  // 将0通道的接收地址设置为 3通道的发射地址
-	else if (nrf_Pipe == 4)
-		SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0, TX_ADDRESS4, TX_ADR_WIDTH);  // 将0通道的接收地址设置为 4通道的发射地址
-	else if (nrf_Pipe == 5)
-		SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0, TX_ADDRESS5, TX_ADR_WIDTH);  // 将0通道的接收地址设置为 5通道的发射地址
+	switch (nrf_Pipe) {
+		case 0:
+			SPI_Write_Buf(WRITE_REG1 + TX_ADDR + nrf_Pipe, TX_ADDRESS_LOCAL, TX_ADR_WIDTH);         //数据通道0发送地址，最大5个字节
+			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0 + nrf_Pipe, TX_ADDRESS_LOCAL, TX_ADR_WIDTH);  // 将通道0的接收地址设置为 0通道的发射地址
+			break;
+		default:
+			SPI_Write_Buf(WRITE_REG1 + TX_ADDR + nrf_Pipe, TX_ADDRESS_DUMMY, TX_ADR_WIDTH);    //数据通道nrf_pipe发送地址，最大5个字节
+			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0 + nrf_Pipe, TX_ADDRESS_DUMMY, TX_ADR_WIDTH); // 将通道nrf_pipe的接收地址设置为dummy的发射地址
+			break;
+	}
 
 	SPI_RW_Reg(WRITE_REG1 + CONFIG, 0x0e);     // bit6 接收中断产生时，IRQ引脚产生低电平
 											   // bit5 发送中断产生时，IRQ引脚产生低电平
-											   // bit4 最大重复发送次数完成时 IRQ引脚产生低电平 
+											   // bit4 最大重复发送次数完成时 IRQ引脚产生低电平
 											   // bit3 CRC校验允许
 											   // bit2 16位CRC
 											   // bit1 上电
-											   // bit0 发送模式 
+											   // bit0 发送模式
 
 	MODE_CE(1);								   // 使能发送模式
 	
@@ -363,7 +331,7 @@ void TX_Mode(void) {
  ****************************************************************************/
 void NRF_Send_Data(uint8_t* data_buffer, uint8_t Nb_bytes) {
 	uchar i = 0;
-	MODE_CE(0);								 //NRF 模式控制	 
+	MODE_CE(0);								 //NRF 模式控制
 
 	SPI_RW_Reg(WRITE_REG1 + STATUS, 0xff);	     //设置状态寄存器初始化
 	SPI_RW_Reg(0xe1, 0);						 //清除TX FIFO寄存器
@@ -376,6 +344,6 @@ void NRF_Send_Data(uint8_t* data_buffer, uint8_t Nb_bytes) {
 	}
 	MODE_CE(0);
 	SPI_Write_Buf(WR_TX_PLOAD, data_buffer, TX_PLOAD_WIDTH);        //发送32字节的缓存区数据到NRF24L01
-	MODE_CE(1);														//保持10us以上，将数据发送出去		
+	MODE_CE(1);														//保持10us以上，将数据发送出去
 }
 
