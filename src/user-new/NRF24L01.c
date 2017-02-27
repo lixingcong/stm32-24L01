@@ -223,7 +223,7 @@ void delay_ms(unsigned int x) {
 void RX_Mode(void) {
 	unsigned char i;
 
-	nrf_baud = 0;							//默认速率2Mbps
+	unsigned char nrf_baud = 0;				//默认速率2Mbps
 
 	TX_ADDRESS_LOCAL[0] = 0x34;	            //通道0 发射地址
 	TX_ADDRESS_LOCAL[1] = 0x43;
@@ -289,6 +289,8 @@ void RX_Mode(void) {
  * 调用方法：TX_Mode();
  ****************************************************************************/
 void TX_Mode(void) {
+	unsigned char nrf_Pipe;
+
 	NotSelect_NRF();
 	MODE_CE(0);
 
@@ -330,7 +332,7 @@ void TX_Mode(void) {
  * 调用方法：RX_Mode();
  ****************************************************************************/
 void NRF_Send_Data(uint8_t* data_buffer, uint8_t Nb_bytes) {
-	uchar i = 0;
+	unsigned char i = 0;
 	MODE_CE(0);								 //NRF 模式控制
 
 	SPI_RW_Reg(WRITE_REG1 + STATUS, 0xff);	     //设置状态寄存器初始化
