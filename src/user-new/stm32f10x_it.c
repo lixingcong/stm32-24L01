@@ -190,6 +190,7 @@ void USART1_IRQHandler(void)      //串口1 中断服务程序
 void EXTI9_5_IRQHandler(void) {
 	u8 i = 0;
 	u8 status;
+	// TODO 2017年2月27日上午11:44:55 重新封装SPI_RW_Reg之类的函数，增强可读性
 	if (EXTI_GetITStatus(EXTI_Line8) != RESET) {
 		if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_8) == 0) { //判断是否是PA0线变低
 			status = SPI_Read(READ_REG1 + STATUS);			// 读取状态寄存其来判断数据接收状况

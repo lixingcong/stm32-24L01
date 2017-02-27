@@ -249,7 +249,7 @@ void RX_Mode(void) {
 			//数据通道1接收地址 5字节
 			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, TX_ADR_WIDTH);
 		} else {
-			//数据通道i+1接收地址，1个字节， 高字节与TX_ADDRESS_LOCAL[39:8]相同
+			//数据通道i+1接收地址，只可以设置1个字节， 高字节与TX_ADDRESS_DUMMY[39:8]相同
 			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, 1);
 		}
 		// 接收数据通道i+1有效数据宽度32   范围1-32
