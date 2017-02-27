@@ -169,15 +169,15 @@ void USART1_IRQHandler(void)      //串口1 中断服务程序
     {
 	  for(i=0; i< RxCounter1; i++) TxBufferRF[i] = RxBufferUSART[i]; 	     //将接收缓冲器的数据转到发送缓冲区，准备转发
 	  usart_rec_flag=1;															 //接收成功标志
-	  TxBufferRF[RxCounter1]=0;		                                     //发送缓冲区结束符    
+	  TxBufferRF[RxCounter1]=0;		                                     //发送缓冲区结束符
 	  TxCounter1=RxCounter1;
 	  RxCounter1=0;
     }
   }
   
-  if(USART_GetITStatus(USART1, USART_IT_TXE) != RESET)                   //这段是为了避免STM32 USART 第一个字节发不出去的BUG 
+  if(USART_GetITStatus(USART1, USART_IT_TXE) != RESET)                   //这段是为了避免STM32 USART 第一个字节发不出去的BUG
   { 
-     USART_ITConfig(USART1, USART_IT_TXE, DISABLE);					     //禁止发缓冲器空中断， 
+     USART_ITConfig(USART1, USART_IT_TXE, DISABLE);					     //禁止发缓冲器空中断，
   }	
 }  
 /*******************************************************************************
@@ -187,33 +187,31 @@ void USART1_IRQHandler(void)      //串口1 中断服务程序
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void EXTI9_5_IRQHandler(void){
-	u8 i=0;
- 	u8 status;	
-	if(EXTI_GetITStatus(EXTI_Line8) != RESET)		    //判断是否产生了中断
-  	{
-		if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_8)==0){ //判断是否是PA0线变低
-			status=SPI_Read(READ_REG1+STATUS);			// 读取状态寄存其来判断数据接收状况	
-			if(status & 0x40)				    		// 判断是否接收到数据				   
-			{			
+void EXTI9_5_IRQHandler(void) {
+	u8 i = 0;
+	u8 status;
+	if (EXTI_GetITStatus(EXTI_Line8) != RESET) {
+		if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_8) == 0) { //判断是否是PA0线变低
+			status = SPI_Read(READ_REG1 + STATUS);			// 读取状态寄存其来判断数据接收状况
+			if (status & 0x40)				    		// 判断是否接收到数据
+					{
 				//GPIO_ResetBits(GPIOB, GPIO_Pin_5);   
-			 	SPI_Read_Buf(RD_RX_PLOAD,rx_buf,TX_PLOAD_WIDTH);  //从接收缓冲区里读出数据
-				for(i=0; i<32; i++){							  //向USB 端点1的缓冲区里放置数据
-					TxBufferUSART[i] = rx_buf[i];     
+				SPI_Read_Buf(RD_RX_PLOAD, rx_buf, TX_PLOAD_WIDTH);  //从接收缓冲区里读出数据
+				for (i = 0; i < 32; i++) {							  //向USB 端点1的缓冲区里放置数据
+					TxBufferUSART[i] = rx_buf[i];
 				}
-				rf_rec_flag=1;
+				rf_rec_flag = 1;
+			} else if ((status & 0x10) > 0) {					 //发射达到最大复发次数
+				SPI_RW_Reg(0xe1, 0);					 	 //清除发送缓冲区
+				RX_Mode();								 //进入接收模式
+			} else if ((status & 0x20) > 0) {					 //发射后收到应答
+				// TODO 2017年2月27日上午11:21:25 PB5对应原作者的哪个管脚？为什么应答？
+				GPIO_SetBits(GPIOB, GPIO_Pin_5);
+				SPI_RW_Reg(0xe1, 0);					     //清除发送缓冲区
+				RX_Mode();								 //进入接收模式
 			}
-			else if((status &0x10)>0){					 //发射达到最大复发次数				
-				SPI_RW_Reg(0xe1,0);					 	 //清除发送缓冲区  				
-				RX_Mode();								 //进入接收模式	   			
-			}
-			else if((status &0x20)>0){					 //发射后收到应答 
-				GPIO_SetBits(GPIOB, GPIO_Pin_5);   
-				SPI_RW_Reg(0xe1,0);					     //清除发送缓冲区  			
-				RX_Mode();								 //进入接收模式	   			
-			}
-			SPI_RW_Reg(WRITE_REG1+STATUS, status);	     //清除07寄存器标志
-		}		
+			SPI_RW_Reg(WRITE_REG1 + STATUS, status);	     //清除07寄存器标志
+		}
 		EXTI_ClearITPendingBit(EXTI_Line8);			 //清除EXTI0上的中断标志
-	} 
+	}
 }
