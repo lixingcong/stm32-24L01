@@ -10,8 +10,8 @@
 
 // TODO 2017年2月27日上午10:13:17 写成类似于msstatePAN的一个int32型的赋值形式
 // 最好设定地址宽度为4字节 刚好能32位整数存下来
-unsigned char TX_ADDRESS_LOCAL[TX_ADR_WIDTH]; // Define a static TX address
-unsigned char TX_ADDRESS_DUMMY[TX_ADR_WIDTH]; // Define a static TX address
+unsigned char TX_ADDRESS_LOCAL[TX_ADR_WIDTH] = { 0x12, 0x34, 0x56, 0x78 };
+unsigned char TX_ADDRESS_DUMMY[TX_ADR_WIDTH] = { 0xee, 0xee, 0xff, 0xff };
 
 unsigned char rx_buf[TX_PLOAD_WIDTH];
 
@@ -92,6 +92,15 @@ void SPI2_NRF24L01_Init(void) {
 	SPI_Cmd(SPI2, ENABLE);
 
 	// 以下是公用的24L01初始化
+	MODE_CE(0);
+	// 设置地址宽度
+#if TX_ADR_WIDTH == 3
+	SPI_RW_Reg(WRITE_REG1 + SETUP_AW, 0x01);
+#elif TX_ADR_WIDTH == 4
+	SPI_RW_Reg(WRITE_REG1 + SETUP_AW, 0x02);
+#else
+	SPI_RW_Reg(WRITE_REG1 + SETUP_AW, 0x03);
+#endif
 
 }
 
@@ -232,20 +241,7 @@ void delay_ms(unsigned int x) {
 
 void RX_Mode(void) {
 	unsigned char i;
-
 	unsigned char nrf_baud = 0;				//默认速率2Mbps
-
-	TX_ADDRESS_LOCAL[0] = 0x34;	            //通道0 发射地址
-	TX_ADDRESS_LOCAL[1] = 0x43;
-	TX_ADDRESS_LOCAL[2] = 0x10;
-	TX_ADDRESS_LOCAL[3] = 0x10;
-	TX_ADDRESS_LOCAL[4] = 0x01;
-
-	TX_ADDRESS_DUMMY[0] = 0x01;				//通道1~5 发射地址（程序里面没有用到）
-	TX_ADDRESS_DUMMY[1] = 0xE1;
-	TX_ADDRESS_DUMMY[2] = 0xE2;
-	TX_ADDRESS_DUMMY[3] = 0xE3;
-	TX_ADDRESS_DUMMY[4] = 0x02;
 
 	MODE_CE(0);
 

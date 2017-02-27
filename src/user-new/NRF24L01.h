@@ -7,9 +7,8 @@
 typedef unsigned char BYTE;
 #endif   /* _BYTE_DEF_ */
 
-// TODO 2017年2月27日下午12:00:28 做一个宏定义在初始化时候判读宽度并写入到寄存器，地址宽度
-#define TX_ADR_WIDTH    5   // 5 bytes TX(RX) address width
-#define TX_PLOAD_WIDTH  32  // 1bytes TX payload
+#define TX_ADR_WIDTH    4   //  TX(RX) address width
+#define TX_PLOAD_WIDTH  32  // 32bytes TX payload
 
 #define READ_REG1        0x00  // Define read command to register
 #define WRITE_REG1       0x20  // Define write command to register
