@@ -1,12 +1,19 @@
-#define NRF_GLOBALS
-
 #include "NRF24L01.h"
 #include "stm32f10x_rcc.h"
 #include "stm32f10x_gpio.h"
 #include "stm32f10x_spi.h"
 #include "stm32f10x_exti.h"
 #include "misc.h"
-#include "globals.h"
+
+#define Select_NRF()     GPIO_ResetBits(GPIOB, GPIO_Pin_12)
+#define NotSelect_NRF()    GPIO_SetBits(GPIOB, GPIO_Pin_12)
+
+// TODO 2017年2月27日上午10:13:17 写成类似于msstatePAN的一个int32型的赋值形式
+// 最好设定地址宽度为4字节 刚好能32位整数存下来
+unsigned char TX_ADDRESS_LOCAL[TX_ADR_WIDTH]; // Define a static TX address
+unsigned char TX_ADDRESS_DUMMY[TX_ADR_WIDTH]; // Define a static TX address
+
+unsigned char rx_buf[TX_PLOAD_WIDTH];
 
 void SPI2_NRF24L01_Init(void);
 void RX_Mode(void);
@@ -83,6 +90,9 @@ void SPI2_NRF24L01_Init(void) {
 
 	/* 使能SPI2  */
 	SPI_Cmd(SPI2, ENABLE);
+
+	// 以下是公用的24L01初始化
+
 }
 
 /****************************************************************************

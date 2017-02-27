@@ -7,6 +7,10 @@
 typedef unsigned char BYTE;
 #endif   /* _BYTE_DEF_ */
 
+// TODO 2017年2月27日下午12:00:28 做一个宏定义在初始化时候判读宽度并写入到寄存器，地址宽度
+#define TX_ADR_WIDTH    5   // 5 bytes TX(RX) address width
+#define TX_PLOAD_WIDTH  32  // 1bytes TX payload
+
 #define READ_REG1        0x00  // Define read command to register
 #define WRITE_REG1       0x20  // Define write command to register
 #define RD_RX_PLOAD     0x61   // Define RX payload register address
@@ -42,6 +46,8 @@ typedef unsigned char BYTE;
 #define RX_PW_P4        0x15  // 'RX payload width, pipe4' register address
 #define RX_PW_P5        0x16  // 'RX payload width, pipe5' register address
 #define FIFO_STATUS     0x17  // 'FIFO Status Register' register address
+
+extern unsigned char rx_buf[TX_PLOAD_WIDTH];
 
 void NRF_Send_Data(unsigned char* data_buffer, unsigned char Nb_bytes);
 void RX_Mode(void);
