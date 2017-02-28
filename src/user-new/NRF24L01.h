@@ -55,5 +55,6 @@ unsigned char SPI_Read(BYTE reg);
 unsigned char SPI_Read_Buf(BYTE reg, BYTE *pBuf, BYTE bytes);
 unsigned char SPI_Write_Buf(BYTE reg, BYTE *pBuf, BYTE bytes);
 unsigned char SPI_RW_Reg(BYTE data1, BYTE data2);
+unsigned char NRF24L01_check_if_exist(void);
 
 #endif

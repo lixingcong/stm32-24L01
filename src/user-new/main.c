@@ -45,21 +45,6 @@ void Delay(__IO uint32_t nCount);
 void USART_Config(USART_TypeDef* USARTx);
 void USART_SendChar(USART_TypeDef* USARTx, uint8_t data);  //发送一个char
 
-//检测24L01是否存在
-//返回值:0，成功;1，失败
-unsigned char NRF24L01_Check(void) {
-	unsigned char buf[5] = { 0XA4, 0XA4, 0XA4, 0XA4, 0XA4 };
-	unsigned char i;
-	SPI_Write_Buf(WRITE_REG1 + TX_ADDR, buf, 5);  //写入5个字节的地址.
-	SPI_Read_Buf(TX_ADDR, buf, 5);  //读出写入的地址
-	for (i = 0; i < 5; i++)
-		if (buf[i] != 0XA4)
-			break;
-	if (i != 5)
-		return 1;  //检测24L01错误
-	return 0;		 //检测到24L01
-}
-
 int main(void) {
 	uint8_t a = 0;  //LED高低电压控制
 	/* System Clocks Configuration */
@@ -75,7 +60,7 @@ int main(void) {
 	USART_Config(USART1);											  //串口1初始化
 
 	// check
-	while(NRF24L01_Check()==1){
+	while(NRF24L01_check_if_exist() == 0){
 		USART_SendChar(USART1, '?');
 	}
 

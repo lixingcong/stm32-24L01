@@ -355,3 +355,20 @@ void NRF_Send_Data(BYTE* data_buffer, BYTE Nb_bytes) {
 	MODE_CE(1);														//保持10us以上，将数据发送出去
 }
 
+//检测24L01是否存在
+//返回值:1: 存在 ;0 不存在
+unsigned char NRF24L01_check_if_exist(void) {
+	unsigned char buf[5] = { 0XA4, 0XA4, 0XA4, 0XA4, 0XA4 };
+	unsigned char i;
+
+	SPI_Write_Buf(WRITE_REG1 + TX_ADDR, buf, TX_ADR_WIDTH);  //写入地址.
+	SPI_Read_Buf(TX_ADDR, buf, TX_ADR_WIDTH);  //读出写入的地址
+
+	for (i = 0; i < TX_ADR_WIDTH; i++){
+		if (buf[i] != 0XA4)
+			return 0; //检测24L01错误
+	}
+
+	return 1;		 //检测到24L01
+}
+
