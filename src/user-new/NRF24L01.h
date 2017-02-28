@@ -7,7 +7,7 @@
 typedef unsigned char BYTE;
 #endif   /* _BYTE_DEF_ */
 
-#define TX_ADR_WIDTH    4   //  TX(RX) address width
+#define TX_ADDR_WIDTH    4   //  TX(RX) address width
 #define TX_PLOAD_WIDTH  32  // 32bytes TX payload
 
 #define READ_REG1        0x00  // Define read command to register

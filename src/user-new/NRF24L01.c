@@ -10,8 +10,8 @@
 
 // TODO 2017年2月27日上午10:13:17 写成类似于msstatePAN的一个int32型的赋值形式
 // 最好设定地址宽度为4字节 刚好能32位整数存下来
-unsigned char TX_ADDRESS_LOCAL[TX_ADR_WIDTH] = { 0x12, 0x34, 0x56, 0x78 };
-unsigned char TX_ADDRESS_DUMMY[TX_ADR_WIDTH] = { 0xee, 0xee, 0xff, 0xff };
+unsigned char TX_ADDRESS_LOCAL[TX_ADDR_WIDTH] = { 0x12, 0x34, 0x56, 0x78 };
+unsigned char TX_ADDRESS_DUMMY[TX_ADDR_WIDTH] = { 0xee, 0xee, 0xff, 0xff };
 
 unsigned char rx_buf[TX_PLOAD_WIDTH];
 
@@ -94,9 +94,9 @@ void SPI2_NRF24L01_Init(void) {
 	// 以下是公用的24L01初始化
 	MODE_CE(0);
 	// 设置地址宽度
-#if TX_ADR_WIDTH == 3
+#if TX_ADDR_WIDTH == 3
 	SPI_RW_Reg(WRITE_REG1 + SETUP_AW, 0x01);
-#elif TX_ADR_WIDTH == 4
+#elif TX_ADDR_WIDTH == 4
 	SPI_RW_Reg(WRITE_REG1 + SETUP_AW, 0x02);
 #else
 	SPI_RW_Reg(WRITE_REG1 + SETUP_AW, 0x03);
@@ -246,14 +246,14 @@ void RX_Mode(void) {
 	MODE_CE(0);
 
 	// 数据通道0
-	SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0, TX_ADDRESS_LOCAL, TX_ADR_WIDTH);  //数据通道0接收地址，最大5个字节， 此处接收地址和发送地址相同
+	SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0, TX_ADDRESS_LOCAL, TX_ADDR_WIDTH);  //数据通道0接收地址，最大5个字节， 此处接收地址和发送地址相同
 	SPI_RW_Reg(WRITE_REG1 + RX_PW_P0, TX_PLOAD_WIDTH);  // 接收数据通道0有效数据宽度32   范围1-32
 
 	// 数据通道1-5
 	for (i = 0; i < 5; i++) {
 		if (i == 0) {
 			//数据通道1接收地址 5字节
-			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, TX_ADR_WIDTH);
+			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, TX_ADDR_WIDTH);
 		} else {
 			//数据通道i+1接收地址，只可以设置1个字节， 高字节与TX_ADDRESS_DUMMY[39:8]相同
 			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, 1);
@@ -307,12 +307,12 @@ void TX_Mode(void) {
 
 	switch (nrf_Pipe) {
 		case 0:
-			SPI_Write_Buf(WRITE_REG1 + TX_ADDR + nrf_Pipe, TX_ADDRESS_LOCAL, TX_ADR_WIDTH);         //数据通道0发送地址，最大5个字节
-			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0 + nrf_Pipe, TX_ADDRESS_LOCAL, TX_ADR_WIDTH);  // 将通道0的接收地址设置为 0通道的发射地址
+			SPI_Write_Buf(WRITE_REG1 + TX_ADDR + nrf_Pipe, TX_ADDRESS_LOCAL, TX_ADDR_WIDTH);         //数据通道0发送地址，最大5个字节
+			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0 + nrf_Pipe, TX_ADDRESS_LOCAL, TX_ADDR_WIDTH);  // 将通道0的接收地址设置为 0通道的发射地址
 			break;
 		default:
-			SPI_Write_Buf(WRITE_REG1 + TX_ADDR + nrf_Pipe, TX_ADDRESS_DUMMY, TX_ADR_WIDTH);    //数据通道nrf_pipe发送地址，最大5个字节
-			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0 + nrf_Pipe, TX_ADDRESS_DUMMY, TX_ADR_WIDTH); // 将通道nrf_pipe的接收地址设置为dummy的发射地址
+			SPI_Write_Buf(WRITE_REG1 + TX_ADDR + nrf_Pipe, TX_ADDRESS_DUMMY, TX_ADDR_WIDTH);    //数据通道nrf_pipe发送地址，最大5个字节
+			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0 + nrf_Pipe, TX_ADDRESS_DUMMY, TX_ADDR_WIDTH); // 将通道nrf_pipe的接收地址设置为dummy的发射地址
 			break;
 	}
 
@@ -361,10 +361,10 @@ unsigned char NRF24L01_check_if_exist(void) {
 	unsigned char buf[5] = { 0XA4, 0XA4, 0XA4, 0XA4, 0XA4 };
 	unsigned char i;
 
-	SPI_Write_Buf(WRITE_REG1 + TX_ADDR, buf, TX_ADR_WIDTH);  //写入地址.
-	SPI_Read_Buf(TX_ADDR, buf, TX_ADR_WIDTH);  //读出写入的地址
+	SPI_Write_Buf(WRITE_REG1 + TX_ADDR, buf, TX_ADDR_WIDTH);  //写入地址.
+	SPI_Read_Buf(TX_ADDR, buf, TX_ADDR_WIDTH);  //读出写入的地址
 
-	for (i = 0; i < TX_ADR_WIDTH; i++){
+	for (i = 0; i < TX_ADDR_WIDTH; i++){
 		if (buf[i] != 0XA4)
 			return 0; //检测24L01错误
 	}
