@@ -49,6 +49,7 @@ typedef unsigned char BYTE;
 extern unsigned char rx_buf[TX_PLOAD_WIDTH];
 
 void NRF_Send_Data(BYTE* data_buffer, BYTE Nb_bytes);
+void SPI2_NRF24L01_Init(void);
 void RX_Mode(void);
 void TX_Mode(void);
 unsigned char SPI_Read(BYTE reg);

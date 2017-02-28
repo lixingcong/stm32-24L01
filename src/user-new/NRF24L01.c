@@ -10,14 +10,10 @@
 
 // TODO 2017年2月27日上午10:13:17 写成类似于msstatePAN的一个int32型的赋值形式
 // 最好设定地址宽度为4字节 刚好能32位整数存下来
-unsigned char TX_ADDRESS_LOCAL[TX_ADDR_WIDTH] = { 0x12, 0x34, 0x56, 0x78 };
-unsigned char TX_ADDRESS_DUMMY[TX_ADDR_WIDTH] = { 0xee, 0xee, 0xff, 0xff };
+static unsigned char TX_ADDRESS_LOCAL[TX_ADDR_WIDTH] = { 0x12, 0x34, 0x56, 0x78 };
+static unsigned char TX_ADDRESS_DUMMY[TX_ADDR_WIDTH] = { 0xee, 0xee, 0xff, 0xff };
 
 unsigned char rx_buf[TX_PLOAD_WIDTH];
-
-void SPI2_NRF24L01_Init(void);
-void RX_Mode(void);
-void TX_Mode(void);
 
 /****************************************************************************
  * 名    称：void MODE_CE(unsigned char a)

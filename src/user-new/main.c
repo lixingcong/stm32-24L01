@@ -22,11 +22,6 @@ uint8_t TxBufferRF[40];
 uint8_t RxBufferRF[40];
 uint8_t rf_rec_flag, rf_tx_flag;
 
-/* */
-extern void SPI2_NRF24L01_Init(void);
-extern void RX_Mode(void);
-extern void TX_Mode(void);
-
 /* Private variables ---------------------------------------------------------*/
 uint8_t TxBufferUSART[40];
 uint8_t RxBufferUSART[40];
