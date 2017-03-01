@@ -196,7 +196,7 @@
 								<option id="org.eclipse.cdt.build.core.settings.holder.symbols.1127684563" name="Symbols" superClass="org.eclipse.cdt.build.core.settings.holder.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="USE_GCC_FOR_ARM"/>
 									<listOptionValue builtIn="false" value="USE_USART1_AS_OUTPUT_DEBUG"/>
-									<listOptionValue builtIn="false" value="NRF_GLOBALS"/>
+									<listOptionValue builtIn="false" value="SENDING"/>
 								</option>
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1313430298" languageId="org.eclipse.cdt.core.gcc" languageName="GNU C" sourceContentType="org.eclipse.cdt.core.cSource,org.eclipse.cdt.core.cHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>
@@ -249,7 +249,6 @@
 								<option id="org.eclipse.cdt.build.core.settings.holder.symbols.198361758" name="Symbols" superClass="org.eclipse.cdt.build.core.settings.holder.symbols" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="USE_GCC_FOR_ARM"/>
 									<listOptionValue builtIn="false" value="USE_USART1_AS_OUTPUT_DEBUG"/>
-									<listOptionValue builtIn="false" value="NRF_GLOBALS"/>
 								</option>
 								<inputType id="org.eclipse.cdt.build.core.settings.holder.inType.1016031183" languageId="org.eclipse.cdt.core.gcc" languageName="GNU C" sourceContentType="org.eclipse.cdt.core.cSource,org.eclipse.cdt.core.cHeader" superClass="org.eclipse.cdt.build.core.settings.holder.inType"/>
 							</tool>
@@ -267,6 +266,7 @@
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="COORD"/>
 		<configuration configurationName="ROUTER"/>
+		<configuration configurationName="24L01-recv"/>
 		<configuration configurationName="24L01-send">
 			<resource resourceType="PROJECT" workspacePath="/cumt-24L01"/>
 		</configuration>

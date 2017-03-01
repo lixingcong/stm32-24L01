@@ -8,7 +8,7 @@
 #include "usart.h"
 #include "misc.h"
 #include "delay.h"
-#include "nrf24l01.h"
+#include "NRF24L01.h"
 #include "stdio.h"
 
 int main(){
@@ -17,34 +17,27 @@ int main(){
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	init_delay();
 	USART1_init();
-	NRF24L01_Init();
+	SPI2_NRF24L01_Init();
+	// nrf24l01 enter to recv mode
+	RX_Mode();
 
 //	USART_scanf_config_EXT();
 	printf("hello\n");
-	while(NRF24L01_Check())
+	while(NRF24L01_check_if_exist()==0)
 	{
 		printf("error\n");
  		DelayMs(200);
 	}
 	printf("nrf24l01 ok\n");
 
-//	while(1);
-
 #ifdef SENDING
-	NRF24L01_TX_Mode();
 	printf("send mode\n");
 #else
-	NRF24L01_RX_Mode();
 	printf("recv mode\n");
 #endif
 	while(1){
 #ifdef SENDING
-		if((err=NRF24L01_TxPacket("good"))==0x20){
-			printf("sent\n");
-		}else{
-			printf("error:%x\n",err);
-		}
-
+		NRF_Send_Data("hello", TX_PLOAD_WIDTH);
 		printf("delaying..\n");
 		DelayMs(1000);
 #endif

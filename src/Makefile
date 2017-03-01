@@ -9,16 +9,16 @@ OBJS+=newlib_stubs.o
 CFLAGS_USE_NEWLIB=-ffunction-sections -fdata-sections -fno-builtin
 
 # Write down your source folder and obj-files
-#VPATH+=demo
+VPATH+=demo
 #	OBJS+=test_new_stack.o
-#	OBJS+=test_24L01.o
+	OBJS+=test_24L01.o
 
-#VPATH+=drivers
-#OBJS+=usart.o
-#OBJS+=sys.o
+VPATH+=drivers
+OBJS+=usart.o
+OBJS+=sys.o
 #OBJS+=SPI1.o
 #OBJS+=SPI2.o
-#OBJS+=delay.o
+OBJS+=delay.o
 #OBJS+=usb_1.o
 #OBJS+=timer2.o
 
@@ -31,8 +31,8 @@ CFLAGS_USE_NEWLIB=-ffunction-sections -fdata-sections -fno-builtin
 #OBJS+=exti8_irq.o
 #OBJS+=A7190.o
 
-#VPATH+=drivers/nrf24l01
-#OBJS+=nrf24l01.o
+VPATH+=drivers/nrf24l01
+OBJS+=NRF24L01.o
 
 #VPATH+=stack
 #OBJS+=hal.o
@@ -55,13 +55,11 @@ CFLAGS_USE_NEWLIB=-ffunction-sections -fdata-sections -fno-builtin
 #OBJS+=usb_endp.o
 #OBJS+=usbio.o
 
-#OBJS+=stm32f10x_it.o
+OBJS+=stm32f10x_it.o
 
 # new template
-VPATH+=user-new
-OBJS+=main.o
-OBJS+=NRF24L01.o
-OBJS+=stm32f10x_it.o
+#VPATH+=user-new
+#OBJS+=main.o
 
 
 all: src
