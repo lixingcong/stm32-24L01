@@ -16,8 +16,6 @@ VPATH+=demo
 VPATH+=drivers
 OBJS+=usart.o
 OBJS+=sys.o
-#OBJS+=SPI1.o
-#OBJS+=SPI2.o
 OBJS+=delay.o
 #OBJS+=usb_1.o
 #OBJS+=timer2.o
@@ -42,10 +40,6 @@ OBJS+=NRF24L01.o
 #OBJS+=route_AP_level.o
 #OBJS+=route_ping.o
 
-#VPATH+=drivers/lmx2581
-#OBJS+=lmx2581.o
-#OBJS+=ctl_lmx2581.o
-
 #VPATH+=drivers/usb
 #OBJS+=usb_desc.o
 #OBJS+=usb_prop.o
@@ -56,11 +50,6 @@ OBJS+=NRF24L01.o
 #OBJS+=usbio.o
 
 OBJS+=stm32f10x_it.o
-
-# new template
-#VPATH+=user-new
-#OBJS+=main.o
-
 
 all: src
 src: app.a
