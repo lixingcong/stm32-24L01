@@ -8,10 +8,11 @@
 #define Select_NRF()     GPIO_ResetBits(GPIOB, GPIO_Pin_12)
 #define NotSelect_NRF()    GPIO_SetBits(GPIOB, GPIO_Pin_12)
 
-// TODO 2017年2月27日上午10:13:17 写成类似于msstatePAN的一个int32型的赋值形式
 // 最好设定地址宽度为4字节 刚好能32位整数存下来
 static unsigned char TX_ADDRESS_LOCAL[TX_ADDR_WIDTH] = { 0x12, 0x34, 0x56, 0x78 };
 static unsigned char TX_ADDRESS_DUMMY[TX_ADDR_WIDTH] = { 0xee, 0xee, 0xff, 0xff };
+
+static void delay_ms(unsigned int x);
 
 unsigned char rx_buf[TX_PLOAD_WIDTH];
 
@@ -23,7 +24,7 @@ unsigned char rx_buf[TX_PLOAD_WIDTH];
  * 说    明：
  * 调用方法：MODE_CE(1);
  ****************************************************************************/
-void MODE_CE(unsigned char a) {			            //NRF24L01 MODE-CE
+void NRF_MODE_CE(unsigned char a) {			            //NRF24L01 MODE-CE
 	if (a == 1)
 		GPIO_SetBits(GPIOB, GPIO_Pin_11);	    //On
 	else
@@ -38,7 +39,7 @@ void MODE_CE(unsigned char a) {			            //NRF24L01 MODE-CE
  * 说    明：
  * 调用方法：SPI2_NRF24L01_Init();
  ****************************************************************************/
-void SPI2_NRF24L01_Init(void) {
+void NRF24L01_Init(void) {
 	SPI_InitTypeDef SPI_InitStructure;
 	GPIO_InitTypeDef GPIO_InitStructure;
 	NVIC_InitTypeDef NVIC_InitStructure;
@@ -109,50 +110,50 @@ void SPI2_NRF24L01_Init(void) {
 	SPI_Cmd(SPI2, ENABLE);
 
 	// 以下是公用的24L01初始化
-	MODE_CE(0);
+	NRF_MODE_CE(0);
 	// 设置地址宽度
 #if TX_ADDR_WIDTH == 3
-	SPI_RW_Reg(WRITE_REG1 + SETUP_AW, 0x01);
+	NRF_SPI_RW_Reg(WRITE_REG1 + SETUP_AW, 0x01);
 #elif TX_ADDR_WIDTH == 4
-	SPI_RW_Reg(WRITE_REG1 + SETUP_AW, 0x02);
+	NRF_SPI_RW_Reg(WRITE_REG1 + SETUP_AW, 0x02);
 #else
-	SPI_RW_Reg(WRITE_REG1 + SETUP_AW, 0x03);
+	NRF_SPI_RW_Reg(WRITE_REG1 + SETUP_AW, 0x03);
 #endif
 
 	// 发送部分
-	SPI_RW_Reg(WRITE_REG1 + SETUP_RETR, 0x00);  // 关闭自动重发
+	NRF_SPI_RW_Reg(WRITE_REG1 + SETUP_RETR, 0x00);  // 关闭自动重发
 
 	// 接收部分
 	// 数据通道0
-	SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0, TX_ADDRESS_LOCAL, TX_ADDR_WIDTH);  //数据通道0接收地址，最大5个字节， 此处接收地址和发送地址相同
-	SPI_RW_Reg(WRITE_REG1 + RX_PW_P0, TX_PLOAD_WIDTH);  // 接收数据通道0有效数据宽度32   范围1-32
+	NRF_SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0, TX_ADDRESS_LOCAL, TX_ADDR_WIDTH);  //数据通道0接收地址，最大5个字节， 此处接收地址和发送地址相同
+	NRF_SPI_RW_Reg(WRITE_REG1 + RX_PW_P0, TX_PLOAD_WIDTH);  // 接收数据通道0有效数据宽度32   范围1-32
 
 	// 数据通道1-5
 	for (i = 0; i < 5; i++) {
 		if (i == 0) {
 			//数据通道1接收地址 5字节
-			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, TX_ADDR_WIDTH);
+			NRF_SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, TX_ADDR_WIDTH);
 		} else {
 			//数据通道i+1接收地址，只可以设置1个字节， 高字节与TX_ADDRESS_DUMMY[39:8]相同
-			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, 1);
+			NRF_SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, 1);
 		}
 		// 接收数据通道i+1有效数据宽度32   范围1-32
-		SPI_RW_Reg(WRITE_REG1 + RX_PW_P1 + i, TX_PLOAD_WIDTH);
+		NRF_SPI_RW_Reg(WRITE_REG1 + RX_PW_P1 + i, TX_PLOAD_WIDTH);
 	}
 
-	SPI_RW_Reg(WRITE_REG1 + EN_AA, 0x00);      // 使能通道0-通道5接收关闭自动应答
-	SPI_RW_Reg(WRITE_REG1 + EN_RXADDR, 0x01);  // 接收通道0使能，关闭其他通道
-	SPI_RW_Reg(WRITE_REG1 + RF_CH, 0);         // 选择射频工作频道0   范围0-127
+	NRF_SPI_RW_Reg(WRITE_REG1 + EN_AA, 0x00);      // 使能通道0-通道5接收关闭自动应答
+	NRF_SPI_RW_Reg(WRITE_REG1 + EN_RXADDR, 0x01);  // 接收通道0使能，关闭其他通道
+	NRF_SPI_RW_Reg(WRITE_REG1 + RF_CH, 0);         // 选择射频工作频道0   范围0-127
 
 	if (nrf_baud == 0)
-		SPI_RW_Reg(WRITE_REG1 + RF_SETUP, 0x0f);   // 0db, 2MPS   射频寄存器   无线速率bit5:bit3		   发射功率bit2-bit1
+		NRF_SPI_RW_Reg(WRITE_REG1 + RF_SETUP, 0x0f);   // 0db, 2MPS   射频寄存器   无线速率bit5:bit3		   发射功率bit2-bit1
 												   //                           00: 1M BPS	                 00:-18dB
 												   //                           01: 2M BPS	                 01:-12dB
 												   //                           10: 250K BPS	             10:-6dB
 												   //                           11：保留                     11:0dB
 
 	else
-		SPI_RW_Reg(WRITE_REG1 + RF_SETUP, 0x07);   // 0db, 1MPS
+		NRF_SPI_RW_Reg(WRITE_REG1 + RF_SETUP, 0x07);   // 0db, 1MPS
 }
 
 /****************************************************************************
@@ -163,7 +164,7 @@ void SPI2_NRF24L01_Init(void) {
  * 说    明：
  * 调用方法：SPI2_NRF_SendByte(data1);
  ****************************************************************************/
-unsigned char SPI2_NRF_SendByte(unsigned char byte) {
+unsigned char NRF_SPI_SendByte(unsigned char byte) {
 	/* 循环检测发送缓冲区是否是空 */
 	while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == RESET)
 		;
@@ -188,11 +189,11 @@ unsigned char SPI2_NRF_SendByte(unsigned char byte) {
  * 说    明：
  * 调用方法：SPI_RW_Reg(WRITE_REG1 + EN_AA, 0x3f);
  ****************************************************************************/
-unsigned char SPI_RW_Reg(unsigned char data1, unsigned char data2) {
+unsigned char NRF_SPI_RW_Reg(unsigned char data1, unsigned char data2) {
 	unsigned int Data = 0;
 	Select_NRF();			    			 //选择NRF24L01片选
-	Data = SPI2_NRF_SendByte(data1);		 //指定NRF24L01寄存器
-	SPI2_NRF_SendByte(data2);				 //写入数据
+	Data = NRF_SPI_SendByte(data1);		 //指定NRF24L01寄存器
+	NRF_SPI_SendByte(data2);				 //写入数据
 	NotSelect_NRF(); 						 //禁止NRF24L01片选
 	return (Data);							 //返回NRF24L01 写寄存器的状态信息
 
@@ -208,15 +209,15 @@ unsigned char SPI_RW_Reg(unsigned char data1, unsigned char data2) {
  * 说    明：
  * 调用方法：SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0, TX_ADDRESS0, TX_ADR_WIDTH);
  ****************************************************************************/
-unsigned char SPI_Write_Buf(BYTE reg, BYTE *pBuf, BYTE bytes) {
+unsigned char NRF_SPI_Write_Buf(BYTE reg, BYTE *pBuf, BYTE bytes) {
 	unsigned char status, byte_ctr;
 
 	Select_NRF();                     //选择NRF24L01片选
-	status = SPI2_NRF_SendByte(reg);	  //指定NRF24L01寄存器
+	status = NRF_SPI_SendByte(reg);	  //指定NRF24L01寄存器
 
 	for (byte_ctr = 0; byte_ctr < bytes; byte_ctr++)    //写入指定长度的数据
 			{
-		SPI2_NRF_SendByte(*pBuf++);
+		NRF_SPI_SendByte(*pBuf++);
 	}
 	NotSelect_NRF();                  //禁止NRF24L01片选
 	return (status);          		  //返回NRF24L01 写寄存器的状态信息
@@ -230,11 +231,11 @@ unsigned char SPI_Write_Buf(BYTE reg, BYTE *pBuf, BYTE bytes) {
  * 说    明：
  * 调用方法：status=SPI_Read(READ_REG1+STATUS);
  ****************************************************************************/
-unsigned char SPI_Read(BYTE reg) {
+unsigned char NRF_SPI_Read(BYTE reg) {
 	unsigned char Data;
 	Select_NRF();						    //选择NRF24L01片选
-	SPI2_NRF_SendByte(reg);			    //指定NRF24L01寄存器
-	Data = SPI2_NRF_SendByte(0);			//读出数据
+	NRF_SPI_SendByte(reg);			    //指定NRF24L01寄存器
+	Data = NRF_SPI_SendByte(0);			//读出数据
 	NotSelect_NRF(); 					    //禁止NRF24L01片选
 	return (Data);
 }
@@ -249,14 +250,14 @@ unsigned char SPI_Read(BYTE reg) {
  * 说    明：
  * 调用方法：SPI_Read_Buf(RD_RX_PLOAD,rx_buf,TX_PLOAD_WIDTH);
  ****************************************************************************/
-unsigned char SPI_Read_Buf(BYTE reg, BYTE *pBuf, BYTE bytes) {
+unsigned char NRF_SPI_Read_Buf(BYTE reg, BYTE *pBuf, BYTE bytes) {
 	unsigned char status, i;
 
 	Select_NRF();              			//选择NRF24L01片选
-	status = SPI2_NRF_SendByte(reg);	   	//读出指定NRF24L01寄存器的状态信息
+	status = NRF_SPI_SendByte(reg);	   	//读出指定NRF24L01寄存器的状态信息
 	for (i = 0; i < bytes; i++)              //读出指定长度的数据
 			{
-		pBuf[i] = SPI2_NRF_SendByte(0);
+		pBuf[i] = NRF_SPI_SendByte(0);
 	}
 	NotSelect_NRF();                    //禁止NRF24L01片选
 	return (status);          		    //返回指定NRF24L01寄存器的状态信息
@@ -270,7 +271,7 @@ unsigned char SPI_Read_Buf(BYTE reg, BYTE *pBuf, BYTE bytes) {
  * 说    明：无
  * 调用方法：delay_ms(1);
  ****************************************************************************/
-void delay_ms(unsigned int x) {
+static void delay_ms(unsigned int x) {
 	unsigned int i, j;
 	i = 0;
 	for (i = 0; i < x; i++) {
@@ -290,17 +291,17 @@ void delay_ms(unsigned int x) {
  * 调用方法：RX_Mode();
  ****************************************************************************/
 
-void RX_Mode(void) {
-	MODE_CE(0);
+void NRF_RX_Mode(void) {
+	NRF_MODE_CE(0);
 
-	SPI_RW_Reg(WRITE_REG1 + CONFIG, 0x0f);     // bit6 接收中断产生时，IRQ引脚产生低电平
+	NRF_SPI_RW_Reg(WRITE_REG1 + CONFIG, 0x0f);     // bit6 接收中断产生时，IRQ引脚产生低电平
 											   // bit5 发送中断产生时，IRQ引脚产生低电平
 											   // bit4 最大重复发送次数完成时 IRQ引脚产生低电平
 											   // bit3 CRC校验允许
 											   // bit2 16位CRC
 											   // bit1 上电
 											   // bit0 接收模式
-	MODE_CE(1);								   // 使能接收模式
+	NRF_MODE_CE(1);								   // 使能接收模式
 }
 
 /****************************************************************************
@@ -311,23 +312,23 @@ void RX_Mode(void) {
  * 说    明：设置了6个发射通道地址、射频频道0、16位CRC、收发中断、增益0dB等等
  * 调用方法：TX_Mode();
  ****************************************************************************/
-void TX_Mode(void) {
+void NRF_TX_Mode(void) {
 	unsigned char nrf_Pipe = 0;
 
-	MODE_CE(0);
+	NRF_MODE_CE(0);
 
 	switch (nrf_Pipe) {
 		case 0:
-			SPI_Write_Buf(WRITE_REG1 + TX_ADDR + nrf_Pipe, TX_ADDRESS_LOCAL, TX_ADDR_WIDTH);         //数据通道0发送地址，最大5个字节
-			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0 + nrf_Pipe, TX_ADDRESS_LOCAL, TX_ADDR_WIDTH);  // 将通道0的接收地址设置为 0通道的发射地址
+			NRF_SPI_Write_Buf(WRITE_REG1 + TX_ADDR + nrf_Pipe, TX_ADDRESS_LOCAL, TX_ADDR_WIDTH);         //数据通道0发送地址，最大5个字节
+			NRF_SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0 + nrf_Pipe, TX_ADDRESS_LOCAL, TX_ADDR_WIDTH);  // 将通道0的接收地址设置为 0通道的发射地址
 			break;
 		default:
-			SPI_Write_Buf(WRITE_REG1 + TX_ADDR + nrf_Pipe, TX_ADDRESS_DUMMY, TX_ADDR_WIDTH);    //数据通道nrf_pipe发送地址，最大5个字节
-			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0 + nrf_Pipe, TX_ADDRESS_DUMMY, TX_ADDR_WIDTH); // 将通道nrf_pipe的接收地址设置为dummy的发射地址
+			NRF_SPI_Write_Buf(WRITE_REG1 + TX_ADDR + nrf_Pipe, TX_ADDRESS_DUMMY, TX_ADDR_WIDTH);    //数据通道nrf_pipe发送地址，最大5个字节
+			NRF_SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0 + nrf_Pipe, TX_ADDRESS_DUMMY, TX_ADDR_WIDTH); // 将通道nrf_pipe的接收地址设置为dummy的发射地址
 			break;
 	}
 
-	SPI_RW_Reg(WRITE_REG1 + CONFIG, 0x0e);     // bit6 接收中断产生时，IRQ引脚产生低电平
+	NRF_SPI_RW_Reg(WRITE_REG1 + CONFIG, 0x0e);     // bit6 接收中断产生时，IRQ引脚产生低电平
 											   // bit5 发送中断产生时，IRQ引脚产生低电平
 											   // bit4 最大重复发送次数完成时 IRQ引脚产生低电平
 											   // bit3 CRC校验允许
@@ -335,7 +336,7 @@ void TX_Mode(void) {
 											   // bit1 上电
 											   // bit0 发送模式
 
-	MODE_CE(1);								   // 使能发送模式
+	NRF_MODE_CE(1);								   // 使能发送模式
 	
 }
 
@@ -350,30 +351,30 @@ void TX_Mode(void) {
  ****************************************************************************/
 void NRF_Send_Data(BYTE* data_buffer, BYTE Nb_bytes) {
 	unsigned char i = 0;
-	MODE_CE(0);								 //NRF 模式控制
+	NRF_MODE_CE(0);								 //NRF 模式控制
 
-	SPI_RW_Reg(WRITE_REG1 + STATUS, 0xff);	     //设置状态寄存器初始化
-	SPI_RW_Reg(0xe1, 0);						 //清除TX FIFO寄存器
-	SPI_RW_Reg(0xe2, 0);		    			 //清除RX FIFO寄存器
-	TX_Mode();								 //设置为发送模式
+	NRF_SPI_RW_Reg(WRITE_REG1 + STATUS, 0xff);	     //设置状态寄存器初始化
+	NRF_SPI_RW_Reg(0xe1, 0);						 //清除TX FIFO寄存器
+	NRF_SPI_RW_Reg(0xe2, 0);		    			 //清除RX FIFO寄存器
+	NRF_TX_Mode();								 //设置为发送模式
 	delay_ms(1);
 	if (Nb_bytes < 32) {						 //当接收到的USB虚拟串口数据小于32，把有效数据外的空间用0填满
 		for (i = Nb_bytes; i < 32; i++)
 			data_buffer[i] = 0;
 	}
-	MODE_CE(0);
-	SPI_Write_Buf(WR_TX_PLOAD, data_buffer, TX_PLOAD_WIDTH);        //发送32字节的缓存区数据到NRF24L01
-	MODE_CE(1);														//保持10us以上，将数据发送出去
+	NRF_MODE_CE(0);
+	NRF_SPI_Write_Buf(WR_TX_PLOAD, data_buffer, TX_PLOAD_WIDTH);        //发送32字节的缓存区数据到NRF24L01
+	NRF_MODE_CE(1);														//保持10us以上，将数据发送出去
 }
 
 //检测24L01是否存在
 //返回值:1: 存在 ;0 不存在
-unsigned char NRF24L01_check_if_exist(void) {
+unsigned char NRF_check_if_exist(void) {
 	unsigned char buf[5] = { 0XA4, 0XA4, 0XA4, 0XA4, 0XA4 };
 	unsigned char i;
 
-	SPI_Write_Buf(WRITE_REG1 + TX_ADDR, buf, TX_ADDR_WIDTH);  //写入地址.
-	SPI_Read_Buf(TX_ADDR, buf, TX_ADDR_WIDTH);  //读出写入的地址
+	NRF_SPI_Write_Buf(WRITE_REG1 + TX_ADDR, buf, TX_ADDR_WIDTH);  //写入地址.
+	NRF_SPI_Read_Buf(TX_ADDR, buf, TX_ADDR_WIDTH);  //读出写入的地址
 
 	for (i = 0; i < TX_ADDR_WIDTH; i++){
 		if (buf[i] != 0XA4)

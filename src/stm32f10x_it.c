@@ -217,20 +217,19 @@ void EXTI9_5_IRQHandler(void) {
 	// TODO 2017年2月27日上午11:44:55 重新封装SPI_RW_Reg之类的函数，增强可读性
 	if (EXTI_GetITStatus(EXTI_Line8) != RESET) {
 		if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_8) == 0) {  //判断是否是PA0线变低
-			status = SPI_Read(READ_REG1 + STATUS);			// 读取状态寄存其来判断数据接收状况
+			status = NRF_SPI_Read(READ_REG1 + STATUS);			// 读取状态寄存其来判断数据接收状况
 			if (status & 0x40){				    		// 判断是否接收到数据
-				SPI_Read_Buf(RD_RX_PLOAD, rx_buf, TX_PLOAD_WIDTH);  //从接收缓冲区里读出数据
+				NRF_SPI_Read_Buf(RD_RX_PLOAD, rx_buf, TX_PLOAD_WIDTH);  //从接收缓冲区里读出数据
 				printf("%s", rx_buf);
 			} else if ((status & 0x10) > 0) {					 //发射达到最大复发次数
-				SPI_RW_Reg(0xe1, 0);					 	 //清除发送缓冲区
-				RX_Mode();								 //进入接收模式
+				NRF_SPI_RW_Reg(0xe1, 0);					 	 //清除发送缓冲区
+				NRF_RX_Mode();								 //进入接收模式
 			} else if ((status & 0x20) > 0) {					 //发射后收到应答
-				// TODO 2017年2月27日上午11:21:25 PB5对应原作者的哪个管脚？为什么应答？
 				GPIO_SetBits(GPIOB, GPIO_Pin_5);
-				SPI_RW_Reg(0xe1, 0);					     //清除发送缓冲区
-				RX_Mode();								 //进入接收模式
+				NRF_SPI_RW_Reg(0xe1, 0);					     //清除发送缓冲区
+				NRF_RX_Mode();								 //进入接收模式
 			}
-			SPI_RW_Reg(WRITE_REG1 + STATUS, status);	     //清除07寄存器标志
+			NRF_SPI_RW_Reg(WRITE_REG1 + STATUS, status);	     //清除07寄存器标志
 		}
 		EXTI_ClearITPendingBit(EXTI_Line8);			 //清除EXTI0上的中断标志
 	}

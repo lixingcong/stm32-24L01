@@ -49,13 +49,13 @@ typedef unsigned char BYTE;
 extern unsigned char rx_buf[TX_PLOAD_WIDTH];
 
 void NRF_Send_Data(BYTE* data_buffer, BYTE Nb_bytes);
-void SPI2_NRF24L01_Init(void);
-void RX_Mode(void);
-void TX_Mode(void);
-unsigned char SPI_Read(BYTE reg);
-unsigned char SPI_Read_Buf(BYTE reg, BYTE *pBuf, BYTE bytes);
-unsigned char SPI_Write_Buf(BYTE reg, BYTE *pBuf, BYTE bytes);
-unsigned char SPI_RW_Reg(BYTE data1, BYTE data2);
-unsigned char NRF24L01_check_if_exist(void);
+void NRF24L01_Init(void);
+void NRF_RX_Mode(void);
+void NRF_TX_Mode(void);
+unsigned char NRF_SPI_Read(BYTE reg);
+unsigned char NRF_SPI_Read_Buf(BYTE reg, BYTE *pBuf, BYTE bytes);
+unsigned char NRF_SPI_Write_Buf(BYTE reg, BYTE *pBuf, BYTE bytes);
+unsigned char NRF_SPI_RW_Reg(BYTE data1, BYTE data2);
+unsigned char NRF_check_if_exist(void);
 
 #endif

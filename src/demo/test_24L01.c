@@ -17,13 +17,13 @@ int main(){
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	init_delay();
 	USART1_init();
-	SPI2_NRF24L01_Init();
+	NRF24L01_Init();
 	// nrf24l01 enter to recv mode
-	RX_Mode();
+	NRF_RX_Mode();
 
 //	USART_scanf_config_EXT();
 	printf("hello\n");
-	while(NRF24L01_check_if_exist()==0)
+	while(NRF_check_if_exist()==0)
 	{
 		printf("error\n");
  		DelayMs(200);
