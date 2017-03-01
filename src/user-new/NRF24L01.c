@@ -44,6 +44,9 @@ void SPI2_NRF24L01_Init(void) {
 	NVIC_InitTypeDef NVIC_InitStructure;
 	EXTI_InitTypeDef EXTI_InitStructure;
 
+	unsigned char i;
+	unsigned char nrf_baud = 0;				//默认速率2Mbps
+
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);	   //使能SPI2外设时钟
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);    //使能GPIOB 时钟
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);    //使能端口复用时钟
@@ -116,6 +119,40 @@ void SPI2_NRF24L01_Init(void) {
 	SPI_RW_Reg(WRITE_REG1 + SETUP_AW, 0x03);
 #endif
 
+	// 发送部分
+	SPI_RW_Reg(WRITE_REG1 + SETUP_RETR, 0x00);  // 关闭自动重发
+
+	// 接收部分
+	// 数据通道0
+	SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0, TX_ADDRESS_LOCAL, TX_ADDR_WIDTH);  //数据通道0接收地址，最大5个字节， 此处接收地址和发送地址相同
+	SPI_RW_Reg(WRITE_REG1 + RX_PW_P0, TX_PLOAD_WIDTH);  // 接收数据通道0有效数据宽度32   范围1-32
+
+	// 数据通道1-5
+	for (i = 0; i < 5; i++) {
+		if (i == 0) {
+			//数据通道1接收地址 5字节
+			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, TX_ADDR_WIDTH);
+		} else {
+			//数据通道i+1接收地址，只可以设置1个字节， 高字节与TX_ADDRESS_DUMMY[39:8]相同
+			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, 1);
+		}
+		// 接收数据通道i+1有效数据宽度32   范围1-32
+		SPI_RW_Reg(WRITE_REG1 + RX_PW_P1 + i, TX_PLOAD_WIDTH);
+	}
+
+	SPI_RW_Reg(WRITE_REG1 + EN_AA, 0x00);      // 使能通道0-通道5接收关闭自动应答
+	SPI_RW_Reg(WRITE_REG1 + EN_RXADDR, 0x01);  // 接收通道0使能，关闭其他通道
+	SPI_RW_Reg(WRITE_REG1 + RF_CH, 0);         // 选择射频工作频道0   范围0-127
+
+	if (nrf_baud == 0)
+		SPI_RW_Reg(WRITE_REG1 + RF_SETUP, 0x0f);   // 0db, 2MPS   射频寄存器   无线速率bit5:bit3		   发射功率bit2-bit1
+												   //                           00: 1M BPS	                 00:-18dB
+												   //                           01: 2M BPS	                 01:-12dB
+												   //                           10: 250K BPS	             10:-6dB
+												   //                           11：保留                     11:0dB
+
+	else
+		SPI_RW_Reg(WRITE_REG1 + RF_SETUP, 0x07);   // 0db, 1MPS
 }
 
 /****************************************************************************
@@ -254,41 +291,7 @@ void delay_ms(unsigned int x) {
  ****************************************************************************/
 
 void RX_Mode(void) {
-	unsigned char i;
-	unsigned char nrf_baud = 0;				//默认速率2Mbps
-
 	MODE_CE(0);
-
-	// 数据通道0
-	SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0, TX_ADDRESS_LOCAL, TX_ADDR_WIDTH);  //数据通道0接收地址，最大5个字节， 此处接收地址和发送地址相同
-	SPI_RW_Reg(WRITE_REG1 + RX_PW_P0, TX_PLOAD_WIDTH);  // 接收数据通道0有效数据宽度32   范围1-32
-
-	// 数据通道1-5
-	for (i = 0; i < 5; i++) {
-		if (i == 0) {
-			//数据通道1接收地址 5字节
-			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, TX_ADDR_WIDTH);
-		} else {
-			//数据通道i+1接收地址，只可以设置1个字节， 高字节与TX_ADDRESS_DUMMY[39:8]相同
-			SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, 1);
-		}
-		// 接收数据通道i+1有效数据宽度32   范围1-32
-		SPI_RW_Reg(WRITE_REG1 + RX_PW_P1 + i, TX_PLOAD_WIDTH);
-	}
-
-	SPI_RW_Reg(WRITE_REG1 + EN_AA, 0x00);      // 使能通道0-通道5接收关闭自动应答
-	SPI_RW_Reg(WRITE_REG1 + EN_RXADDR, 0x01);  // 接收通道0使能，关闭其他通道
-	SPI_RW_Reg(WRITE_REG1 + RF_CH, 0);         // 选择射频工作频道0   范围0-127
-
-	if (nrf_baud == 0)
-		SPI_RW_Reg(WRITE_REG1 + RF_SETUP, 0x0f);   // 0db, 2MPS   射频寄存器   无线速率bit5:bit3		   发射功率bit2-bit1
-												   //                           00: 1M BPS	                 00:-18dB
-												   //                           01: 2M BPS	                 01:-12dB
-												   //                           10: 250K BPS	             10:-6dB
-												   //                           11：保留                     11:0dB
-
-	else
-		SPI_RW_Reg(WRITE_REG1 + RF_SETUP, 0x07);   // 0db, 1MPS
 
 	SPI_RW_Reg(WRITE_REG1 + CONFIG, 0x0f);     // bit6 接收中断产生时，IRQ引脚产生低电平
 											   // bit5 发送中断产生时，IRQ引脚产生低电平
@@ -309,15 +312,9 @@ void RX_Mode(void) {
  * 调用方法：TX_Mode();
  ****************************************************************************/
 void TX_Mode(void) {
-	unsigned char nrf_Pipe;
+	unsigned char nrf_Pipe = 0;
 
-	NotSelect_NRF();
 	MODE_CE(0);
-
-	// TODO: 这是指定六个通道互相发送的关键 2017年2月26日 下午5:33:38
-	nrf_Pipe = 0;
-	
-	SPI_RW_Reg(WRITE_REG1 + SETUP_RETR, 0x00);  // 关闭自动重发
 
 	switch (nrf_Pipe) {
 		case 0:
