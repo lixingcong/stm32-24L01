@@ -43,7 +43,6 @@ extern uint8_t usart_rec_flag,usart_tx_flag;
 
 extern uint8_t TxBufferRF[40];  
 extern uint8_t RxBufferRF[40];
-extern uint8_t rf_rec_flag,rf_tx_flag;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
@@ -199,9 +198,8 @@ void EXTI9_5_IRQHandler(void) {
 				//GPIO_ResetBits(GPIOB, GPIO_Pin_5);   
 				SPI_Read_Buf(RD_RX_PLOAD, rx_buf, TX_PLOAD_WIDTH);  //从接收缓冲区里读出数据
 				for (i = 0; i < 32; i++) {							  //向USB 端点1的缓冲区里放置数据
-					TxBufferUSART[i] = rx_buf[i];
+					USART_SendChar(USART1, rx_buf[i]);
 				}
-				rf_rec_flag = 1;
 			} else if ((status & 0x10) > 0) {					 //发射达到最大复发次数
 				SPI_RW_Reg(0xe1, 0);					 	 //清除发送缓冲区
 				RX_Mode();								 //进入接收模式

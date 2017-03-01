@@ -20,7 +20,6 @@
 
 uint8_t TxBufferRF[40];
 uint8_t RxBufferRF[40];
-uint8_t rf_rec_flag, rf_tx_flag;
 
 /* Private variables ---------------------------------------------------------*/
 uint8_t TxBufferUSART[40];
@@ -76,14 +75,6 @@ int main(void) {
 			else {
 				GPIO_ResetBits(GPIOC, GPIO_Pin_13);
 				a = 0;
-			}
-		}
-		if (rf_rec_flag == 1) {
-			rf_rec_flag = 0;
-			for (i = 0; i < 32; i++)          //发送字符串
-					{
-				USART_SendChar(USART1, TxBufferUSART[i]);
-				//	Delay(0x0000ff00);
 			}
 		}
 	}
@@ -149,7 +140,7 @@ void NVIC_Configuration(void) {
 	NVIC_InitTypeDef NVIC_InitStructure;
 
 	/* 优先级组 1  */
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 
 	/* Enable the USART1 Interrupt */
 	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;			     	//设置串口1中断
