@@ -9,12 +9,12 @@
 #define NotSelect_NRF()    GPIO_SetBits(GPIOB, GPIO_Pin_12)
 
 // 最好设定地址宽度为4字节 刚好能32位整数存下来
-static unsigned char TX_ADDRESS_LOCAL[TX_ADDR_WIDTH] = { 0x12, 0x34, 0x56, 0x78 };
-static unsigned char TX_ADDRESS_DUMMY[TX_ADDR_WIDTH] = { 0xee, 0xee, 0xff, 0xff };
+static unsigned char TX_ADDRESS_LOCAL[NRF_ADDR_WIDTH] = { 0x12, 0x34, 0x56, 0x78 };
+static unsigned char TX_ADDRESS_DUMMY[NRF_ADDR_WIDTH] = { 0xee, 0xee, 0xff, 0xff };
 
 static void delay_ms(unsigned int x);
 
-unsigned char rx_buf[TX_PLOAD_WIDTH];
+unsigned char rx_buf[NRF_PLOAD_WIDTH];
 
 /****************************************************************************
  * 名    称：void MODE_CE(unsigned char a)
@@ -112,48 +112,48 @@ void NRF24L01_Init(void) {
 	// 以下是公用的24L01初始化
 	NRF_MODE_CE(0);
 	// 设置地址宽度
-#if TX_ADDR_WIDTH == 3
-	NRF_SPI_RW_Reg(WRITE_REG1 + SETUP_AW, 0x01);
-#elif TX_ADDR_WIDTH == 4
-	NRF_SPI_RW_Reg(WRITE_REG1 + SETUP_AW, 0x02);
+#if NRF_ADDR_WIDTH == 3
+	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_SETUP_AW, 0x01);
+#elif NRF_ADDR_WIDTH == 4
+	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_SETUP_AW, 0x02);
 #else
-	NRF_SPI_RW_Reg(WRITE_REG1 + SETUP_AW, 0x03);
+	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_SETUP_AW, 0x03);
 #endif
 
 	// 发送部分
-	NRF_SPI_RW_Reg(WRITE_REG1 + SETUP_RETR, 0x00);  // 关闭自动重发
+	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_SETUP_RETR, 0x00);  // 关闭自动重发
 
 	// 接收部分
 	// 数据通道0
-	NRF_SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0, TX_ADDRESS_LOCAL, TX_ADDR_WIDTH);  //数据通道0接收地址，最大5个字节， 此处接收地址和发送地址相同
-	NRF_SPI_RW_Reg(WRITE_REG1 + RX_PW_P0, TX_PLOAD_WIDTH);  // 接收数据通道0有效数据宽度32   范围1-32
+	NRF_SPI_Write_Buf(NRF_WRITE_REG + NRF_RX_ADDR_P0, TX_ADDRESS_LOCAL, NRF_ADDR_WIDTH);  //数据通道0接收地址，最大5个字节， 此处接收地址和发送地址相同
+	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_RX_PW_P0, NRF_PLOAD_WIDTH);  // 接收数据通道0有效数据宽度32   范围1-32
 
 	// 数据通道1-5
 	for (i = 0; i < 5; i++) {
 		if (i == 0) {
 			//数据通道1接收地址 5字节
-			NRF_SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, TX_ADDR_WIDTH);
+			NRF_SPI_Write_Buf(NRF_WRITE_REG + NRF_RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, NRF_ADDR_WIDTH);
 		} else {
 			//数据通道i+1接收地址，只可以设置1个字节， 高字节与TX_ADDRESS_DUMMY[39:8]相同
-			NRF_SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, 1);
+			NRF_SPI_Write_Buf(NRF_WRITE_REG + NRF_RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, 1);
 		}
 		// 接收数据通道i+1有效数据宽度32   范围1-32
-		NRF_SPI_RW_Reg(WRITE_REG1 + RX_PW_P1 + i, TX_PLOAD_WIDTH);
+		NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_RX_PW_P1 + i, NRF_PLOAD_WIDTH);
 	}
 
-	NRF_SPI_RW_Reg(WRITE_REG1 + EN_AA, 0x00);      // 使能通道0-通道5接收关闭自动应答
-	NRF_SPI_RW_Reg(WRITE_REG1 + EN_RXADDR, 0x01);  // 接收通道0使能，关闭其他通道
-	NRF_SPI_RW_Reg(WRITE_REG1 + RF_CH, 0);         // 选择射频工作频道0   范围0-127
+	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_EN_AA, 0x00);      // 使能通道0-通道5接收关闭自动应答
+	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_EN_RXADDR, 0x01);  // 接收通道0使能，关闭其他通道
+	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_RF_CH, 0);         // 选择射频工作频道0   范围0-127
 
 	if (nrf_baud == 0)
-		NRF_SPI_RW_Reg(WRITE_REG1 + RF_SETUP, 0x0f);   // 0db, 2MPS   射频寄存器   无线速率bit5:bit3		   发射功率bit2-bit1
+		NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_RF_SETUP, 0x0f);   // 0db, 2MPS   射频寄存器   无线速率bit5:bit3		   发射功率bit2-bit1
 												   //                           00: 1M BPS	                 00:-18dB
 												   //                           01: 2M BPS	                 01:-12dB
 												   //                           10: 250K BPS	             10:-6dB
 												   //                           11：保留                     11:0dB
 
 	else
-		NRF_SPI_RW_Reg(WRITE_REG1 + RF_SETUP, 0x07);   // 0db, 1MPS
+		NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_RF_SETUP, 0x07);   // 0db, 1MPS
 }
 
 /****************************************************************************
@@ -294,7 +294,7 @@ static void delay_ms(unsigned int x) {
 void NRF_RX_Mode(void) {
 	NRF_MODE_CE(0);
 
-	NRF_SPI_RW_Reg(WRITE_REG1 + CONFIG, 0x0f);     // bit6 接收中断产生时，IRQ引脚产生低电平
+	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_CONFIG, 0x0f);     // bit6 接收中断产生时，IRQ引脚产生低电平
 											   // bit5 发送中断产生时，IRQ引脚产生低电平
 											   // bit4 最大重复发送次数完成时 IRQ引脚产生低电平
 											   // bit3 CRC校验允许
@@ -319,16 +319,16 @@ void NRF_TX_Mode(void) {
 
 	switch (nrf_Pipe) {
 		case 0:
-			NRF_SPI_Write_Buf(WRITE_REG1 + TX_ADDR + nrf_Pipe, TX_ADDRESS_LOCAL, TX_ADDR_WIDTH);         //数据通道0发送地址，最大5个字节
-			NRF_SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0 + nrf_Pipe, TX_ADDRESS_LOCAL, TX_ADDR_WIDTH);  // 将通道0的接收地址设置为 0通道的发射地址
+			NRF_SPI_Write_Buf(NRF_WRITE_REG + NRF_TX_ADDR + nrf_Pipe, TX_ADDRESS_LOCAL, NRF_ADDR_WIDTH);         //数据通道0发送地址，最大5个字节
+			NRF_SPI_Write_Buf(NRF_WRITE_REG + NRF_RX_ADDR_P0 + nrf_Pipe, TX_ADDRESS_LOCAL, NRF_ADDR_WIDTH);  // 将通道0的接收地址设置为 0通道的发射地址
 			break;
 		default:
-			NRF_SPI_Write_Buf(WRITE_REG1 + TX_ADDR + nrf_Pipe, TX_ADDRESS_DUMMY, TX_ADDR_WIDTH);    //数据通道nrf_pipe发送地址，最大5个字节
-			NRF_SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0 + nrf_Pipe, TX_ADDRESS_DUMMY, TX_ADDR_WIDTH); // 将通道nrf_pipe的接收地址设置为dummy的发射地址
+			NRF_SPI_Write_Buf(NRF_WRITE_REG + NRF_TX_ADDR + nrf_Pipe, TX_ADDRESS_DUMMY, NRF_ADDR_WIDTH);    //数据通道nrf_pipe发送地址，最大5个字节
+			NRF_SPI_Write_Buf(NRF_WRITE_REG + NRF_RX_ADDR_P0 + nrf_Pipe, TX_ADDRESS_DUMMY, NRF_ADDR_WIDTH); // 将通道nrf_pipe的接收地址设置为dummy的发射地址
 			break;
 	}
 
-	NRF_SPI_RW_Reg(WRITE_REG1 + CONFIG, 0x0e);     // bit6 接收中断产生时，IRQ引脚产生低电平
+	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_CONFIG, 0x0e);     // bit6 接收中断产生时，IRQ引脚产生低电平
 											   // bit5 发送中断产生时，IRQ引脚产生低电平
 											   // bit4 最大重复发送次数完成时 IRQ引脚产生低电平
 											   // bit3 CRC校验允许
@@ -353,7 +353,7 @@ void NRF_Send_Data(BYTE* data_buffer, BYTE Nb_bytes) {
 	unsigned char i = 0;
 	NRF_MODE_CE(0);								 //NRF 模式控制
 
-	NRF_SPI_RW_Reg(WRITE_REG1 + STATUS, 0xff);	     //设置状态寄存器初始化
+	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_STATUS, 0xff);	     //设置状态寄存器初始化
 	NRF_SPI_RW_Reg(0xe1, 0);						 //清除TX FIFO寄存器
 	NRF_SPI_RW_Reg(0xe2, 0);		    			 //清除RX FIFO寄存器
 	NRF_TX_Mode();								 //设置为发送模式
@@ -363,7 +363,7 @@ void NRF_Send_Data(BYTE* data_buffer, BYTE Nb_bytes) {
 			data_buffer[i] = 0;
 	}
 	NRF_MODE_CE(0);
-	NRF_SPI_Write_Buf(WR_TX_PLOAD, data_buffer, TX_PLOAD_WIDTH);        //发送32字节的缓存区数据到NRF24L01
+	NRF_SPI_Write_Buf(NRF_WR_TX_PLOAD, data_buffer, NRF_PLOAD_WIDTH);        //发送32字节的缓存区数据到NRF24L01
 	NRF_MODE_CE(1);														//保持10us以上，将数据发送出去
 }
 
@@ -373,10 +373,10 @@ unsigned char NRF_check_if_exist(void) {
 	unsigned char buf[5] = { 0XA4, 0XA4, 0XA4, 0XA4, 0XA4 };
 	unsigned char i;
 
-	NRF_SPI_Write_Buf(WRITE_REG1 + TX_ADDR, buf, TX_ADDR_WIDTH);  //写入地址.
-	NRF_SPI_Read_Buf(TX_ADDR, buf, TX_ADDR_WIDTH);  //读出写入的地址
+	NRF_SPI_Write_Buf(NRF_WRITE_REG + NRF_TX_ADDR, buf, NRF_ADDR_WIDTH);  //写入地址.
+	NRF_SPI_Read_Buf(NRF_TX_ADDR, buf, NRF_ADDR_WIDTH);  //读出写入的地址
 
-	for (i = 0; i < TX_ADDR_WIDTH; i++){
+	for (i = 0; i < NRF_ADDR_WIDTH; i++){
 		if (buf[i] != 0XA4)
 			return 0; //检测24L01错误
 	}

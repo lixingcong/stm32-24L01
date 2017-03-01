@@ -37,7 +37,7 @@ int main(){
 #endif
 	while(1){
 #ifdef SENDING
-		NRF_Send_Data("hello", TX_PLOAD_WIDTH);
+		NRF_Send_Data("hello", NRF_PLOAD_WIDTH);
 		printf("delaying..\n");
 		DelayMs(1000);
 #endif
