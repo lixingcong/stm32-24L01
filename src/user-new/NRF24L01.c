@@ -41,9 +41,12 @@ void MODE_CE(unsigned char a) {			            //NRF24L01 MODE-CE
 void SPI2_NRF24L01_Init(void) {
 	SPI_InitTypeDef SPI_InitStructure;
 	GPIO_InitTypeDef GPIO_InitStructure;
+	NVIC_InitTypeDef NVIC_InitStructure;
+	EXTI_InitTypeDef EXTI_InitStructure;
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);	   //使能SPI2外设时钟
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);    //使能GPIOB 时钟
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);    //使能端口复用时钟
 
 	/* 配置 SPI2 引脚: SCK, MISO and MOSI（PB13, PB14, PB15) */
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
@@ -68,6 +71,21 @@ void SPI2_NRF24L01_Init(void) {
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;		 		  //NRF24L01 IRQ
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;			  //上拉输入模式
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;					//NRF24L01 中断响应
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;		    //抢占优先级 0
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;				//子优先级为1
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;					//使能
+	NVIC_Init(&NVIC_InitStructure);
+
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource8);	   //NRF24L01 IRQ
+
+	EXTI_InitStructure.EXTI_Line = EXTI_Line8;					   //NRF24L01 IRQ
+	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;			   //EXTI中断
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;		   //下降沿触发
+	EXTI_InitStructure.EXTI_LineCmd = ENABLE;						   //使能
+	EXTI_Init(&EXTI_InitStructure);
+	EXTI_ClearITPendingBit(EXTI_Line10);
 
 	//禁止SPI2 NRF24L01+的片选。
 	NotSelect_NRF();

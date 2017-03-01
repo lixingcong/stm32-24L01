@@ -124,7 +124,7 @@ void Delay(__IO uint32_t nCount) {
  系统时钟配置为72MHZ+外设时钟配置*/
 void RCC_Configuration(void) {
 	SystemInit();
-	RCC_APB2PeriphClockCmd( RCC_APB2Periph_USART1 | RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_AFIO, ENABLE);
+	RCC_APB2PeriphClockCmd( RCC_APB2Periph_USART1 | RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC, ENABLE);
 }
 //-------------------------------------------------------------------------------------- 
 void GPIO_Configuration(void) {
@@ -147,7 +147,6 @@ void GPIO_Configuration(void) {
 void NVIC_Configuration(void) {
 	/*  结构声明*/
 	NVIC_InitTypeDef NVIC_InitStructure;
-	EXTI_InitTypeDef EXTI_InitStructure;
 
 	/* 优先级组 1  */
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
@@ -158,19 +157,4 @@ void NVIC_Configuration(void) {
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;				//子优先级为0
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;					//使能
 	NVIC_Init(&NVIC_InitStructure);
-
-	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;					//NRF24L01 中断响应
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;		    //抢占优先级 0
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;				//子优先级为1
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;					//使能
-	NVIC_Init(&NVIC_InitStructure);
-
-	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource8);	   //NRF24L01 IRQ
-
-	EXTI_InitStructure.EXTI_Line = EXTI_Line8;					   //NRF24L01 IRQ
-	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;			   //EXTI中断
-	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;		   //下降沿触发
-	EXTI_InitStructure.EXTI_LineCmd = ENABLE;						   //使能
-	EXTI_Init(&EXTI_InitStructure);
-	EXTI_ClearITPendingBit(EXTI_Line10);
 }
