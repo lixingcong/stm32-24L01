@@ -30,7 +30,7 @@
 //#include "usb_istr.h"
 #include "stdio.h"
 
-#include "stm32f10x_old.h"
+#include "stm32f10x_it.h"
 //#include "timer2.h"
 
 unsigned int systick_count=0;
