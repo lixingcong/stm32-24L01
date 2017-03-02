@@ -11,15 +11,22 @@
 #include "NRF24L01.h"
 #include "stdio.h"
 
+// --------pc_control-----------
+#include "execute_PC_cmd.h"
+
 int main(){
 	unsigned char err;
 
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	init_delay();
-	USART1_init();
-	NRF24L01_Init();
 
-//	USART_scanf_config_EXT();
+	// init USART
+	USART1_init();
+	USART2_init();
+	USART_scanf_config_EXT();
+
+	// nrf24l01
+	NRF24L01_Init();
 	printf("nrf24l01 ok\n");
 
 #ifdef SENDING

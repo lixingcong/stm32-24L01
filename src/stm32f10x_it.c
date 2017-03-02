@@ -26,8 +26,7 @@
 #include "stm32f10x_usart.h"
 #include "stm32f10x_tim.h"
 #include "stm32f10x_exti.h"
-//#include "usart_scanf_irq.h"
-//#include "SPI1.h"
+#include "usart_scanf_irq.h"
 //#include "usb_istr.h"
 #include "stdio.h"
 
@@ -180,8 +179,8 @@ void USART1_IRQHandler(void)
 {
 	if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET) {
 		// WARNING: spaces were ignore by scanf()
-//		scanf("%s", usart_scanf_data);
-//		usart_irq_scanf_callback();
+		scanf("%s", usart_scanf_data);
+		usart_irq_scanf_callback();
 		USART_ClearITPendingBit(USART1, USART_IT_RXNE);
 	}
 
@@ -197,8 +196,8 @@ void USART2_IRQHandler(void)
 {
 	if (USART_GetITStatus(USART2, USART_IT_RXNE) != RESET) {
 		// WARNING: spaces were ignore by scanf()
-//		scanf("%s", usart_scanf_data);
-//		usart_irq_scanf_callback();
+		scanf("%s", usart_scanf_data);
+		usart_irq_scanf_callback();
 		USART_ClearITPendingBit(USART2, USART_IT_RXNE);
 	}
 

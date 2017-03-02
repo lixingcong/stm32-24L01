@@ -20,10 +20,10 @@ OBJS+=delay.o
 #OBJS+=usb_1.o
 #OBJS+=timer2.o
 
-#VPATH+=drivers/pc_control
-#OBJS+=usart_scanf_irq.o
-#OBJS+=execute_PC_cmd.o
-#OBJS+=parse_PC_cmd.o
+VPATH+=drivers/pc_control
+OBJS+=usart_scanf_irq.o
+OBJS+=execute_PC_cmd.o
+OBJS+=parse_PC_cmd.o
 
 #VPATH+=drivers/a7190
 #OBJS+=exti8_irq.o
