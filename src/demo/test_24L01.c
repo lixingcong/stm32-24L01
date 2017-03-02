@@ -18,8 +18,6 @@ int main(){
 	init_delay();
 	USART1_init();
 	NRF24L01_Init();
-	// nrf24l01 enter to recv mode
-	NRF_RX_Mode();
 
 //	USART_scanf_config_EXT();
 	printf("nrf24l01 ok\n");
@@ -31,7 +29,7 @@ int main(){
 #endif
 	while(1){
 #ifdef SENDING
-		NRF_Send_Data("hello", NRF_PLOAD_WIDTH);
+		NRF_Send_Data("hello", NRF_PLOAD_LENGTH);
 		printf("delaying..\n");
 		DelayMs(1000);
 #endif

@@ -6,6 +6,46 @@
 #include "misc.h"
 #include "stdio.h" // printf
 
+// registers
+#define NRF_READ_REG        0x00  // Define read command to register
+#define NRF_WRITE_REG       0x20  // Define write command to register
+#define NRF_RD_RX_PLOAD     0x61   // Define RX payload register address
+#define NRF_WR_TX_PLOAD     0xA0   // Define TX payload register address
+#define NRF_FLUSH_TX        0xE1   // Define flush TX register command
+#define NRF_FLUSH_RX        0xE2   // Define flush RX register command
+#define NRF_REUSE_TX_PL     0xE3   // Define reuse TX payload register command
+#define NRF_NOP             0xFF   // Define No Operation, might be used to read status register
+
+//***************************************************//
+// SPI(nRF24L01) registers(addresses)
+#define NRF_CONFIG          0x00   // 'Config' register address
+#define NRF_EN_AA           0x01   // 'Enable Auto Acknowledgment' register address
+#define NRF_EN_RXADDR       0x02   // 'Enabled RX addresses' register address
+#define NRF_SETUP_AW        0x03   // 'Setup address width' register address
+#define NRF_SETUP_RETR      0x04   // 'Setup Auto. Retrans' register address
+#define NRF_RF_CH           0x05   // 'RF channel' register address
+#define NRF_RF_SETUP        0x06   // 'RF setup' register address
+#define NRF_STATUS          0x07  // 'Status' register address
+#define NRF_OBSERVE_TX      0x08  // 'Observe TX' register address
+#define NRF_CD              0x09  // 'Carrier Detect' register address
+#define NRF_RX_ADDR_P0      0x0A  // 'RX address pipe0' register address
+#define NRF_RX_ADDR_P1      0x0B  // 'RX address pipe1' register address
+#define NRF_RX_ADDR_P2      0x0C  // 'RX address pipe2' register address
+#define NRF_RX_ADDR_P3      0x0D  // 'RX address pipe3' register address
+#define NRF_RX_ADDR_P4      0x0E  // 'RX address pipe4' register address
+#define NRF_RX_ADDR_P5      0x0F  // 'RX address pipe5' register address
+#define NRF_TX_ADDR         0x10  // 'TX address' register address
+#define NRF_RX_PW_P0        0x11  // 'RX payload width, pipe0' register address
+#define NRF_RX_PW_P1        0x12  // 'RX payload width, pipe1' register address
+#define NRF_RX_PW_P2        0x13  // 'RX payload width, pipe2' register address
+#define NRF_RX_PW_P3        0x14  // 'RX payload width, pipe3' register address
+#define NRF_RX_PW_P4        0x15  // 'RX payload width, pipe4' register address
+#define NRF_RX_PW_P5        0x16  // 'RX payload width, pipe5' register address
+#define NRF_FIFO_STATUS     0x17  // 'FIFO Status Register' register address
+
+// set by user, address width and payload len
+#define NRF_ADDR_WIDTH    4   //  TX(RX) address width
+
 #define Select_NRF()     GPIO_ResetBits(GPIOB, GPIO_Pin_12)
 #define NotSelect_NRF()    GPIO_SetBits(GPIOB, GPIO_Pin_12)
 
@@ -20,8 +60,10 @@ static unsigned char NRF_SPI_Write_Buf(BYTE reg, BYTE *pBuf, BYTE bytes);
 static unsigned char NRF_SPI_RW_Reg(BYTE data1, BYTE data2);
 static void delay_ms(unsigned int x);
 static unsigned char NRF_check_if_exist(void);
+static void NRF_RX_Mode(void);
+static void NRF_TX_Mode(void);
 
-static unsigned char rx_buf[NRF_PLOAD_WIDTH];
+static unsigned char rx_buf[NRF_PLOAD_LENGTH];
 
 /****************************************************************************
  * 名    称：void MODE_CE(unsigned char a)
@@ -133,7 +175,7 @@ void NRF24L01_Init(void) {
 	// 接收部分
 	// 数据通道0
 	NRF_SPI_Write_Buf(NRF_WRITE_REG + NRF_RX_ADDR_P0, TX_ADDRESS_LOCAL, NRF_ADDR_WIDTH);  //数据通道0接收地址，最大5个字节， 此处接收地址和发送地址相同
-	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_RX_PW_P0, NRF_PLOAD_WIDTH);  // 接收数据通道0有效数据宽度32   范围1-32
+	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_RX_PW_P0, NRF_PLOAD_LENGTH);  // 接收数据通道0有效数据宽度32   范围1-32
 
 	// 数据通道1-5
 	for (i = 0; i < 5; i++) {
@@ -145,7 +187,7 @@ void NRF24L01_Init(void) {
 			NRF_SPI_Write_Buf(NRF_WRITE_REG + NRF_RX_ADDR_P1 + i, TX_ADDRESS_DUMMY, 1);
 		}
 		// 接收数据通道i+1有效数据宽度32   范围1-32
-		NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_RX_PW_P1 + i, NRF_PLOAD_WIDTH);
+		NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_RX_PW_P1 + i, NRF_PLOAD_LENGTH);
 	}
 
 	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_EN_AA, 0x00);      // 使能通道0-通道5接收关闭自动应答
@@ -168,6 +210,9 @@ void NRF24L01_Init(void) {
 		printf("24L01 error\n");
 		delay_ms(500);
 	}
+
+	// nrf24l01 enter to recv mode
+	NRF_RX_Mode();
 }
 
 /****************************************************************************
@@ -305,7 +350,7 @@ static void delay_ms(unsigned int x) {
  * 调用方法：RX_Mode();
  ****************************************************************************/
 
-void NRF_RX_Mode(void) {
+static void NRF_RX_Mode(void) {
 	NRF_MODE_CE(0);
 
 	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_CONFIG, 0x0f);     // bit6 接收中断产生时，IRQ引脚产生低电平
@@ -326,7 +371,7 @@ void NRF_RX_Mode(void) {
  * 说    明：设置了6个发射通道地址、射频频道0、16位CRC、收发中断、增益0dB等等
  * 调用方法：TX_Mode();
  ****************************************************************************/
-void NRF_TX_Mode(void) {
+static void NRF_TX_Mode(void) {
 	unsigned char nrf_Pipe = 0;
 
 	NRF_MODE_CE(0);
@@ -377,7 +422,7 @@ void NRF_Send_Data(BYTE* data_buffer, BYTE Nb_bytes) {
 			data_buffer[i] = 0;
 	}
 	NRF_MODE_CE(0);
-	NRF_SPI_Write_Buf(NRF_WR_TX_PLOAD, data_buffer, NRF_PLOAD_WIDTH);        //发送32字节的缓存区数据到NRF24L01
+	NRF_SPI_Write_Buf(NRF_WR_TX_PLOAD, data_buffer, NRF_PLOAD_LENGTH);        //发送32字节的缓存区数据到NRF24L01
 	NRF_MODE_CE(1);														//保持10us以上，将数据发送出去
 }
 
@@ -403,7 +448,7 @@ void NRF_interupt_handler(void){
 	unsigned char status;
 	status = NRF_SPI_Read(NRF_READ_REG + NRF_STATUS);				// 读取状态寄存其来判断数据接收状况
 	if (status & 0x40){												// 判断是否接收到数据
-		NRF_SPI_Read_Buf(NRF_RD_RX_PLOAD, rx_buf, NRF_PLOAD_WIDTH);  //从接收缓冲区里读出数据
+		NRF_SPI_Read_Buf(NRF_RD_RX_PLOAD, rx_buf, NRF_PLOAD_LENGTH);  //从接收缓冲区里读出数据
 		printf("%s", rx_buf);
 	} else if (status & 0x10) {				     //发射达到最大复发次数（在自动答复模式下）
 		NRF_SPI_RW_Reg(0xe1, 0);				 //清除发送缓冲区
