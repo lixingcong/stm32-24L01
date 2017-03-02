@@ -4,6 +4,7 @@
 #include "stm32f10x_spi.h"
 #include "stm32f10x_exti.h"
 #include "misc.h"
+#include "stdio.h" // printf
 
 #define Select_NRF()     GPIO_ResetBits(GPIOB, GPIO_Pin_12)
 #define NotSelect_NRF()    GPIO_SetBits(GPIOB, GPIO_Pin_12)
@@ -12,9 +13,15 @@
 static unsigned char TX_ADDRESS_LOCAL[NRF_ADDR_WIDTH] = { 0x12, 0x34, 0x56, 0x78 };
 static unsigned char TX_ADDRESS_DUMMY[NRF_ADDR_WIDTH] = { 0xee, 0xee, 0xff, 0xff };
 
+static unsigned char NRF_SPI_SendByte(unsigned char byte);
+static unsigned char NRF_SPI_Read(BYTE reg);
+static unsigned char NRF_SPI_Read_Buf(BYTE reg, BYTE *pBuf, BYTE bytes);
+static unsigned char NRF_SPI_Write_Buf(BYTE reg, BYTE *pBuf, BYTE bytes);
+static unsigned char NRF_SPI_RW_Reg(BYTE data1, BYTE data2);
 static void delay_ms(unsigned int x);
+static unsigned char NRF_check_if_exist(void);
 
-unsigned char rx_buf[NRF_PLOAD_WIDTH];
+static unsigned char rx_buf[NRF_PLOAD_WIDTH];
 
 /****************************************************************************
  * 名    称：void MODE_CE(unsigned char a)
@@ -154,6 +161,13 @@ void NRF24L01_Init(void) {
 
 	else
 		NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_RF_SETUP, 0x07);   // 0db, 1MPS
+
+	// 检查24L01是否存在
+	while(NRF_check_if_exist()==0)
+	{
+		printf("24L01 error\n");
+		delay_ms(500);
+	}
 }
 
 /****************************************************************************
@@ -164,7 +178,7 @@ void NRF24L01_Init(void) {
  * 说    明：
  * 调用方法：SPI2_NRF_SendByte(data1);
  ****************************************************************************/
-unsigned char NRF_SPI_SendByte(unsigned char byte) {
+static unsigned char NRF_SPI_SendByte(unsigned char byte) {
 	/* 循环检测发送缓冲区是否是空 */
 	while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == RESET)
 		;
@@ -189,7 +203,7 @@ unsigned char NRF_SPI_SendByte(unsigned char byte) {
  * 说    明：
  * 调用方法：SPI_RW_Reg(WRITE_REG1 + EN_AA, 0x3f);
  ****************************************************************************/
-unsigned char NRF_SPI_RW_Reg(unsigned char data1, unsigned char data2) {
+static unsigned char NRF_SPI_RW_Reg(unsigned char data1, unsigned char data2) {
 	unsigned int Data = 0;
 	Select_NRF();			    			 //选择NRF24L01片选
 	Data = NRF_SPI_SendByte(data1);		 //指定NRF24L01寄存器
@@ -209,7 +223,7 @@ unsigned char NRF_SPI_RW_Reg(unsigned char data1, unsigned char data2) {
  * 说    明：
  * 调用方法：SPI_Write_Buf(WRITE_REG1 + RX_ADDR_P0, TX_ADDRESS0, TX_ADR_WIDTH);
  ****************************************************************************/
-unsigned char NRF_SPI_Write_Buf(BYTE reg, BYTE *pBuf, BYTE bytes) {
+static unsigned char NRF_SPI_Write_Buf(BYTE reg, BYTE *pBuf, BYTE bytes) {
 	unsigned char status, byte_ctr;
 
 	Select_NRF();                     //选择NRF24L01片选
@@ -231,7 +245,7 @@ unsigned char NRF_SPI_Write_Buf(BYTE reg, BYTE *pBuf, BYTE bytes) {
  * 说    明：
  * 调用方法：status=SPI_Read(READ_REG1+STATUS);
  ****************************************************************************/
-unsigned char NRF_SPI_Read(BYTE reg) {
+static unsigned char NRF_SPI_Read(BYTE reg) {
 	unsigned char Data;
 	Select_NRF();						    //选择NRF24L01片选
 	NRF_SPI_SendByte(reg);			    //指定NRF24L01寄存器
@@ -250,7 +264,7 @@ unsigned char NRF_SPI_Read(BYTE reg) {
  * 说    明：
  * 调用方法：SPI_Read_Buf(RD_RX_PLOAD,rx_buf,TX_PLOAD_WIDTH);
  ****************************************************************************/
-unsigned char NRF_SPI_Read_Buf(BYTE reg, BYTE *pBuf, BYTE bytes) {
+static unsigned char NRF_SPI_Read_Buf(BYTE reg, BYTE *pBuf, BYTE bytes) {
 	unsigned char status, i;
 
 	Select_NRF();              			//选择NRF24L01片选
@@ -369,7 +383,7 @@ void NRF_Send_Data(BYTE* data_buffer, BYTE Nb_bytes) {
 
 //检测24L01是否存在
 //返回值:1: 存在 ;0 不存在
-unsigned char NRF_check_if_exist(void) {
+static unsigned char NRF_check_if_exist(void) {
 	unsigned char buf[5] = { 0XA4, 0XA4, 0XA4, 0XA4, 0XA4 };
 	unsigned char i;
 

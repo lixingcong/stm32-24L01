@@ -22,12 +22,6 @@ int main(){
 	NRF_RX_Mode();
 
 //	USART_scanf_config_EXT();
-	printf("hello\n");
-	while(NRF_check_if_exist()==0)
-	{
-		printf("error\n");
- 		DelayMs(200);
-	}
 	printf("nrf24l01 ok\n");
 
 #ifdef SENDING

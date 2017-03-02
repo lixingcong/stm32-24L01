@@ -46,17 +46,10 @@ typedef unsigned char BYTE;
 #define NRF_RX_PW_P5        0x16  // 'RX payload width, pipe5' register address
 #define NRF_FIFO_STATUS     0x17  // 'FIFO Status Register' register address
 
-extern unsigned char rx_buf[NRF_PLOAD_WIDTH];
-
 void NRF_Send_Data(BYTE* data_buffer, BYTE Nb_bytes);
 void NRF24L01_Init(void);
 void NRF_RX_Mode(void);
 void NRF_TX_Mode(void);
-unsigned char NRF_SPI_Read(BYTE reg);
-unsigned char NRF_SPI_Read_Buf(BYTE reg, BYTE *pBuf, BYTE bytes);
-unsigned char NRF_SPI_Write_Buf(BYTE reg, BYTE *pBuf, BYTE bytes);
-unsigned char NRF_SPI_RW_Reg(BYTE data1, BYTE data2);
-unsigned char NRF_check_if_exist(void);
 void NRF_interupt_handler(void);
 
 #endif
