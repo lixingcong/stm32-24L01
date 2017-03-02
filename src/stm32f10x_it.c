@@ -33,7 +33,7 @@
 #include "stm32f10x_it.h"
 #include "stm32f10x_gpio.h"
 #include "NRF24L01.h"
-//#include "timer2.h"
+#include "timer2.h"
 
 unsigned int systick_count=0;
 
@@ -226,8 +226,8 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
 
 // 定时器2用于更新system_msecond
 void TIM2_IRQHandler(void){
-//	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET){
-//		++system_msecond;
-//		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
-//	}
+	if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET){
+		++system_msecond;
+		TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+	}
 }

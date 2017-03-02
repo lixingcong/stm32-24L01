@@ -14,9 +14,10 @@
 #include "route_table.h"
 #include "route_ping.h"
 #include "route_AP_level.h"
-#include "A7190.h"
 #include "execute_PC_cmd.h"
 #include "hal.h"
+#include "stdio.h"
+#include "delay.h"
 
 //#define ROUTE_TABLE_OUTPUT_DEBUG
 

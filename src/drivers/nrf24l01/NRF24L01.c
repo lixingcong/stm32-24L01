@@ -6,6 +6,9 @@
 #include "misc.h"
 #include "stdio.h" // printf
 
+#include "NRF_api.h"
+#include "hal.h"
+
 // registers
 #define NRF_READ_REG        0x00  // Define read command to register
 #define NRF_WRITE_REG       0x20  // Define write command to register
@@ -445,17 +448,52 @@ static unsigned char NRF_check_if_exist(void) {
 
 // 中断接收处理函数
 void NRF_interupt_handler(void){
+	unsigned char flen, i;
+	unsigned short total_flen;
 	unsigned char status;
+
 	status = NRF_SPI_Read(NRF_READ_REG + NRF_STATUS);				// 读取状态寄存其来判断数据接收状况
 	if (status & 0x40){												// 判断是否接收到数据
+		NRF_set_state(BUSY_RX);
 		NRF_SPI_Read_Buf(NRF_RD_RX_PLOAD, rx_buf, NRF_PLOAD_LENGTH);  //从接收缓冲区里读出数据
-		printf("%s", rx_buf);
+		// printf("%s", rx_buf);
+		flen=rx_buf[0];
+
+		recv_buffer_a7190[0] = flen;
+		recv_buffer_a7190[1] = rx_buf[1]; //read the length(LSB 8 bit)
+
+		if ((flen & 0xfe) == 0xf0) {  // long
+			total_flen = ((flen & 0x01) << 8) | recv_buffer_a7190[1];
+			for(i=0;i<(total_flen - 2);++i){
+				recv_buffer_a7190[i+2]=rx_buf[i+2];
+			}
+			macRxCustomPacketCallback(recv_buffer_a7190, FALSE, total_flen);
+		} else if ((flen & 0xff) == 0x00) {  // short
+			for(i=0;i<(recv_buffer_a7190[1]);++i){
+				recv_buffer_a7190[i+2]=rx_buf[i+2];
+			}
+			macRxCustomPacketCallback(recv_buffer_a7190, TRUE, recv_buffer_a7190[1]);
+			/*
+			 printf("%x %x ",recv_buffer_a7190[0],recv_buffer_a7190[1]);
+			 for(i=2;i<recv_buffer_a7190[1];++i)
+			 printf("%x ",recv_buffer_a7190[i]);
+			 printf("\r\n");
+			 */
+		} else {
+			goto do_rxflush;
+			// drop invalid packet
+		}
+
+		do_rxflush:
+		NRF_set_state(IDLE);
 	} else if (status & 0x10) {				     //发射达到最大复发次数（在自动答复模式下）
 		NRF_SPI_RW_Reg(0xe1, 0);				 //清除发送缓冲区
 		NRF_RX_Mode();							 //进入接收模式
+		NRF_set_state(IDLE);
 	} else if (status & 0x20) {					 //数据发送完毕
 		NRF_SPI_RW_Reg(0xe1, 0);			     //清除发送缓冲区
 		NRF_RX_Mode();							 //进入接收模式
+		NRF_set_state(IDLE);
 	}
 	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_STATUS, status);	     //清除07寄存器标志
 }

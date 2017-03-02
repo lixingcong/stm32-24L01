@@ -18,7 +18,7 @@ OBJS+=usart.o
 OBJS+=sys.o
 OBJS+=delay.o
 #OBJS+=usb_1.o
-#OBJS+=timer2.o
+OBJS+=timer2.o
 
 VPATH+=drivers/pc_control
 OBJS+=usart_scanf_irq.o
@@ -31,14 +31,15 @@ OBJS+=parse_PC_cmd.o
 
 VPATH+=drivers/nrf24l01
 OBJS+=NRF24L01.o
+OBJS+=NRF_api.o
 
-#VPATH+=stack
-#OBJS+=hal.o
-#OBJS+=FSM_coord.o
-#OBJS+=FSM_router.o
-#OBJS+=route_table.o
-#OBJS+=route_AP_level.o
-#OBJS+=route_ping.o
+VPATH+=stack
+OBJS+=hal.o
+OBJS+=FSM_coord.o
+OBJS+=FSM_router.o
+OBJS+=route_table.o
+OBJS+=route_AP_level.o
+OBJS+=route_ping.o
 
 #VPATH+=drivers/usb
 #OBJS+=usb_desc.o

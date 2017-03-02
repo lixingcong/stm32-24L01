@@ -22,8 +22,8 @@ extern unsigned int systick_count;
 #define LRWPAN_DEFAULT_START_CHANNEL 62
 #endif
 
-// 单个packet最大长度，根据A7910手册设置
-#define LRWPAN_MAX_FRAME_SIZE 512
+// 单个packet最大长度，根据无线发射手册设置
+#define LRWPAN_MAX_FRAME_SIZE 32
 
 // 求出距离上次的毫秒数x之差，限制为0xffff即为65535ms
 #define halMACTimerNowDelta(x) ((halGetMACTimer()-(x))& 0xffff)
