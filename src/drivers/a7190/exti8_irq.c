@@ -2,7 +2,6 @@
 #include "exti8_irq.h"
 #include "A7190.h"
 #include "A7190reg.h"
-#include "SPI1.h"
 #include "route_table.h"
 
 unsigned char recv_buffer_a7190[LRWPAN_MAX_FRAME_SIZE];  // max len

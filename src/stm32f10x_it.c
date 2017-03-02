@@ -212,24 +212,9 @@ void USART1_IRQHandler(void)
 #endif
 
 void EXTI9_5_IRQHandler(void) {
-	u8 i = 0;
-	u8 status;
-	// TODO 2017年2月27日上午11:44:55 重新封装SPI_RW_Reg之类的函数，增强可读性
 	if (EXTI_GetITStatus(EXTI_Line8) != RESET) {
 		if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_8) == 0) {  //判断是否是PA0线变低
-			status = NRF_SPI_Read(NRF_READ_REG + NRF_STATUS);			// 读取状态寄存其来判断数据接收状况
-			if (status & 0x40){				    		// 判断是否接收到数据
-				NRF_SPI_Read_Buf(NRF_RD_RX_PLOAD, rx_buf, NRF_PLOAD_WIDTH);  //从接收缓冲区里读出数据
-				printf("%s", rx_buf);
-			} else if ((status & 0x10) > 0) {					 //发射达到最大复发次数
-				NRF_SPI_RW_Reg(0xe1, 0);					 	 //清除发送缓冲区
-				NRF_RX_Mode();								 //进入接收模式
-			} else if ((status & 0x20) > 0) {					 //发射后收到应答
-				GPIO_SetBits(GPIOB, GPIO_Pin_5);
-				NRF_SPI_RW_Reg(0xe1, 0);					     //清除发送缓冲区
-				NRF_RX_Mode();								 //进入接收模式
-			}
-			NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_STATUS, status);	     //清除07寄存器标志
+			NRF_interupt_handler();
 		}
 		EXTI_ClearITPendingBit(EXTI_Line8);			 //清除EXTI0上的中断标志
 	}

@@ -57,5 +57,6 @@ unsigned char NRF_SPI_Read_Buf(BYTE reg, BYTE *pBuf, BYTE bytes);
 unsigned char NRF_SPI_Write_Buf(BYTE reg, BYTE *pBuf, BYTE bytes);
 unsigned char NRF_SPI_RW_Reg(BYTE data1, BYTE data2);
 unsigned char NRF_check_if_exist(void);
+void NRF_interupt_handler(void);
 
 #endif
