@@ -11,7 +11,6 @@
  */
 
 // --------hardware--------------
-#include "SPI1.h"
 #include "delay.h"
 #include "usart.h"
 #include "A7190.h"
@@ -30,9 +29,6 @@
 #include "usbio.h"
 #include "app_cfg.h"
 #include "usb_pwr.h"
-// --------LMX2581--------------
-#include "ctl_lmx2581.h"
-#include "stm32f10x_rcc.h"
 // --------pc_control-----------
 #include "execute_PC_cmd.h"
 
@@ -70,16 +66,6 @@ int main() {
 	initRF();
 	printf("A7190 init done, PLL channel=%u\r\n", LRWPAN_DEFAULT_START_CHANNEL);
 
-#if 0
-	// init SPI2+lmx2581
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB,ENABLE);
-	ctl_lmx2581_init();
-	DelayMs(600);
-	ctl_lmx2581_init();
-	ctl_frequency_set(400);
-	printf("LMX2581 init done\r\n");
-#endif
-
 	// init USB
 	init_USB_GPIO();
 	USB_Interrupts_Config();
@@ -88,7 +74,6 @@ int main() {
 	printf("USB init done\r\n");
 
 	// configuration flags for pc_control
-	dynamic_freq_mode = 0xff;  // 这个必须要设置0xff，否则A7190强行工作跳频模式无法接收东西
 	isBroadcastRegularly = FALSE;  // 默认禁用上位机广播
 
 #ifdef LRWPAN_COORDINATOR
@@ -156,9 +141,6 @@ int main() {
 
 
 #ifdef LRWPAN_COORDINATOR
-		if (dynamic_freq_mode != 0xff)
-		work_under_dynamic_freq_mode();
-
 		if(isBroadcastRegularly == TRUE) {  // 周期性发送广播
 			if(halMACTimerNowDelta(last_broadcast_timer) >= (3000)) {
 				fprintf(stderr,"ZZIFsending broadcast...@\r\n");

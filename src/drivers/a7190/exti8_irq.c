@@ -5,7 +5,6 @@
 #include "SPI1.h"
 #include "route_table.h"
 
-extern unsigned char dynamic_freq_mode;
 unsigned char recv_buffer_a7190[LRWPAN_MAX_FRAME_SIZE];  // max len
 
 // 外部中断PA8服务函数，当a7190有发送（接收）活动时调用
@@ -14,11 +13,6 @@ void EXTI8_irq_a7190(void) {
 	unsigned char flen, i;
 	unsigned short total_flen;
 	if (A7190_read_state() == IDLE) {
-#ifdef LRWPAN_COORDINATOR
-		if (dynamic_freq_mode != 0xff)  //跳频模式忽略一切收到的数据包
-			goto do_rxflush;
-#endif
-
 		A7190_set_state(BUSY_RX);
 		flen = ReadFIFO1(1);  //read the length(higher 8 bit)
 

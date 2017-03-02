@@ -11,9 +11,6 @@
 #include "define_songlu.h"
 #include "hal.h"
 
-// 是否工作在跳频模式下,0xff代表不工作在跳频，0~2代表三个频段
-extern unsigned char dynamic_freq_mode;
-
 extern BOOL isBroadcastRegularly;
 extern unsigned int last_broadcast_timer;
 
@@ -22,10 +19,6 @@ void upload_route_table();
 void set_payload_len(unsigned char i);
 void set_datarate(unsigned char i);
 void send_test_msg_to_dst(unsigned char dst);
-
-#ifdef LRWPAN_COORDINATOR
-void work_under_dynamic_freq_mode();
-#endif
 
 // after parsing, we need to execute commands sent from PC
 void execute_PC_command(control_from_pc_t *in);

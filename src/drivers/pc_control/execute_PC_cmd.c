@@ -11,9 +11,7 @@
 #include "route_table.h"
 #include "route_ping.h"
 #include "A7190.h"
-#include "ctl_lmx2581.h"
 
-unsigned char dynamic_freq_mode;
 BOOL isBroadcastRegularly;
 unsigned int last_broadcast_timer;
 
@@ -33,38 +31,6 @@ void set_datarate(unsigned char i) {
 void send_test_msg_to_dst(unsigned char dst) {
 
 }
-
-#ifdef LRWPAN_COORDINATOR
-// 跳频模式，暂时失去协调器的组网功能（在spi1_irq.c中屏蔽接收处理过程，收到任何东西都将丢弃）
-void work_under_dynamic_freq_mode() {
-	unsigned short freq, freq_step_in;
-	unsigned char steps;
-	unsigned int last_timer;
-	steps = DIVISION_OF_DYNAMIC_FREQ[dynamic_freq_mode];
-#define LMX2581_MAX_FREQ 700
-#define LMX2581_MIN_FREQ 400
-	freq = LMX2581_MIN_FREQ;
-	freq_step_in = (LMX2581_MAX_FREQ - LMX2581_MIN_FREQ) / steps;
-	last_timer = halGetMACTimer();
-	// reset first three bytes to avoid received by other nodes incidentally
-	recv_buffer_a7190[0] = recv_buffer_a7190[1] = recv_buffer_a7190[2] = 0;
-	while (1) {
-		if (dynamic_freq_mode == 0xff)  // 定频模式：跳出
-			break;
-
-		halSendPacket(((unsigned short) LRWPAN_MAX_FRAME_SIZE), recv_buffer_a7190, FALSE);  // 往死里发包
-		// TODO: 跳频模式下发送间隔，频谱仪上显示不稳定 2016年8月18日 下午1:01:51
-		if (halMACTimerNowDelta(last_timer) > 10) {  // 每10ms改变VCO频率
-			freq = (freq < (LMX2581_MAX_FREQ - freq_step_in) ? (freq + freq_step_in) : LMX2581_MIN_FREQ);
-			ctl_frequency_set(freq);
-			last_timer = halGetMACTimer();
-		}
-	}
-	ctl_frequency_set(my_control_from_pc.freq);
-#undef LMX2581_MAX_FREQ
-#undef LMX2581_MIN_FREQ
-}
-#endif
 
 // 成功上报1，失败上报0
 void upload_self_check_status() {
@@ -109,10 +75,7 @@ void execute_PC_command(control_from_pc_t *in) {
 
 	printf("\r\nfreq:\t");
 	if (in->freq > 100) {
-		dynamic_freq_mode = 0xff;  // 取消跳频模式
 		printf("%u\r\n", in->freq);
-		// to 彭朋：这里设置定频工作
-		// ctl_frequency_set(in->freq);
 	} else {
 		switch (in->freq) {
 			case MODE_DYNAMIC_FREQ_32CH:
@@ -128,7 +91,6 @@ void execute_PC_command(control_from_pc_t *in) {
 				puts("not set yet");
 				return;
 		}
-		dynamic_freq_mode = ((in->freq) - '1');
 	}
 
 	printf("\r\nto:\t");
