@@ -411,7 +411,7 @@ static void NRF_TX_Mode(void) {
  * 说    明：数据小于32，把有效数据外的空间用0填满
  * 调用方法：RX_Mode();
  ****************************************************************************/
-void NRF_Send_Data(BYTE* data_buffer, BYTE Nb_bytes) {
+void NRF_Send_Data(BYTE* data_buffer, unsigned short Nb_bytes) {
 	unsigned char i = 0;
 	NRF_MODE_CE(0);								 //NRF 模式控制
 

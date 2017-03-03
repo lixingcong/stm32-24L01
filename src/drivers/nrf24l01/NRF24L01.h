@@ -9,7 +9,7 @@ typedef unsigned char BYTE;
 
 #define NRF_PLOAD_LENGTH  32  // 32bytes TX payload
 
-void NRF_Send_Data(BYTE* data_buffer, BYTE Nb_bytes);
+void NRF_Send_Data(BYTE* data_buffer, unsigned short Nb_bytes);
 void NRF24L01_Init(void);
 void NRF_interupt_handler(void);
 
