@@ -14,7 +14,6 @@ typedef enum {
 	 IDLE, BUSY_TX, BUSY_RX, WAIT_TX
 } rtx_state_t;
 
-extern unsigned char recv_buffer_a7190[NRF_PLOAD_LENGTH];
 
 void initRF(void);
 void NRF_set_state(rtx_state_t state);

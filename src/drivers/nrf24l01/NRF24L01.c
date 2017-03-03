@@ -448,7 +448,7 @@ static unsigned char NRF_check_if_exist(void) {
 
 // 中断接收处理函数
 void NRF_interupt_handler(void){
-	unsigned char flen, i;
+	unsigned char flen_h, flen_l, i;
 	unsigned short total_flen;
 	unsigned char status;
 
@@ -457,27 +457,18 @@ void NRF_interupt_handler(void){
 		NRF_set_state(BUSY_RX);
 		NRF_SPI_Read_Buf(NRF_RD_RX_PLOAD, rx_buf, NRF_PLOAD_LENGTH);  //从接收缓冲区里读出数据
 		// printf("%s", rx_buf);
-		flen=rx_buf[0];
+		flen_h = rx_buf[0];
+		flen_l = rx_buf[1]; //read the length(LSB 8 bit)
 
-		recv_buffer_a7190[0] = flen;
-		recv_buffer_a7190[1] = rx_buf[1]; //read the length(LSB 8 bit)
-
-		if ((flen & 0xfe) == 0xf0) {  // long
-			total_flen = ((flen & 0x01) << 8) | recv_buffer_a7190[1];
-			// TODO 2017年3月3日下午5:53:21 不需要重新拷贝recv_buffer。
-			for(i=0;i<(total_flen - 2);++i){
-				recv_buffer_a7190[i+2]=rx_buf[i+2];
-			}
-			macRxCustomPacketCallback(recv_buffer_a7190, FALSE, total_flen);
-		} else if ((flen & 0xff) == 0x00) {  // short
-			for(i=0;i<(recv_buffer_a7190[1]);++i){
-				recv_buffer_a7190[i+2]=rx_buf[i+2];
-			}
-			macRxCustomPacketCallback(recv_buffer_a7190, TRUE, recv_buffer_a7190[1]);
+		if ((flen_h & 0xfe) == 0xf0) {  // long
+			total_flen = ((flen_h & 0x01) << 8) | flen_l;
+			macRxCustomPacketCallback(rx_buf, FALSE, total_flen);
+		} else if ((flen_h & 0xff) == 0x00) {  // short
+			macRxCustomPacketCallback(rx_buf, TRUE, flen_l);
 			/*
-			 printf("%x %x ",recv_buffer_a7190[0],recv_buffer_a7190[1]);
-			 for(i=2;i<recv_buffer_a7190[1];++i)
-			 printf("%x ",recv_buffer_a7190[i]);
+			 printf("%x %x ",rx_buf[0],rx_buf[1]);
+			 for(i=2;i<rx_buf[1];++i)
+			 printf("%x ",rx_buf[i]);
 			 printf("\r\n");
 			 */
 		} else {

@@ -11,7 +11,6 @@
 #include "NRF24L01.h"
 
 static  rtx_state_t rtx_state;
-unsigned char recv_buffer_a7190[NRF_PLOAD_LENGTH];
 
 void initRF(void){
 	NRF24L01_Init();
