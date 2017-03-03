@@ -14,7 +14,7 @@ static  rtx_state_t rtx_state;
 
 void initRF(void){
 	NRF24L01_Init();
-	NRF_set_state(IDLE);
+	NRF_set_state(NRF_STATE_IDLE);
 }
 
 rtx_state_t NRF_read_state() {

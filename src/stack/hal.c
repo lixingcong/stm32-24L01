@@ -42,12 +42,12 @@ void halSendPacket(unsigned short flen, unsigned char *ptr, BOOL isShortDataLeng
 		return;
 	}
 
-	if(NRF_read_state() != IDLE){
+	if(NRF_read_state() != NRF_STATE_IDLE){
 		printf("halSendPacket: busy when sending\r\n");
 		return;
 	}
 
-	NRF_set_state(WAIT_TX);
+	NRF_set_state(NRF_STATE_WAIT_TX);
 
 	if (isShortDataLengthMode == TRUE) {
 		tx_buf[0]=0x00;
@@ -61,7 +61,7 @@ void halSendPacket(unsigned short flen, unsigned char *ptr, BOOL isShortDataLeng
 		tx_buf[index+2]=*(ptr+index);  // has 2 bytes offset
 	}
 
-	NRF_set_state(BUSY_TX);
+	NRF_set_state(NRF_STATE_BUSY_TX);
 	NRF_Send_Data(tx_buf, NRF_PLOAD_LENGTH);
 }
 
