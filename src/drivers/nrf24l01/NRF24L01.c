@@ -464,6 +464,7 @@ void NRF_interupt_handler(void){
 
 		if ((flen & 0xfe) == 0xf0) {  // long
 			total_flen = ((flen & 0x01) << 8) | recv_buffer_a7190[1];
+			// TODO 2017年3月3日下午5:53:21 不需要重新拷贝recv_buffer。
 			for(i=0;i<(total_flen - 2);++i){
 				recv_buffer_a7190[i+2]=rx_buf[i+2];
 			}
