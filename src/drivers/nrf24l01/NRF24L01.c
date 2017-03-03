@@ -453,7 +453,7 @@ void NRF_interupt_handler(void){
 	unsigned char status;
 
 	status = NRF_SPI_Read(NRF_READ_REG + NRF_STATUS);				// 读取状态寄存其来判断数据接收状况
-	if (status & 0x40){												// 判断是否接收到数据
+	if (0 != (status & 0x40) && NRF_STATE_IDLE == NRF_read_state()){		// 判断是否接收到数据
 		NRF_set_state(NRF_STATE_BUSY_RX);
 		NRF_SPI_Read_Buf(NRF_RD_RX_PLOAD, rx_buf, NRF_PLOAD_LENGTH);  //从接收缓冲区里读出数据
 		// printf("%s", rx_buf);
