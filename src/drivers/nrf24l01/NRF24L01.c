@@ -9,6 +9,8 @@
 #include "NRF_api.h"
 #include "hal.h"
 
+#include "route_table.h"
+
 // registers
 #define NRF_READ_REG        0x00  // Define read command to register
 #define NRF_WRITE_REG       0x20  // Define write command to register
@@ -413,6 +415,8 @@ static void NRF_TX_Mode(void) {
  ****************************************************************************/
 void NRF_Send_Data(BYTE* data_buffer, unsigned short Nb_bytes) {
 	unsigned char i = 0;
+	static unsigned char nrf_tx_buf[NRF_PLOAD_LENGTH];
+
 	NRF_MODE_CE(0);								 //NRF 模式控制
 
 	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_STATUS, 0xff);	     //设置状态寄存器初始化
@@ -420,12 +424,14 @@ void NRF_Send_Data(BYTE* data_buffer, unsigned short Nb_bytes) {
 	NRF_SPI_RW_Reg(0xe2, 0);		    			 //清除RX FIFO寄存器
 	NRF_TX_Mode();								 //设置为发送模式
 	delay_ms(1);
-	if (Nb_bytes < 32) {						 //当接收到的USB虚拟串口数据小于32，把有效数据外的空间用0填满
-		for (i = Nb_bytes; i < 32; i++)
-			data_buffer[i] = 0;
+	for (i = 0; i < NRF_PLOAD_LENGTH; ++i) {
+		if (i < Nb_bytes)
+			nrf_tx_buf[i] = *(data_buffer + i);
+		else
+			nrf_tx_buf[i] = 0;  //当接收到的USB虚拟串口数据小于32，把有效数据外的空间用0填满
 	}
 	NRF_MODE_CE(0);
-	NRF_SPI_Write_Buf(NRF_WR_TX_PLOAD, data_buffer, NRF_PLOAD_LENGTH);        //发送32字节的缓存区数据到NRF24L01
+	NRF_SPI_Write_Buf(NRF_WR_TX_PLOAD, nrf_tx_buf, NRF_PLOAD_LENGTH);        //发送32字节的缓存区数据到NRF24L01
 	NRF_MODE_CE(1);														//保持10us以上，将数据发送出去
 }
 
@@ -453,6 +459,7 @@ void NRF_interupt_handler(void){
 	unsigned char status;
 
 	status = NRF_SPI_Read(NRF_READ_REG + NRF_STATUS);				// 读取状态寄存其来判断数据接收状况
+	printf("here");
 	if (0 != (status & 0x40) && NRF_STATE_IDLE == NRF_read_state()){		// 判断是否接收到数据
 		NRF_set_state(NRF_STATE_BUSY_RX);
 		NRF_SPI_Read_Buf(NRF_RD_RX_PLOAD, rx_buf, NRF_PLOAD_LENGTH);  //从接收缓冲区里读出数据
