@@ -18,6 +18,8 @@
 // stack
 #include "route_table.h"
 #include "route_AP_level.h"
+#include "FSM_coord.h"
+#include "FSM_router.h"
 
 int main(){
 	unsigned char err;
@@ -37,17 +39,23 @@ int main(){
 	initRF();
 	printf("nrf24l01 ok\n");
 
-#ifdef SENDING
-	printf("send mode\n");
+	// configuration flags for pc_control
+	isBroadcastRegularly = FALSE;  // 默认禁用上位机广播
+
+	#ifdef LRWPAN_COORDINATOR
+	my_role = ROLE_COORDINATOR;
+	coord_FSM_state = COORD_STATE_INITAILIZE_ALL_NODES;
+	mainFSM = coord_FSM;
 #else
-	printf("recv mode\n");
+	my_role = ROLE_ROUTER;
+	router_FSM_state = ROUTER_STATE_INITAILIZE_ALL_NODES;
+	mainFSM = router_FSM;
 #endif
-	while(1){
-#ifdef SENDING
-		NRF_Send_Data("hello", NRF_PLOAD_LENGTH);
-		printf("delaying..\n");
-		DelayMs(1000);
-#endif
+
+	while (1) {
+		do {
+			mainFSM();  // 组网、入网状态机
+		} while (isOffline == TRUE);
 	}
 }
 

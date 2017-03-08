@@ -8,8 +8,8 @@
 #include "stdio.h"
 #include "execute_PC_cmd.h"
 #include "define_songlu.h"
-//#include "route_table.h"
-//#include "route_ping.h"
+#include "route_table.h"
+#include "route_ping.h"
 
 BOOL isBroadcastRegularly;
 unsigned int last_broadcast_timer;
@@ -33,8 +33,6 @@ void send_test_msg_to_dst(unsigned char dst) {
 
 // 成功上报1，失败上报0
 void upload_self_check_status() {
-	// TODO: 记得删掉isOffline 2017年3月2日 下午8:49:23
-	unsigned char isOffline = FALSE;
 	if (isOffline == FALSE) {
 #ifdef LRWPAN_COORDINATOR
 		fprintf(stderr, "ZZCK1,C,%u@\r\n", MY_NODE_NUM);
@@ -51,11 +49,10 @@ void upload_route_table() {
 	unsigned char i;
 	fprintf(stderr, "ZZST");
 	fprintf(stderr, "$,R0,ADDR0, ,&0,#");
-	// TODO: 记得补上上传路由表 2017年3月2日 下午8:44:19
-//	for (i = 0; i < ALL_NODES_NUM; ++i) {
-//		if (all_nodes[i] < ALL_NODES_NUM)
-//			fprintf(stderr, "$,R%u,ADDR%u,%u,&%u,#", i, i, all_nodes_ping[i], all_nodes[i]);
-//	}
+	for (i = 0; i < ALL_NODES_NUM; ++i) {
+		if (all_nodes[i] < ALL_NODES_NUM)
+			fprintf(stderr, "$,R%u,ADDR%u,%u,&%u,#", i, i, all_nodes_ping[i], all_nodes[i]);
+	}
 	fprintf(stderr, "@\r\n");
 }
 
@@ -99,8 +96,7 @@ void execute_PC_command(control_from_pc_t *in) {
 	if (in->dst == 0xffff){
 		puts("boardcast");
 		isBroadcastRegularly=TRUE;
-		// TODO: 记得取消注释调halGet下面这句话 2017年3月2日 下午8:51:49
-		//last_broadcast_timer=halGetMACTimer();
+		last_broadcast_timer=halGetMACTimer();
 	}
 
 	else if ((in->dst) & 0x100){
