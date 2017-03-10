@@ -31,7 +31,7 @@ unsigned short halGetRandomShortByte(void) {
 
 void halSendPacket(unsigned short flen, unsigned char *ptr, BOOL isShortDataLengthMode) {
 	unsigned short flen_real;
-
+	unsigned char nrf_state;
 	static unsigned char tx_buf[NRF_PLOAD_LENGTH];
 	unsigned char index;
 
@@ -42,7 +42,8 @@ void halSendPacket(unsigned short flen, unsigned char *ptr, BOOL isShortDataLeng
 		return;
 	}
 
-	if(NRF_read_state() != NRF_STATE_IDLE){
+	nrf_state = NRF_read_state();
+	if(nrf_state != NRF_STATE_IDLE && nrf_state != NRF_STATE_BUSY_RX){
 		printf("halSendPacket: busy when sending\r\n");
 		return;
 	}
