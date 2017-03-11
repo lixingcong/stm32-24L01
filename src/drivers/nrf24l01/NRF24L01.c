@@ -165,6 +165,19 @@ void NRF24L01_Init(void) {
 
 	// 以下是公用的24L01初始化
 	NRF_MODE_CE(0);
+
+	// 检查24L01是否存在
+	while(NRF_check_if_exist()==0){
+		printf("24L01 error\n");
+		delay_ms(500);
+	}
+
+	// 复位24L01，避免stm32芯片复位后，无法发送接收数据
+	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_CONFIG,0x00); // use power down mode (PWR_UP = 0)
+	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_STATUS,0x7f); // clear data ready flag and data sent flag in status register
+	NRF_SPI_RW_Reg(NRF_FLUSH_TX, 0); // flush tx buffer
+	NRF_SPI_RW_Reg(NRF_FLUSH_RX, 0); // flush rx buffer
+
 	// 设置地址宽度
 #if NRF_ADDR_WIDTH == 3
 	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_SETUP_AW, 0x01);
@@ -208,13 +221,6 @@ void NRF24L01_Init(void) {
 
 	else
 		NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_RF_SETUP, 0x07);   // 0db, 1MPS
-
-	// 检查24L01是否存在
-	while(NRF_check_if_exist()==0)
-	{
-		printf("24L01 error\n");
-		delay_ms(500);
-	}
 
 	// nrf24l01 enter to recv mode
 	NRF_RX_Mode();
@@ -478,20 +484,21 @@ void NRF_interupt_handler(void){
 			 printf("\r\n");
 			 */
 		} else {
+			printf("invalid packet, flush it\n");
 			goto do_rxflush;
-			printf("invalid packet\n");
 			// drop invalid packet
 		}
 
 		do_rxflush:
+		NRF_SPI_RW_Reg(NRF_FLUSH_RX, 0);		//清除发送缓冲区
 		NRF_set_state(NRF_STATE_IDLE);
-	} else if (status & 0x10) {				     //发射达到最大复发次数（在自动答复模式下）
-		NRF_SPI_RW_Reg(0xe1, 0);				 //清除发送缓冲区
-		NRF_RX_Mode();							 //进入接收模式
+	} else if (status & 0x10) {				    //发射达到最大复发次数（在自动答复模式下）
+		NRF_SPI_RW_Reg(NRF_FLUSH_TX, 0);		//清除发送缓冲区
+		NRF_RX_Mode();							//进入接收模式
 		NRF_set_state(NRF_STATE_IDLE);
-	} else if (status & 0x20) {					 //数据发送完毕
-		NRF_SPI_RW_Reg(0xe1, 0);			     //清除发送缓冲区
-		NRF_RX_Mode();							 //进入接收模式
+	} else if (status & 0x20) {					//数据发送完毕
+		NRF_SPI_RW_Reg(NRF_FLUSH_TX, 0);		//清除发送缓冲区
+		NRF_RX_Mode();							//进入接收模式
 		NRF_set_state(NRF_STATE_IDLE);
 	}
 	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_STATUS, status);	     //清除07寄存器标志

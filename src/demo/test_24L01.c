@@ -29,8 +29,8 @@ int main(){
 
 	// init USART
 	USART1_init();
-	USART2_init();
-	USART_scanf_config_EXT();
+	//USART2_init();
+	//USART_scanf_config_EXT();
 
 	// init timer2(system_msecond)
 	TIM2_Init();
