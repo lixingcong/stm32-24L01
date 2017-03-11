@@ -211,11 +211,11 @@ void USART1_IRQHandler(void)
 #endif
 
 void EXTI9_5_IRQHandler(void) {
-	if (EXTI_GetITStatus(EXTI_Line8) != RESET) {
-		if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_8) == 0) {  //判断是否线变低
+	if (EXTI_GetITStatus(EXTI_Line7) != RESET) {
+		if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_7) == 0) {  //判断是否线变低
 			NRF_interupt_handler();
 		}
-		EXTI_ClearITPendingBit(EXTI_Line8);			 //清除EXTI上的中断标志
+		EXTI_ClearITPendingBit(EXTI_Line7);			 //清除EXTI上的中断标志
 	}
 }
 

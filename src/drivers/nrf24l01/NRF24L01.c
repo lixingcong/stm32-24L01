@@ -125,8 +125,8 @@ void NRF24L01_Init(void) {
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 	GPIO_SetBits(GPIOB, GPIO_Pin_11);	    //On
 
-	/* 配置NRF24L01+ 中断信号产生连接到  PB8 */
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;		 		  //NRF24L01 IRQ
+	/* 配置NRF24L01+ 中断信号 */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7;		 		  //NRF24L01 IRQ
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;			  //上拉输入模式
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 
@@ -136,14 +136,14 @@ void NRF24L01_Init(void) {
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;					//使能
 	NVIC_Init(&NVIC_InitStructure);
 
-	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource8);	   //NRF24L01 IRQ
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource7);	   //NRF24L01 IRQ
 
-	EXTI_InitStructure.EXTI_Line = EXTI_Line8;					   //NRF24L01 IRQ
+	EXTI_InitStructure.EXTI_Line = EXTI_Line7;					   //NRF24L01 IRQ
 	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;			   //EXTI中断
 	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;		   //下降沿触发
 	EXTI_InitStructure.EXTI_LineCmd = ENABLE;						   //使能
 	EXTI_Init(&EXTI_InitStructure);
-	EXTI_ClearITPendingBit(EXTI_Line10);
+	EXTI_ClearITPendingBit(EXTI_Line7);
 
 	//禁止SPI2 NRF24L01+的片选。
 	NotSelect_NRF();
