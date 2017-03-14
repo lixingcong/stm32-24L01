@@ -8,7 +8,7 @@
 #ifndef _USART_SCANF_IRQ_H_
 #define _USART_SCANF_IRQ_H_
 
-#define MAX_USART1_BUFFER_LEN 30
+#define MAX_USART1_BUFFER_LEN 60
 
 // usart1 rx buffer
 extern unsigned char usart_scanf_data[MAX_USART1_BUFFER_LEN];

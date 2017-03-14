@@ -16,10 +16,6 @@
 #include "delay.h"
 
 
-// 设置存储
-control_from_pc_t my_control_from_pc;
-control_from_pc_t *my_control_from_pc_ptr = &my_control_from_pc;
-
 unsigned char usart_scanf_data[MAX_USART1_BUFFER_LEN];
 
 // Hint: input test hex string:  0F535A4131353637423239433144310D0A   定频567M 广播
@@ -37,17 +33,20 @@ void usart_irq_scanf_callback() {
 #endif
 
 	// parse
-	res = parse_command(usart_scanf_data, my_control_from_pc_ptr);
+	res = parse_command(usart_scanf_data);
 	switch (res) {
-		case 0:  // 设置工作模式
-			execute_PC_command(my_control_from_pc_ptr);
+		case CMD_SEND_MSG:
+			execute_PC_command();
 			fprintf(stderr, "ZZIFSET OK!@\r\n");
 			break;
-		case 1:  // 上报路由
+		case CMD_REQUEST_ROUTETABLE:  // 上报路由
 			upload_route_table();
 			break;
-		case 2:  //上报状态
+		case CMD_SELF_CHECK:  //上报状态
 			upload_self_check_status();
+			break;
+		case CMD_SEND_TEST:
+			// 批量发送测试
 			break;
 		default:  // 未识别命令
 			fprintf(stderr, "ZZIFInvalid Command@\r\n");

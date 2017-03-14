@@ -10,7 +10,14 @@
 
 #include "define_songlu.h"
 
-char parse_command(char *in1, control_from_pc_t *in2);
-void str2case(char *in, char *out);
+typedef struct CMD_SEND_MSG_T_{
+	unsigned short dest;
+	unsigned char msg[30];
+}CMD_SEND_MSG_T;
+
+extern CMD_SEND_MSG_T cmd_send_msg;
+
+char parse_command(char *in1);
+//void str2case(char *in, char *out);
 
 #endif /* SRC_DRIVERS_PC_CONTROL_PARSE_CONTROL_CMD_H_ */

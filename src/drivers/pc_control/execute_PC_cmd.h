@@ -16,12 +16,10 @@ extern unsigned int last_broadcast_timer;
 
 void upload_self_check_status();
 void upload_route_table();
-void set_payload_len(unsigned char i);
-void set_datarate(unsigned char i);
 void send_test_msg_to_dst(unsigned char dst);
 
 // after parsing, we need to execute commands sent from PC
-void execute_PC_command(control_from_pc_t *in);
+void execute_PC_command();
 
 // draw the path on PC
 void upload_route_for_PC(unsigned char src, unsigned char dst);

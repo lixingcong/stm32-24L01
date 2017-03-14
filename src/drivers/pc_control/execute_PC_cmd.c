@@ -6,6 +6,7 @@
  */
 
 #include "stdio.h"
+#include "parse_PC_cmd.h"
 #include "execute_PC_cmd.h"
 #include "define_songlu.h"
 #include "route_table.h"
@@ -13,19 +14,6 @@
 
 BOOL isBroadcastRegularly;
 unsigned int last_broadcast_timer;
-
-void set_payload_len(unsigned char i) {
-	/*
-	 PAYLOAD_SET_LEN=PAYLOAD_SET_LEN_LIST[i];
-	 // fprintf(stdout,"payload has been set to %d\r\n",PAYLOAD_MAX_LEN);
-	 */
-}
-
-void set_datarate(unsigned char i) {
-	/*
-	 RATE_DELAY_MS=(unsigned int)RATE_DELAY_MS_LIST[i];
-	 */
-}
 
 void send_test_msg_to_dst(unsigned char dst) {
 
@@ -57,50 +45,16 @@ void upload_route_table() {
 }
 
 // 执行这个函数前,必须保证parse_command是正确返回值0的！！
-void execute_PC_command(control_from_pc_t *in) {
-	printf("\r\nwork mode settings:");
-	printf("\r\nmode:\t");
-	switch (in->mode) {
-		case 0:
-			puts("static freq");
-			break;
-		case 1:
-			puts("dynamic freq");
-			break;
-		default:
-			puts("not set yet");
-			return;
-	}
-
-	printf("\r\nfreq:\t");
-	if (in->freq > 100) {
-		printf("%u\r\n", in->freq);
-	} else {
-		switch (in->freq) {
-			case MODE_DYNAMIC_FREQ_32CH:
-				puts("32 channels");
-				break;
-			case MODE_DYNAMIC_FREQ_64CH:
-				puts("64 channels");
-				break;
-			case MODE_DYNAMIC_FREQ_128CH:
-				puts("128 channels");
-				break;
-			default:
-				puts("not set yet");
-				return;
-		}
-	}
-
+void execute_PC_command() {
 	printf("\r\nto:\t");
-	if (in->dst == 0xffff){
+	if (cmd_send_msg.dest == 0xffff){
 		puts("boardcast");
 		isBroadcastRegularly=TRUE;
 		last_broadcast_timer=halGetMACTimer();
 	}
 
-	else if ((in->dst) & 0x100){
-		printf("#%d\r\n", (in->dst) & 0xff);
+	else if ((cmd_send_msg.dest) & 0x100){
+		printf("#%u\r\n", (cmd_send_msg.dest) & 0xff);
 		isBroadcastRegularly=FALSE;
 	}
 
@@ -108,45 +62,9 @@ void execute_PC_command(control_from_pc_t *in) {
 		puts("not set yet");
 		return;
 	}
-
-	printf("\r\nrate:\t");
-	switch (in->rate) {
-		case 0:
-			puts("2Mbps");
-			break;
-		case 1:
-			puts("512Kbps");
-			break;
-		case 2:
-			puts("256Kbps");
-			break;
-		case 3:
-			puts("128Kbps");
-			break;
-		default:
-			puts("not set yet");
-			return;
-	}
-	set_datarate(in->rate);
-
-	printf("\r\ndlen:\t");
-	switch (in->data_len) {
-		case 0:
-			puts("short 32Byte");
-			break;
-		case 1:
-			puts("middle 128Byte");
-			break;
-		case 2:
-			puts("long 512Byte");
-			break;
-		default:
-			puts("not set yet");
-			return;
-	}
-	set_payload_len(in->data_len);
-
+	printf("msg: %s\r\n",cmd_send_msg.msg);
 	printf("\r\n--------------\r\n");
+	// TODO: 将cmd_send_msg中的内容发送出去 2017年3月14日 下午9:32:26
 }
 
 void upload_route_for_PC(unsigned char src, unsigned char dst) {
