@@ -83,7 +83,7 @@ char parse_command(char *in1) {
 	unsigned int len, i;
 	char *ptr = in1;
 	/* valify */
-	len = *(ptr++);
+	len = *(ptr++) - 32;
 	if (strlen(in1) != len) {
 		//printf("parse_command error: invalid len, drop packet\r\n");
 		printf("packet[0] len is %d, but in fact len is %d\r\n", len, strlen(in1));

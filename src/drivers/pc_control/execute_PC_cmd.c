@@ -46,7 +46,7 @@ void upload_route_table() {
 
 // 执行这个函数前,必须保证parse_command是正确返回值0的！！
 void execute_PC_command() {
-	printf("\r\nto:\t");
+	printf("\r\nto:");
 	if (cmd_send_msg.dest == 0xffff){
 		puts("boardcast");
 		isBroadcastRegularly=TRUE;
