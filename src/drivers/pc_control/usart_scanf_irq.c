@@ -18,9 +18,9 @@
 
 unsigned char usart_scanf_data[MAX_USART1_BUFFER_LEN];
 
-// Hint: input test hex string:  0F535A4131353637423239433144310D0A   定频567M 广播
-//                               0F535A4132353631423239433144310D0A   跳频32频道
-//                               0F535A4131353637423239433144310D0A   定频567 单播
+// Hint: input test hex string:
+//   37535a4231632368692c6d616e5c695c616d5c746f6e790d0a  send a msg to #2
+
 void usart_irq_scanf_callback() {
 	static char res;
 #if 0           // for debug

@@ -178,7 +178,7 @@ void SysTick_Handler(void)
 void USART1_IRQHandler(void)
 {
 	if (USART_GetITStatus(USART1, USART_IT_RXNE) != RESET) {
-		// WARNING: spaces were ignore by scanf()
+		// WARNING: spaces sent by user should be replaced with '\'
 		scanf("%s", usart_scanf_data);
 		usart_irq_scanf_callback();
 		USART_ClearITPendingBit(USART1, USART_IT_RXNE);
@@ -195,7 +195,7 @@ void USART2_IRQHandler(void)
 void USART2_IRQHandler(void)
 {
 	if (USART_GetITStatus(USART2, USART_IT_RXNE) != RESET) {
-		// WARNING: spaces were ignore by scanf()
+		// WARNING: spaces sent by user should be replaced with '\'
 		scanf("%s", usart_scanf_data);
 		usart_irq_scanf_callback();
 		USART_ClearITPendingBit(USART2, USART_IT_RXNE);

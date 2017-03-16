@@ -112,7 +112,7 @@ char parse_command(char *in1) {
 			}
 			ptr += 2;  // skip '#'
 			for (i = 0; i < len - 7; ++i) {
-				cmd_send_msg.msg[i] = *(ptr + i);  // copy the msg
+				cmd_send_msg.msg[i] = (*(ptr+i)=='\\')?(' '):(*(ptr+i)); // escape from space
 			}
 			cmd_send_msg.msg[i]=0; // add NULL at the end of string
 		} else {
