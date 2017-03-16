@@ -100,7 +100,7 @@ void NRF24L01_Init(void) {
 	EXTI_InitTypeDef EXTI_InitStructure;
 
 	unsigned char i;
-	unsigned char nrf_baud = 0;				//默认速率2Mbps
+	unsigned char nrf_baud = 1;				//速率设置：0为2Mbps，1为1Mbps
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);	   //使能SPI2外设时钟
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);    //使能GPIOB 时钟
