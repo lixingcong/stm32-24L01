@@ -12,6 +12,7 @@
 
 typedef struct CMD_SEND_MSG_T_{
 	unsigned short dest;
+	unsigned short len;
 	unsigned char msg[30];
 }CMD_SEND_MSG_T;
 

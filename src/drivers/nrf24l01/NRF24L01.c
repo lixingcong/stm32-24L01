@@ -429,7 +429,7 @@ void NRF_Send_Data(BYTE* data_buffer, unsigned short Nb_bytes) {
 	NRF_SPI_RW_Reg(0xe1, 0);						 //清除TX FIFO寄存器
 	NRF_SPI_RW_Reg(0xe2, 0);		    			 //清除RX FIFO寄存器
 	NRF_TX_Mode();								 //设置为发送模式
-	delay_ms(1);
+
 	for (i = 0; i < NRF_PLOAD_LENGTH; ++i) {
 		if (i < Nb_bytes)
 			nrf_tx_buf[i] = *(data_buffer + i);
@@ -439,6 +439,10 @@ void NRF_Send_Data(BYTE* data_buffer, unsigned short Nb_bytes) {
 	NRF_MODE_CE(0);
 	NRF_SPI_Write_Buf(NRF_WR_TX_PLOAD, nrf_tx_buf, NRF_PLOAD_LENGTH);        //发送32字节的缓存区数据到NRF24L01
 	NRF_MODE_CE(1);														//保持10us以上，将数据发送出去
+
+	// TODO: 自动ACK模式下需要在中断中清除标志位并设置状态 2017年3月16日 下午8:09:07
+	// 在非自动答复模式下，只需发送后就可以马上置state为空闲。
+	NRF_set_state(NRF_STATE_IDLE);
 }
 
 //检测24L01是否存在
@@ -496,7 +500,7 @@ void NRF_interupt_handler(void){
 		NRF_SPI_RW_Reg(NRF_FLUSH_TX, 0);		//清除发送缓冲区
 		NRF_RX_Mode();							//进入接收模式
 		NRF_set_state(NRF_STATE_IDLE);
-	} else if (status & 0x20) {					//数据发送完毕
+	} else if (status & 0x20) {					//数据发送完毕（在自动答复模式下）
 		NRF_SPI_RW_Reg(NRF_FLUSH_TX, 0);		//清除发送缓冲区
 		NRF_RX_Mode();							//进入接收模式
 		NRF_set_state(NRF_STATE_IDLE);

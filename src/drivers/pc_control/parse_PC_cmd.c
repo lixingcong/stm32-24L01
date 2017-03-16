@@ -115,6 +115,7 @@ char parse_command(char *in1) {
 				cmd_send_msg.msg[i] = (*(ptr+i)=='\\')?(' '):(*(ptr+i)); // escape from space
 			}
 			cmd_send_msg.msg[i]=0; // add NULL at the end of string
+			cmd_send_msg.len=len - 7;
 		} else {
 			printf("no dst flag, drop.\r\n");
 			return -1;

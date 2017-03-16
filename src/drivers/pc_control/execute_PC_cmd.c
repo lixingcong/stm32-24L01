@@ -11,6 +11,7 @@
 #include "define_songlu.h"
 #include "route_table.h"
 #include "route_ping.h"
+#include "route_AP_level.h"
 
 BOOL isBroadcastRegularly;
 unsigned int last_broadcast_timer;
@@ -64,7 +65,9 @@ void execute_PC_command() {
 	}
 	printf("msg: %s\r\n",cmd_send_msg.msg);
 	printf("\r\n--------------\r\n");
-	// TODO: 将cmd_send_msg中的内容发送出去 2017年3月14日 下午9:32:26
+
+	// 将cmd_send_msg中的内容发送出去
+	aplSendMSG(cmd_send_msg.dest & 0xff, cmd_send_msg.len & 0xff, cmd_send_msg.msg);
 }
 
 void upload_route_for_PC(unsigned char src, unsigned char dst) {

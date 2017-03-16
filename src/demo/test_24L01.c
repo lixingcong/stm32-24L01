@@ -88,10 +88,11 @@ void aplRxCustomCallBack() {
 
 	// USB_SendData(ENDP2, ptr, len);
 
-/*
+
 #if 1
 	for (i = 0; i < len; ++i)
-		printf("%u: %x\r\n", i, *(ptr + i));
+		printf("%c", *(ptr + i));
+	puts("");
 #else
 	// move pointer to USB msg offset 24
 	ptr += 24;
@@ -99,6 +100,6 @@ void aplRxCustomCallBack() {
 	printf("%c", *(ptr++));
 	printf("\r\n");
 #endif
-*/
+
 
 }

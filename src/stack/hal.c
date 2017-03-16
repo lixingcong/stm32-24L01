@@ -44,7 +44,7 @@ void halSendPacket(unsigned short flen, unsigned char *ptr, BOOL isShortDataLeng
 
 	nrf_state = NRF_read_state();
 	if(nrf_state != NRF_STATE_IDLE && nrf_state != NRF_STATE_BUSY_RX){
-		printf("halSendPacket: busy when sending\r\n");
+		printf("halSendPacket: busy when sending, st=%u\r\n",nrf_state);
 		return;
 	}
 
