@@ -16,8 +16,7 @@ extern unsigned int last_broadcast_timer;
 
 void upload_self_check_status();
 void upload_route_table();
-void send_test_msg_to_dst(unsigned char dst);
-
+void show_msg_to_PC(unsigned char sender, unsigned char *msg, unsigned char len, BOOL isBoardcast);
 // after parsing, we need to execute commands sent from PC
 void execute_PC_command();
 

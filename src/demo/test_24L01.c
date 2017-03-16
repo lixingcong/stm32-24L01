@@ -63,10 +63,12 @@ int main(){
 void aplRxCustomCallBack() {
 	unsigned short len, i;
 	unsigned char *ptr;
+	unsigned char isBoardcast=FALSE;
 	printf("aplRxCustomCallBack(): recv a packet, type=");
 
 	switch (aplGetRxMsgType()) {
 		case FRAME_TYPE_LONG_BROADCAST:
+			isBoardcast=TRUE;
 			printf("broadcast: \r\n");
 			break;
 		case FRAME_TYPE_LONG_MSG:
@@ -90,9 +92,17 @@ void aplRxCustomCallBack() {
 
 
 #if 1
+
+#define DISPLAY_ON_SERIAL
+
+#ifndef DISPLAY_ON_SERIAL
 	for (i = 0; i < len; ++i)
 		printf("%c", *(ptr + i));
 	puts("");
+#endif
+
+	show_msg_to_PC(aplGetRxMsgSrcAddr(), ptr, len, isBoardcast);
+
 #else
 	// move pointer to USB msg offset 24
 	ptr += 24;

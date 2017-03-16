@@ -16,8 +16,13 @@
 BOOL isBroadcastRegularly;
 unsigned int last_broadcast_timer;
 
-void send_test_msg_to_dst(unsigned char dst) {
-
+void show_msg_to_PC(unsigned char sender, unsigned char *msg, unsigned char len, BOOL isBoardcast) {
+	unsigned char i;
+	fprintf(stderr, "ZZRC%u,%u,", isBoardcast, sender);
+	for (i = 0; i < len; ++i) {
+		fprintf(stderr, "%c", *(msg + i));
+	}
+	fprintf(stderr, "@\r\n");
 }
 
 // 成功上报1，失败上报0
