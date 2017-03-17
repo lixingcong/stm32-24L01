@@ -20,7 +20,7 @@ void show_msg_to_PC(unsigned char sender, unsigned char *msg, unsigned char len,
 	unsigned char i;
 	fprintf(stderr, "ZZRC%u,%u,", isBoardcast, sender);
 	for (i = 0; i < len; ++i) {
-		fprintf(stderr, "%c", *(msg + i));
+		fprintf(stderr, "%0x", *(msg + i));
 	}
 	fprintf(stderr, "@\r\n");
 }
