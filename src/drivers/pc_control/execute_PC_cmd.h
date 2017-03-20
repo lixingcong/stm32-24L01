@@ -12,6 +12,7 @@
 #include "hal.h"
 
 extern BOOL isBroadcastRegularly;
+extern BOOL testAckPending;
 extern unsigned int last_broadcast_timer;
 
 void upload_self_check_status();
@@ -22,5 +23,9 @@ void execute_PC_command();
 
 // draw the path on PC
 void upload_route_for_PC(unsigned char src, unsigned char dst);
+
+// send test
+void send_test_replyACK(unsigned char *ptr);
+void send_test_checkData(unsigned char *ptr);
 
 #endif /* SRC_DRIVERS_PC_CONTROL_EXECUTE_PC_CMD_H_ */

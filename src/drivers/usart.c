@@ -106,7 +106,7 @@ void USART1_init(void) {
 }
 
 //usart config
-void USART_scanf_config_EXT(void) {
+void USART_INPUT_NVIC_enable(void) {
 	NVIC_InitTypeDef NVIC_InitStructure;
 	//初始化中断向量
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
@@ -119,3 +119,16 @@ void USART_scanf_config_EXT(void) {
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 }
+
+void USART_INPUT_NVIC_disable(void) {
+	NVIC_InitTypeDef NVIC_InitStructure;
+#ifndef USE_USART1_AS_OUTPUT_DEBUG
+	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+#else
+	NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
+#endif
+	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
+	NVIC_Init(&NVIC_InitStructure);
+}
+
+

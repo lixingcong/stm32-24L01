@@ -364,7 +364,13 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 					printf("recv a path for PC: #%u -> #%u\r\n", *(ptr + 4), *(ptr + 5));
 					upload_route_for_PC(*(ptr+4), *(ptr+5));
 				}
-
+				break;
+			case FRAME_TYPE_SHORT_SEND_TEST_SEND:
+				send_test_replyACK(ptr);
+				break;
+			case FRAME_TYPE_SHORT_SEND_TEST_RECV:
+				send_test_checkData(ptr);
+				testAckPending=FALSE;
 				break;
 			default:
 				break;

@@ -14,6 +14,7 @@
 
 void USART2_init(void);
 void USART1_init(void);
-void USART_scanf_config_EXT(void);
+void USART_INPUT_NVIC_enable(void);
+void USART_INPUT_NVIC_disable(void);
 
 #endif

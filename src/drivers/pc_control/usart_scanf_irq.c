@@ -46,7 +46,7 @@ void usart_irq_scanf_callback() {
 			upload_self_check_status();
 			break;
 		case CMD_SEND_TEST:
-			// 批量发送测试
+			send_test(send_test_group_num);
 			break;
 		default:  // 未识别命令
 			fprintf(stderr, "ZZIFInvalid Command@\r\n");

@@ -41,3 +41,13 @@ void TIM2_Init()
 
 }
 
+//usart turn off EXT
+void TIM2_NVIC_disable(void) {
+	NVIC_InitTypeDef NVIC_InitStructure;
+
+	TIM_ITConfig(TIM2, TIM_IT_Update, DISABLE);
+
+	NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
+	NVIC_Init(&NVIC_InitStructure);
+}

@@ -14,6 +14,7 @@
 
 // global
 CMD_SEND_MSG_T cmd_send_msg={0};
+unsigned short send_test_group_num;
 
 #if 0
 int hex2dec(char in) {
@@ -78,6 +79,16 @@ int str2hex(char *in, char *out, int len) {
 }
 #endif
 
+static unsigned short get_num_from_string(unsigned char *str,unsigned char stopChar){
+	unsigned short val=0;
+	unsigned short i=0;
+	while(*(str+i)!=stopChar){
+		val=val*10+(*(str+i)-'0');
+		i++;
+	}
+	return val;
+}
+
 // firstly execute it
 char parse_command(char *in1) {
 	unsigned int len, i;
@@ -128,7 +139,9 @@ char parse_command(char *in1) {
 		printf("uploading self check status\r\n");
 		return CMD_SELF_CHECK;
 	} else if (*(ptr) == 'T' && *(ptr + 1) == 'N') {
-		// TODO: 批量发送测试 2017年3月14日 下午9:24:33
+		// skip 'Tn'
+		ptr += 2;
+		send_test_group_num=get_num_from_string(ptr, 0);
 		return CMD_SEND_TEST;
 	} else {
 		printf("invalid command from PC, drop.\r\n");

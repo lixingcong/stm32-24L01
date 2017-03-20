@@ -30,7 +30,7 @@ int main(){
 	// init USART
 	USART1_init();
 	USART2_init();
-	USART_scanf_config_EXT();
+	USART_INPUT_NVIC_enable();
 
 	// init timer2(system_msecond)
 	TIM2_Init();
