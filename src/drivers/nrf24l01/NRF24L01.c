@@ -131,8 +131,8 @@ void NRF24L01_Init(void) {
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 
 	NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;					//NRF24L01 中断响应
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;		    //抢占优先级 0
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;				//子优先级为1
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;		    //抢占优先级 0
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;				//子优先级为1
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;					//使能
 	NVIC_Init(&NVIC_InitStructure);
 
