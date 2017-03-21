@@ -367,12 +367,15 @@ void macRxCustomPacketCallback(unsigned char *ptr, BOOL isShortMSG, unsigned sho
 				break;
 			case FRAME_TYPE_SHORT_SEND_TEST_SEND:
 				send_test_replyACK(ptr);
+				fprintf(stderr,"recv a send test req\r\n");
 				break;
 			case FRAME_TYPE_SHORT_SEND_TEST_RECV:
 				send_test_checkData(ptr);
+				fprintf(stderr,"recv a send test reply\r\n");
 				testAckPending=FALSE;
 				break;
 			default:
+				fprintf(stderr,"not support short msg!\r\n");
 				break;
 		}
 	}

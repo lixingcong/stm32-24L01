@@ -43,10 +43,6 @@ void halSendPacket(unsigned short flen, unsigned char *ptr, BOOL isShortDataLeng
 	}
 
 	nrf_state = NRF_read_state();
-	if(nrf_state != NRF_STATE_IDLE && nrf_state != NRF_STATE_BUSY_RX){
-		printf("halSendPacket: busy when sending, st=%u\r\n",nrf_state);
-		return;
-	}
 
 	NRF_set_state(NRF_STATE_WAIT_TX);
 
@@ -64,6 +60,7 @@ void halSendPacket(unsigned short flen, unsigned char *ptr, BOOL isShortDataLeng
 
 	NRF_set_state(NRF_STATE_BUSY_TX);
 	NRF_Send_Data(tx_buf, flen_real);
+	NRF_set_state(nrf_state);
 }
 
 // all_nodes[]数组的下标不能被越界，否则stm32会死机，因此做启动检查地址是否合法
