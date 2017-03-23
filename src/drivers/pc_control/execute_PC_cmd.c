@@ -113,6 +113,7 @@ void send_test(unsigned short num){
 	unsigned short current=0;
 	unsigned int last_timer_sendPacket;
 	unsigned int last_timer_showPC=0;
+	unsigned int timer;
 
 	rx_group_num=rx_bytes=err_bytes=0;
 
@@ -127,12 +128,16 @@ void send_test(unsigned short num){
 		testAckPending=TRUE;
 
 		last_timer_sendPacket=halGetMACTimer();
-		while(halMACTimerNowDelta(last_timer_sendPacket)<10){ // wait for 3ms
+		while(1){
+			timer=halMACTimerNowDelta(last_timer_sendPacket);
 			if(testAckPending==FALSE){
 				rx_bytes+=valid_test_plen; // recv a seq bytes
 				rx_group_num++;
 				break;
 			}
+
+			if(timer>1000)// wait for 100ms
+				break;
 		}
 
 		// show to PC
@@ -151,8 +156,13 @@ void send_test(unsigned short num){
 
 // 回调函数，被mac层函数调用
 void send_test_replyACK(unsigned char *ptr){
-	*(ptr+2)=FRAME_TYPE_SHORT_SEND_TEST_RECV;
-	halSendPacket(LRWPAN_MAX_FRAME_SIZE-2,ptr+2,TRUE);
+	unsigned char i;
+	static unsigned char rx_buf_reply[LRWPAN_MAX_FRAME_SIZE-2];
+	rx_buf_reply[0]=FRAME_TYPE_SHORT_SEND_TEST_RECV;
+	for(i=1;i<LRWPAN_MAX_FRAME_SIZE-2;++i){
+		rx_buf_reply[i]=*(ptr+2+i);
+	}
+	halSendPacket(LRWPAN_MAX_FRAME_SIZE-2,rx_buf_reply,TRUE);
 }
 
 void send_test_checkData(unsigned char *ptr){

@@ -481,12 +481,12 @@ void NRF_interupt_handler(void){
 			macRxCustomPacketCallback(rx_buf, FALSE, total_flen);
 		} else if ((flen_h & 0xff) == 0x00) {  // short
 			macRxCustomPacketCallback(rx_buf, TRUE, flen_l);
-			/*
-			 printf("%x %x ",rx_buf[0],rx_buf[1]);
+
+			 fprintf(stderr,"%x %x ",rx_buf[0],rx_buf[1]);
 			 for(i=2;i<rx_buf[1];++i)
-			 printf("%x ",rx_buf[i]);
-			 printf("\r\n");
-			 */
+			 fprintf(stderr,"%x ",rx_buf[i]);
+			 fprintf(stderr,"\r\n");
+
 		} else {
 			printf("invalid packet, flush it\n");
 			goto do_rxflush;
