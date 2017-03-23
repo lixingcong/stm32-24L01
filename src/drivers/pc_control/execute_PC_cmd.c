@@ -110,7 +110,7 @@ void upload_route_for_PC(unsigned char src, unsigned char dst) {
 
 // 批量发送测试 统计信号质量,num为发送组数
 void send_test(unsigned short num){
-	unsigned short current=0;
+	unsigned short current=1;
 	unsigned int last_timer_sendPacket;
 	unsigned int last_timer_showPC=0;
 	unsigned int timer;
@@ -122,7 +122,7 @@ void send_test(unsigned short num){
 	NRF_set_state(NRF_STATE_IDLE);
 	send_test_data[0]=FRAME_TYPE_SHORT_SEND_TEST_SEND;
 
-	while(current<num){
+	while(current<=num){
 		printf("%u/%u\r\n",current,num);
 		halSendPacket(LRWPAN_MAX_FRAME_SIZE-2,send_test_data,TRUE);
 		testAckPending=TRUE;
@@ -168,7 +168,7 @@ void send_test_replyACK(unsigned char *ptr){
 void send_test_checkData(unsigned char *ptr){
 	unsigned char i;
 	for(i=3;i<LRWPAN_MAX_FRAME_SIZE;++i){
-		if(0 != send_test_data[i-2] ^ (*(ptr+i)))
+		if(0 != (send_test_data[i-2] ^ (*(ptr+i))))
 			++err_bytes;
 	}
 }
@@ -189,7 +189,7 @@ static void send_test_show_result(unsigned short current){ // 参数current是�
 	rx_group_num_buf[4]=(rx_group_num)%10+'0';
 
 	// 丢包率
-	lost_rate_multi_10000=(((int)current)*1000/current);
+	lost_rate_multi_10000=(((int)(current - rx_group_num))*1000/current);
 //	lost_rate_multi_1000=(int)((current-rx_group_num)*1000/current);
 	lost_rate_buf[0]=(lost_rate_multi_10000/1000)+'0';
 	lost_rate_buf[1]=(lost_rate_multi_10000/100)%10+'0';
