@@ -136,7 +136,7 @@ void send_test(unsigned short num){
 				break;
 			}
 
-			if(timer>1000)// wait for 100ms
+			if(timer>50)// wait for 100ms
 				break;
 		}
 

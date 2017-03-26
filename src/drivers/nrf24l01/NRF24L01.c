@@ -364,6 +364,8 @@ static void delay_ms(unsigned int x) {
 static void NRF_RX_Mode(void) {
 	NRF_MODE_CE(0);
 
+	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_STATUS, 0xff);	     //设置状态寄存器初始化
+
 	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_CONFIG, 0x0f);     // bit6 接收中断产生时，IRQ引脚产生低电平
 											   // bit5 发送中断产生时，IRQ引脚产生低电平
 											   // bit4 最大重复发送次数完成时 IRQ引脚产生低电平
@@ -386,6 +388,8 @@ static void NRF_TX_Mode(void) {
 	unsigned char nrf_Pipe = 0;
 
 	NRF_MODE_CE(0);
+
+	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_STATUS, 0xff);	     //设置状态寄存器初始化
 
 	switch (nrf_Pipe) {
 		case 0:
@@ -425,9 +429,8 @@ void NRF_Send_Data(BYTE* data_buffer, unsigned short Nb_bytes) {
 
 	NRF_MODE_CE(0);								 //NRF 模式控制
 
-	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_STATUS, 0xff);	     //设置状态寄存器初始化
-	NRF_SPI_RW_Reg(0xe1, 0);						 //清除TX FIFO寄存器
-	NRF_SPI_RW_Reg(0xe2, 0);		    			 //清除RX FIFO寄存器
+	NRF_SPI_RW_Reg(NRF_FLUSH_TX, 0);		//清除发送缓冲区
+	NRF_SPI_RW_Reg(NRF_FLUSH_RX, 0);		//清除接收缓冲区
 	NRF_TX_Mode();								 //设置为发送模式
 
 	for (i = 0; i < NRF_PLOAD_LENGTH; ++i) {
@@ -486,22 +489,19 @@ void NRF_interupt_handler(void){
 		} else if ((flen_h & 0xff) == 0x00) {  // short
 			macRxCustomPacketCallback(rx_buf, TRUE, flen_l);
 		} else {
-			printf("invalid packet, flush it\n");
-			goto do_rxflush;
-			// drop invalid packet
+			printf("invalid packet, flush it\n"); // drop invalid packet
 		}
 
-		do_rxflush:
 		NRF_SPI_RW_Reg(NRF_FLUSH_RX, 0);		//清除发送缓冲区
+		NRF_RX_Mode();
 		NRF_set_state(NRF_STATE_IDLE);
 	} else if (status & 0x10) {				    //发射达到最大复发次数（在自动答复模式下）
 		NRF_SPI_RW_Reg(NRF_FLUSH_TX, 0);		//清除发送缓冲区
 		NRF_RX_Mode();							//进入接收模式
 		NRF_set_state(NRF_STATE_IDLE);
-	} else if (status & 0x20) {					//数据发送完毕（在自动答复模式下）
+	} else if (status & 0x20) {					//数据发送完毕
 		NRF_SPI_RW_Reg(NRF_FLUSH_TX, 0);		//清除发送缓冲区
 		NRF_RX_Mode();							//进入接收模式
 		NRF_set_state(NRF_STATE_IDLE);
 	}
-	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_STATUS, status);	     //清除07寄存器标志
 }
