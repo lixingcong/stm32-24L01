@@ -38,7 +38,6 @@ int main(){
 	// nrf24l01
 	initRF();
 	printf("nrf24l01 ok\n");
-	while(1);
 
 	// configuration flags for pc_control
 	isBroadcastRegularly = FALSE;  // 默认禁用上位机广播
