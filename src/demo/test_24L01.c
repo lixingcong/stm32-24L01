@@ -95,7 +95,7 @@ void aplRxCustomCallBack() {
 
 #define DISPLAY_ON_SERIAL
 
-#ifndef DISPLAY_ON_SERIAL
+#ifdef DISPLAY_ON_SERIAL
 	for (i = 0; i < len; ++i)
 		printf("%c", *(ptr + i));
 	puts("");
