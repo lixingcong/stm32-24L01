@@ -17,7 +17,7 @@ all: libs src
 #	arm-none-eabi-nm -t d -S --size-sort -s $(PROGRAM_NAME).elf > $(PROGRAM_NAME).info_symbol
 # binary execute hex and bin
 	$(OBJCOPY) -O ihex $(PROGRAM_NAME).elf $(PROGRAM_NAME).hex
-#	$(OBJCOPY) -O binary $(PROGRAM_NAME).elf $(PROGRAM_NAME).bin
+	$(OBJCOPY) -O binary $(PROGRAM_NAME).elf $(PROGRAM_NAME).bin
 	@cat $(PROGRAM_NAME).info_size
 
 .PHONY: libs src clean tshow cleanall
@@ -46,7 +46,10 @@ flash:all
 	@echo 'go' >> $(JLINKEXE_SCRIPT)
 	@echo 'qc' >> $(JLINKEXE_SCRIPT)
 	JLinkExe -Device $(SUPPORTED_DEVICE) -Speed 4000 -If SWD $(JLINKEXE_SCRIPT)
-#	perl ./do_flash.pl $(TOP)/$(PROGRAM_NAME).bin  
+
+flash1:all
+	perl ./do_flash.pl $(TOP)/$(PROGRAM_NAME).bin
+
 erase:
 	@echo 'power on' > $(JLINKEXE_SCRIPT)
 	@echo 'erase' >> $(JLINKEXE_SCRIPT)
