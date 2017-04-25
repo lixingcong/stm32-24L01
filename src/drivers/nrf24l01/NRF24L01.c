@@ -475,6 +475,10 @@ void NRF_interupt_handler(void){
 	if (0 != (status & 0x40) && NRF_STATE_IDLE == NRF_read_state()){		// 判断是否接收到数据
 		NRF_set_state(NRF_STATE_BUSY_RX);
 		NRF_SPI_Read_Buf(NRF_RD_RX_PLOAD, rx_buf, NRF_PLOAD_LENGTH);  //从接收缓冲区里读出数据
+
+		NRF_SPI_RW_Reg(NRF_FLUSH_RX, 0);		//清除缓冲区
+		NRF_SPI_RW_Reg(NRF_WRITE_REG+NRF_STATUS, status);	     //清除07寄存器标志
+
 		// printf("%s", rx_buf);
 		flen_h = rx_buf[0];
 		flen_l = rx_buf[1]; //read the length(LSB 8 bit)
@@ -492,8 +496,6 @@ void NRF_interupt_handler(void){
 			printf("invalid packet, flush it\n"); // drop invalid packet
 		}
 
-		NRF_SPI_RW_Reg(NRF_FLUSH_RX, 0);		//清除发送缓冲区
-		NRF_SPI_RW_Reg(NRF_WRITE_REG+NRF_STATUS, status);	     //清除07寄存器标志
 		NRF_set_state(NRF_STATE_IDLE);
 	} else if (status & 0x10) {				    //发射达到最大复发次数（在自动答复模式下）
 		NRF_SPI_RW_Reg(NRF_FLUSH_TX, 0);		//清除发送缓冲区
