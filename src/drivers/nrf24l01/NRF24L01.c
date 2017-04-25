@@ -365,6 +365,7 @@ static void NRF_RX_Mode(void) {
 	NRF_MODE_CE(0);
 
 	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_STATUS, 0xff);	     //设置状态寄存器初始化
+	NRF_SPI_RW_Reg(NRF_FLUSH_RX, 0);		//清除缓冲区
 
 	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_CONFIG, 0x0f);     // bit6 接收中断产生时，IRQ引脚产生低电平
 											   // bit5 发送中断产生时，IRQ引脚产生低电平
@@ -390,6 +391,7 @@ static void NRF_TX_Mode(void) {
 	NRF_MODE_CE(0);
 
 	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_STATUS, 0xff);	     //设置状态寄存器初始化
+	NRF_SPI_RW_Reg(NRF_FLUSH_TX, 0);		//清除发送缓冲区
 
 	switch (nrf_Pipe) {
 		case 0:
@@ -429,8 +431,6 @@ void NRF_Send_Data(BYTE* data_buffer, unsigned short Nb_bytes) {
 
 	NRF_MODE_CE(0);								 //NRF 模式控制
 
-	NRF_SPI_RW_Reg(NRF_FLUSH_TX, 0);		//清除发送缓冲区
-	NRF_SPI_RW_Reg(NRF_FLUSH_RX, 0);		//清除接收缓冲区
 	NRF_TX_Mode();								 //设置为发送模式
 
 	for (i = 0; i < NRF_PLOAD_LENGTH; ++i) {
