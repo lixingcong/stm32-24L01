@@ -442,10 +442,6 @@ void NRF_Send_Data(BYTE* data_buffer, unsigned short Nb_bytes) {
 	NRF_MODE_CE(0);
 	NRF_SPI_Write_Buf(NRF_WR_TX_PLOAD, nrf_tx_buf, NRF_PLOAD_LENGTH);        //发送32字节的缓存区数据到NRF24L01
 	NRF_MODE_CE(1);														//保持10us以上，将数据发送出去
-
-	// TODO: 自动ACK模式下需要在中断中清除标志位并设置状态 2017年3月16日 下午8:09:07
-	// 在非自动答复模式下，只需发送后就可以马上置state为空闲。
-	NRF_set_state(NRF_STATE_IDLE);
 }
 
 //检测24L01是否存在

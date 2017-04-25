@@ -13,8 +13,7 @@
 typedef enum {
 	NRF_STATE_IDLE,
 	NRF_STATE_BUSY_TX,
-	NRF_STATE_BUSY_RX,
-	NRF_STATE_WAIT_TX
+	NRF_STATE_BUSY_RX
 } rtx_state_t;
 
 
