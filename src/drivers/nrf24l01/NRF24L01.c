@@ -471,9 +471,11 @@ void NRF_interupt_handler(void){
 		flen_h = rx_buf[0];
 		flen_l = rx_buf[1]; //read the length(LSB 8 bit)
 
+		/*
 		for(i=0;i<rx_buf[1];++i)
 			 fprintf(stderr,"%x ",rx_buf[i]);
-		 fprintf(stderr,"\r\n");
+		fprintf(stderr,"\r\n");
+		*/
 
 		if ((flen_h & 0xfe) == 0xf0) {  // long
 			total_flen = ((flen_h & 0x01) << 8) | flen_l;
