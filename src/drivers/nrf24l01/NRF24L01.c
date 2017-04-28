@@ -366,7 +366,7 @@ static void NRF_RX_Mode(void) {
 
 	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_STATUS, 0xff);	     //设置状态寄存器初始化
 	NRF_SPI_RW_Reg(NRF_FLUSH_RX, 0);		//清除缓冲区
-
+	NRF_SPI_Write_Buf(NRF_WRITE_REG + NRF_RX_ADDR_P0, TX_ADDRESS_LOCAL, NRF_ADDR_WIDTH);  // 将通道0的接收地址设置为 0通道的发射地址
 	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_CONFIG, 0x0f);     // bit6 接收中断产生时，IRQ引脚产生低电平
 											   // bit5 发送中断产生时，IRQ引脚产生低电平
 											   // bit4 最大重复发送次数完成时 IRQ引脚产生低电平
@@ -386,23 +386,12 @@ static void NRF_RX_Mode(void) {
  * 调用方法：TX_Mode();
  ****************************************************************************/
 static void NRF_TX_Mode(void) {
-	unsigned char nrf_Pipe = 0;
-
 	NRF_MODE_CE(0);
 
 	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_STATUS, 0xff);	     //设置状态寄存器初始化
 	NRF_SPI_RW_Reg(NRF_FLUSH_TX, 0);		//清除发送缓冲区
 
-	switch (nrf_Pipe) {
-		case 0:
-			NRF_SPI_Write_Buf(NRF_WRITE_REG + NRF_TX_ADDR + nrf_Pipe, TX_ADDRESS_LOCAL, NRF_ADDR_WIDTH);         //数据通道0发送地址，最大5个字节
-			NRF_SPI_Write_Buf(NRF_WRITE_REG + NRF_RX_ADDR_P0 + nrf_Pipe, TX_ADDRESS_LOCAL, NRF_ADDR_WIDTH);  // 将通道0的接收地址设置为 0通道的发射地址
-			break;
-		default:
-			NRF_SPI_Write_Buf(NRF_WRITE_REG + NRF_TX_ADDR + nrf_Pipe, TX_ADDRESS_DUMMY, NRF_ADDR_WIDTH);    //数据通道nrf_pipe发送地址，最大5个字节
-			NRF_SPI_Write_Buf(NRF_WRITE_REG + NRF_RX_ADDR_P0 + nrf_Pipe, TX_ADDRESS_DUMMY, NRF_ADDR_WIDTH); // 将通道nrf_pipe的接收地址设置为dummy的发射地址
-			break;
-	}
+	NRF_SPI_Write_Buf(NRF_WRITE_REG + NRF_TX_ADDR, TX_ADDRESS_LOCAL, NRF_ADDR_WIDTH);         //数据通道0发送地址，最大5个字节
 
 	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_CONFIG, 0x0e);     // bit6 接收中断产生时，IRQ引脚产生低电平
 											   // bit5 发送中断产生时，IRQ引脚产生低电平
