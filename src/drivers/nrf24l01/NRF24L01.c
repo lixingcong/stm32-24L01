@@ -418,8 +418,6 @@ void NRF_Send_Data(BYTE* data_buffer, unsigned short Nb_bytes) {
 	unsigned char i = 0;
 	static unsigned char nrf_tx_buf[NRF_PLOAD_LENGTH];
 
-	NRF_MODE_CE(0);								 //NRF 模式控制
-
 	NRF_TX_Mode();								 //设置为发送模式
 
 	for (i = 0; i < NRF_PLOAD_LENGTH; ++i) {
@@ -487,13 +485,9 @@ void NRF_interupt_handler(void){
 		flush_rx:
 		NRF_SPI_RW_Reg(NRF_FLUSH_RX, 0);		//清除缓冲区
 		NRF_SPI_RW_Reg(NRF_WRITE_REG+NRF_STATUS, status);	     //清除07寄存器标志
-	} else if (status & 0x10) {				    //发射达到最大复发次数（在自动答复模式下）
-		NRF_SPI_RW_Reg(NRF_FLUSH_TX, 0);		//清除发送缓冲区
-		NRF_RX_Mode();							//进入接收模式
-		NRF_set_state(NRF_STATE_IDLE);
 	} else if (status & 0x20) {					//数据发送完毕
-		NRF_SPI_RW_Reg(NRF_FLUSH_TX, 0);		//清除发送缓冲区
-		NRF_RX_Mode();							//进入接收模式
 		NRF_set_state(NRF_STATE_IDLE);
+		NRF_SPI_RW_Reg(NRF_FLUSH_TX, 0);		//清除缓冲区
+		NRF_RX_Mode();							//进入接收模式
 	}
 }
