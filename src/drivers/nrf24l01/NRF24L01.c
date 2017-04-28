@@ -367,7 +367,7 @@ static void NRF_RX_Mode(void) {
 	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_STATUS, 0xff);	     //设置状态寄存器初始化
 	NRF_SPI_RW_Reg(NRF_FLUSH_RX, 0);		//清除缓冲区
 	NRF_SPI_Write_Buf(NRF_WRITE_REG + NRF_RX_ADDR_P0, TX_ADDRESS_LOCAL, NRF_ADDR_WIDTH);  // 将通道0的接收地址设置为 0通道的发射地址
-	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_CONFIG, 0x0f);     // bit6 接收中断产生时，IRQ引脚产生低电平
+	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_CONFIG, 0x2f);     // bit6 接收中断产生时，IRQ引脚产生低电平
 											   // bit5 发送中断产生时，IRQ引脚产生低电平
 											   // bit4 最大重复发送次数完成时 IRQ引脚产生低电平
 											   // bit3 CRC校验允许
@@ -393,7 +393,7 @@ static void NRF_TX_Mode(void) {
 
 	NRF_SPI_Write_Buf(NRF_WRITE_REG + NRF_TX_ADDR, TX_ADDRESS_LOCAL, NRF_ADDR_WIDTH);         //数据通道0发送地址，最大5个字节
 
-	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_CONFIG, 0x0e);     // bit6 接收中断产生时，IRQ引脚产生低电平
+	NRF_SPI_RW_Reg(NRF_WRITE_REG + NRF_CONFIG, 0x2e);     // bit6 接收中断产生时，IRQ引脚产生低电平
 											   // bit5 发送中断产生时，IRQ引脚产生低电平
 											   // bit4 最大重复发送次数完成时 IRQ引脚产生低电平
 											   // bit3 CRC校验允许
@@ -429,6 +429,10 @@ void NRF_Send_Data(BYTE* data_buffer, unsigned short Nb_bytes) {
 	NRF_MODE_CE(0);
 	NRF_SPI_Write_Buf(NRF_WR_TX_PLOAD, nrf_tx_buf, NRF_PLOAD_LENGTH);        //发送32字节的缓存区数据到NRF24L01
 	NRF_MODE_CE(1);														//保持10us以上，将数据发送出去
+
+	delay_ms(100);
+	NRF_set_state(NRF_STATE_IDLE);
+	NRF_RX_Mode();							//进入接收模式
 }
 
 //检测24L01是否存在
@@ -486,8 +490,6 @@ void NRF_interupt_handler(void){
 		NRF_SPI_RW_Reg(NRF_FLUSH_RX, 0);		//清除缓冲区
 		NRF_SPI_RW_Reg(NRF_WRITE_REG+NRF_STATUS, status);	     //清除07寄存器标志
 	} else if (status & 0x20) {					//数据发送完毕
-		NRF_set_state(NRF_STATE_IDLE);
-		NRF_SPI_RW_Reg(NRF_FLUSH_TX, 0);		//清除缓冲区
-		NRF_RX_Mode();							//进入接收模式
+
 	}
 }
