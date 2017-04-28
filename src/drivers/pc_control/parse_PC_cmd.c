@@ -110,16 +110,15 @@ char parse_command(char *in1) {
 		/* dst mode */
 		if (*(ptr++) == SEND_DIRECTION_OPTION_FLAG) {
 			switch (*(ptr++)) {
-				case SEND_DIRECTION_P2P:
+				case SEND_DIRECTION_P2P: // '1'
 					if ((*ptr) >= 'a' && (*ptr) <= 'z')
 						cmd_send_msg.dest = (0x01 << 8 | (*ptr) - 'a');
-					else {
+					else if('9' == *ptr) {
+						cmd_send_msg.dest = 0xffff;
+					} else {
 						printf("error dst number, drop.\r\n");
 						return -1;
 					}
-					break;
-				case SEND_DIRECTION_BOARDCAST:
-					cmd_send_msg.dest=0xff;
 					break;
 				default:
 					printf("error dst number, drop.\r\n");
