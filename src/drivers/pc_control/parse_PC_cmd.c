@@ -15,6 +15,7 @@
 // global
 CMD_SEND_MSG_T cmd_send_msg={0};
 unsigned short send_test_group_num;
+unsigned short send_test_group_fail_delay;
 
 #if 0
 int hex2dec(char in) {
@@ -79,13 +80,15 @@ int str2hex(char *in, char *out, int len) {
 }
 #endif
 
-static unsigned short get_num_from_string(unsigned char *str,unsigned char stopChar){
+// 从字符串中取出数字 参数：str字符串，stopChar停止字符，len指针是取出数字跨越的字符个数
+static unsigned short get_num_from_string(unsigned char *str, unsigned char stopChar, unsigned char *len){
 	unsigned short val=0;
-	unsigned short i=0;
+	unsigned char i=0;
 	while(*(str+i)!=stopChar){
 		val=val*10+(*(str+i)-'0');
 		i++;
 	}
+	*len=i;
 	return val;
 }
 
@@ -93,6 +96,7 @@ static unsigned short get_num_from_string(unsigned char *str,unsigned char stopC
 char parse_command(char *in1) {
 	unsigned int len, i;
 	char *ptr = in1;
+	unsigned char len_of_num;
 	/* valify */
 	len = *(ptr++) - 32;
 	if (strlen(in1) != len) {
@@ -141,7 +145,9 @@ char parse_command(char *in1) {
 	} else if (*(ptr) == 'T' && *(ptr + 1) == 'N') {
 		// skip 'Tn'
 		ptr += 2;
-		send_test_group_num=get_num_from_string(ptr, 0);
+		send_test_group_num=get_num_from_string(ptr, ',', &len_of_num);
+		send_test_group_fail_delay = get_num_from_string(ptr + len_of_num + 1, 0, &len_of_num);
+		//fprintf(stderr, "num=%u, delay=%u\r\n",send_test_group_num, send_test_group_fail_delay);
 		return CMD_SEND_TEST;
 	} else {
 		printf("invalid command from PC, drop.\r\n");

@@ -136,7 +136,7 @@ void send_test(unsigned short num){
 				break;
 			}
 
-			if(timer>50)// wait for 100ms
+			if(timer>(2+send_test_group_fail_delay))// wait for (2+user_delay) ms
 				break;
 		}
 

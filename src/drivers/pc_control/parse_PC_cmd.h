@@ -18,6 +18,7 @@ typedef struct CMD_SEND_MSG_T_{
 
 extern CMD_SEND_MSG_T cmd_send_msg;
 extern unsigned short send_test_group_num;
+extern unsigned short send_test_group_fail_delay;
 
 char parse_command(char *in1);
 //void str2case(char *in, char *out);
