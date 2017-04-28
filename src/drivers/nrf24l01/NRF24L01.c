@@ -430,7 +430,7 @@ void NRF_Send_Data(BYTE* data_buffer, unsigned short Nb_bytes) {
 	NRF_SPI_Write_Buf(NRF_WR_TX_PLOAD, nrf_tx_buf, NRF_PLOAD_LENGTH);        //发送32字节的缓存区数据到NRF24L01
 	NRF_MODE_CE(1);														//保持10us以上，将数据发送出去
 
-	delay_ms(100);
+	delay_ms(50);
 	NRF_set_state(NRF_STATE_IDLE);
 	NRF_RX_Mode();							//进入接收模式
 }
@@ -489,7 +489,5 @@ void NRF_interupt_handler(void){
 		flush_rx:
 		NRF_SPI_RW_Reg(NRF_FLUSH_RX, 0);		//清除缓冲区
 		NRF_SPI_RW_Reg(NRF_WRITE_REG+NRF_STATUS, status);	     //清除07寄存器标志
-	} else if (status & 0x20) {					//数据发送完毕
-
 	}
 }
