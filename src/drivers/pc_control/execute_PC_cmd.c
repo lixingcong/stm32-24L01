@@ -23,7 +23,7 @@ unsigned int last_broadcast_timer;
 // 以下变量是发送测试用的
 static unsigned short rx_group_num=0;
 static unsigned int rx_bytes=0;
-static unsigned int lost_rate_multi_10000,err_rate_multi_10000;
+static unsigned int lost_rate_multi_10000,err_rate_multi_10000,data_rate_multi_10000;
 static unsigned int err_bytes=0;
 static unsigned char valid_test_plen=LRWPAN_MAX_FRAME_SIZE-3; // 3 bytes header
 
@@ -32,6 +32,8 @@ static unsigned char tx_group_num_buf[6]={0};
 static unsigned char rx_group_num_buf[6]={0};
 static unsigned char err_rate_buf[7]={0};
 static unsigned char lost_rate_buf[7]={0};
+static unsigned char data_rate_buf[7]={0};
+static unsigned int data_rate_start_time;
 
 // stat
 static unsigned char send_test_data[LRWPAN_MAX_FRAME_SIZE]={
@@ -122,6 +124,8 @@ void send_test(unsigned short num){
 	NRF_set_state(NRF_STATE_IDLE);
 	send_test_data[0]=FRAME_TYPE_SHORT_SEND_TEST_SEND;
 
+	data_rate_start_time = halGetMACTimer();
+
 	while(current<=num){
 		halSendPacket(LRWPAN_MAX_FRAME_SIZE-2,send_test_data,TRUE);
 		testAckPending=TRUE;
@@ -135,7 +139,7 @@ void send_test(unsigned short num){
 				break;
 			}
 
-			if(timer>(2+send_test_group_fail_delay))// wait for (2+user_delay) ms
+			if(timer>(1+send_test_group_fail_delay))// wait for (2+user_delay) ms
 				break;
 		}
 
@@ -173,6 +177,7 @@ void send_test_checkData(unsigned char *ptr){
 }
 
 static void send_test_show_result(unsigned short current){ // 参数current是当前第几组
+	unsigned int delta_time = halMACTimerNowDelta(data_rate_start_time);
 	// 已发送组数
 	tx_group_num_buf[0]=(current/10000)%10+'0';
 	tx_group_num_buf[1]=(current/1000)%10+'0';
@@ -206,7 +211,18 @@ static void send_test_show_result(unsigned short current){ // 参数current是�
 	err_rate_buf[4]=err_rate_multi_10000%10+'0';
 	err_rate_buf[5]='%';
 
+	// 发送速率（不计接收）最大约100kbit/s
+	data_rate_multi_10000=((((int)current*2560))/delta_time); // get KiBit
+	data_rate_multi_10000 = (data_rate_multi_10000 * 1000) >> 10; // *1000 gets mil-second, /1024 gets Kbit
+	data_rate_buf[0]=(data_rate_multi_10000/1000)+'0';
+	data_rate_buf[1]=(data_rate_multi_10000/100)%10+'0';
+	data_rate_buf[2]=(data_rate_multi_10000/10)%10+'0';
+	data_rate_buf[3]='.';
+	data_rate_buf[4]=data_rate_multi_10000%10+'0';
+	data_rate_buf[5]='k';
+
+
 	// 发送到PC
-	fprintf(stderr,"ZZTJ%s,%s,%s,%s@\r\n",
-			tx_group_num_buf,rx_group_num_buf,lost_rate_buf,err_rate_buf);
+	fprintf(stderr,"ZZTJ%s,%s,%s,%s,%s@\r\n",
+			tx_group_num_buf,rx_group_num_buf,lost_rate_buf,err_rate_buf,data_rate_buf);
 }
