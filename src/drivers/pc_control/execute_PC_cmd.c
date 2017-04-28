@@ -123,7 +123,6 @@ void send_test(unsigned short num){
 	send_test_data[0]=FRAME_TYPE_SHORT_SEND_TEST_SEND;
 
 	while(current<=num){
-		printf("%u/%u\r\n",current,num);
 		halSendPacket(LRWPAN_MAX_FRAME_SIZE-2,send_test_data,TRUE);
 		testAckPending=TRUE;
 
