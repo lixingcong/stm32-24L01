@@ -14,6 +14,7 @@
 
 // --------pc_control-----------
 #include "execute_PC_cmd.h"
+#include "parse_PC_cmd.h"
 
 // stack
 #include "route_table.h"
@@ -56,6 +57,16 @@ int main(){
 		do {
 			mainFSM();  // 组网、入网状态机
 		} while (isOffline == TRUE);
+
+#ifdef LRWPAN_COORDINATOR
+		if(isBroadcastRegularly == TRUE) {  // 协调器周期性发送广播
+			if(halMACTimerNowDelta(last_broadcast_timer) >= (3000)) {
+				fprintf(stderr,"ZZIFsending broadcast...@\r\n");
+				aplSendBROADCAST(cmd_send_msg.len,cmd_send_msg.msg);
+				last_broadcast_timer=halGetMACTimer();
+			}
+		}
+#endif
 	}
 }
 

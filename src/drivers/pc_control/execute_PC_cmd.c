@@ -82,27 +82,28 @@ void upload_route_table() {
 
 // 执行这个函数前,必须保证parse_command是正确返回值0的！！
 void execute_PC_command() {
+	printf("msg: %s\r\n",cmd_send_msg.msg);
 	printf("\r\nto:");
 	if (cmd_send_msg.dest == 0xffff){
 		puts("boardcast");
 		isBroadcastRegularly=TRUE;
 		last_broadcast_timer=halGetMACTimer();
+
+		// 将cmd_send_msg中的内容发送出去
+		aplSendBROADCAST(cmd_send_msg.len, cmd_send_msg.msg);
 	}
 
 	else if ((cmd_send_msg.dest) & 0x100){
 		printf("#%u\r\n", (cmd_send_msg.dest) & 0xff);
 		isBroadcastRegularly=FALSE;
+
+		aplSendMSG(cmd_send_msg.dest & 0xff, cmd_send_msg.len & 0xff, cmd_send_msg.msg);
 	}
 
 	else {
 		puts("not set yet");
 		return;
 	}
-	printf("msg: %s\r\n",cmd_send_msg.msg);
-	printf("\r\n--------------\r\n");
-
-	// 将cmd_send_msg中的内容发送出去
-	aplSendMSG(cmd_send_msg.dest & 0xff, cmd_send_msg.len & 0xff, cmd_send_msg.msg);
 }
 
 void upload_route_for_PC(unsigned char src, unsigned char dst) {
