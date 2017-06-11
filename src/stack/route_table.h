@@ -34,7 +34,7 @@ extern BOOL isOffline;
 
 // 某个节点的最大孩子数目，该值影响着网络拓朴的形状
 // 若想连成一条线，设置为1
-#define MAX_CHILDREN_NUM 1
+#define MAX_CHILDREN_NUM 2
 
 // 短帧的长度，不含2个头字节flen，因为头字节是由halSendPacket()函数修改的
 #define FRAME_LENGTH_BEACON 3
